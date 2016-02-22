@@ -1,9 +1,11 @@
 {
   "name": "npmcdn.com",
   "version": "1.0.0",
+  "description": "An HTTP server for files in npm packages",
   "author": "Michael Jackson",
-  "license": "MIT",
-  "main": "server.js",
+  "config": {
+    "port": 5000
+  },
   "dependencies": {
     "cors": "^2.7.1",
     "express": "^4.13.4",
