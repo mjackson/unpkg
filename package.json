@@ -6,6 +6,7 @@
   "main": "server.js",
   "dependencies": {
     "cors": "^2.7.1",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "npm-http-server": "^2.0.0"
   }
 }
