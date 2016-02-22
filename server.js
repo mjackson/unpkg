@@ -1,9 +1,9 @@
-var express = require('express')
-var createRequestHandler = require('npm-http-server').createRequestHandler
-var cors = require('cors')
+const createRequestHandler = require('npm-http-server').createRequestHandler
+const express = require('express')
+const cors = require('cors')
 
-var port = process.env.PORT || process.env.npm_package_config_port
-var app = express()
+const port = process.env.PORT || process.env.npm_package_config_port
+const app = express()
 
 app.disable('x-powered-by')
 app.use(cors())
