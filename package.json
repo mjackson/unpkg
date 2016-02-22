@@ -1,0 +1,11 @@
+{
+  "name": "npmcdn.com",
+  "version": "1.0.0",
+  "author": "Michael Jackson",
+  "license": "MIT",
+  "main": "server.js",
+  "dependencies": {
+    "cors": "^2.7.1",
+    "express": "^4.13.4"
+  }
+}
