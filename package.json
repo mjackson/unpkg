@@ -4,6 +4,8 @@
   "description": "An HTTP server for files in npm packages",
   "author": "Michael Jackson",
   "config": {
+    "registryURL": "https://registry.npmjs.org",
+    "bowerBundle": "/bower.zip",
     "port": 5000
   },
   "dependencies": {
