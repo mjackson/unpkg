@@ -16,5 +16,5 @@ app.use(createRequestHandler(
 ))
 
 app.listen(port, function () {
-  console.log('Server started on port %s. Ctrl+C to quit', port)
+  console.log('Server started on port %s, Ctrl+C to quit', port)
 })
