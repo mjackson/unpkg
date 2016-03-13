@@ -87,7 +87,7 @@
           <tr>
             <td><code>main</code></td>
             <td><code>main</code></td>
-            <td>The name of the field in <a href="https://docs.npmjs.com/files/package.json">package.json</a> to use as the main entry point when there is no file path in the URL. This value may be dot-separated to specify a nested field (e.g. <code>?main=config.browserMain</code>).</td>
+            <td>The name of the field in <a href="https://docs.npmjs.com/files/package.json">package.json</a> to use as the main entry point when there is no file path in the URL (e.g. <code>?main=browser</code>).</td>
           </tr>
         </tbody>
       </table>
@@ -97,14 +97,14 @@
       <p>You can do this easily using the following setup:</p>
       <ul>
         <li>Add the <code>umd</code> (or <code>dist</code>) directory to your <code>.gitignore</code> file</li>
-        <li>Make sure you have a separate <code>.npmignore</code> file that <b>does not</b> list the <code>umd</code> directory. If you don't have an <code>.npmignore</code>, npm will attempt to ignore everything in your <code>.gitignore</code> when you <code>npm publish</code></li>
-        <li>Use a build script to generate your UMD build in the <code>umd</code> directory just before you publish. Your first thought might be to use npm's <code>prepublish</code> script for that, but I'd recommend you just use a separate build script, like <a href="https://github.com/mjackson/expect/blob/master/scripts/release.sh">this one</a> because prepublish <a href="https://github.com/npm/npm/issues/3059">can also run when you don't expect it to</a></li>
+        <li>Add the <code>umd</code> directory to your <a href="https://docs.npmjs.com/files/package.json#files"><code>files</code> array</a> in package.json</li>
+        <li>Use a build script to generate your UMD build in the <code>umd</code> directory just before you publish</li>
         <li>That's it! Now when you <code>npm publish</code> you'll have a version available on npmcdn as well</li>
       </ul>
 
       <h3>Feedback</h3>
       <p>If you think this is useful, I'd love to hear from you. Please reach out to <a href="https://twitter.com/mjackson">@mjackson</a> with any questions/concerns.</p>
-      <p>Also, please feel free to examine the source on <a href="https://github.com/mjackson/npm-http-server">GitHub</a>.</p>
+      <p>Also, please feel free to examine the source on <a href="https://github.com/mjackson/npmcdn.com">GitHub</a>.</p>
     </section>
   </body>
 </html>
