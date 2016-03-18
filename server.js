@@ -4,6 +4,7 @@ const cors = require('cors')
 
 const registryURL = process.env.npm_package_config_registryURL
 const bowerBundle = process.env.npm_package_config_bowerBundle
+const redirectTTL = process.env.npm_package_config_redirectTTL
 const port = process.env.PORT || process.env.npm_package_config_port
 const app = express()
 
@@ -12,7 +13,8 @@ app.use(cors())
 app.use(express.static('public', { maxAge: 60000 }))
 app.use(createRequestHandler({
   registryURL: registryURL,
-  bowerBundle: bowerBundle
+  bowerBundle: bowerBundle,
+  redirectTTL: redirectTTL
 }))
 
 app.listen(port, function () {
