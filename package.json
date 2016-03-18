@@ -12,6 +12,6 @@
   "dependencies": {
     "cors": "^2.7.1",
     "express": "^4.13.4",
-    "npm-http-server": "^2.4.0"
+    "npm-http-server": "^2.4.1"
   }
 }
