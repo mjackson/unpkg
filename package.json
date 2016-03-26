@@ -7,11 +7,12 @@
     "registryURL": "https://registry.npmjs.org",
     "bowerBundle": "/bower.zip",
     "redirectTTL": 500,
+    "autoIndex": true,
     "port": 5000
   },
   "dependencies": {
     "cors": "^2.7.1",
     "express": "^4.13.4",
-    "npm-http-server": "^2.4.1"
+    "npm-http-server": "^2.5.0"
   }
 }
