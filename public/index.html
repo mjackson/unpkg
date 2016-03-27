@@ -59,7 +59,7 @@
         <li><a href="/react/dist/react.min.js">https://npmcdn.com/react/dist/react.min.js</a></li>
       </ul>
 
-      <p>If you omit the file path, the <a href="https://docs.npmjs.com/files/package.json#main">main module</a> will be returned. This is especially useful for loading libaries that publish a UMD build as their main module.</p>
+      <p>If you omit the file path, the <a href="https://docs.npmjs.com/files/package.json#main">main module</a> will be served. This is especially useful for loading libaries that publish a UMD build as their main module.</p>
       <ul>
         <li><a href="/three">https://npmcdn.com/three</a></li>
         <li><a href="/jquery">https://npmcdn.com/jquery</a></li>
@@ -73,7 +73,7 @@
         <li><a href="/react/">https://npmcdn.com/react/</a></li>
       </ul>
 
-      <p>If you use the special <code>/bower.zip</code> file path in a package that contains a <code>bower.json</code> file, a zip file will be created on the fly that Bower can use to install the package.</p>
+      <p>You may use the special <code>/bower.zip</code> file path in packages that contain a <code>bower.json</code> file to dynamically generate a zip file that Bower can use to install the package.</p>
       <ul>
         <li><a href="/react-swap/bower.zip">https://npmcdn.com/react-swap/bower.zip</a></li>
         <li><a href="/react-collapse@1.6.3/bower.zip">https://npmcdn.com/react-collapse@1.6.3/bower.zip</a></li>
@@ -104,10 +104,10 @@
       <p>You can do this easily using the following setup:</p>
       <ul>
         <li>Add the <code>umd</code> (or <code>dist</code>) directory to your <code>.gitignore</code> file</li>
-        <li>Add the <code>umd</code> directory to your <a href="https://docs.npmjs.com/files/package.json#files"><code>files</code> array</a> in package.json</li>
-        <li>Use a build script to generate your UMD build in the <code>umd</code> directory just before you publish</li>
-        <li>That's it! Now when you <code>npm publish</code> you'll have a version available on npmcdn as well</li>
+        <li>Add the <code>umd</code> directory to your <a href="https://docs.npmjs.com/files/package.json#files">files array</a> in <code>package.json</code></li>
+        <li>Use a build script to generate your UMD build in the <code>umd</code> directory when you publish</li>
       </ul>
+      <p>That's it! Now when you <code>npm publish</code> you'll have a version available on npmcdn as well.</p>
 
       <h3>Feedback</h3>
       <p>If you think this is useful, I'd love to hear from you. Please reach out to <a href="https://twitter.com/mjackson">@mjackson</a> with any questions/concerns.</p>
