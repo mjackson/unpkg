@@ -14,5 +14,8 @@
     "cors": "^2.7.1",
     "express": "^4.13.4",
     "npm-http-server": "^2.9.0"
+  },
+  "engines": {
+    "node": "5.8.x"
   }
 }
