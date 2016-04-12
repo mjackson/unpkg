@@ -10,7 +10,7 @@ const redirectTTL = process.env.npm_package_config_redirectTTL
 const autoIndex = process.env.npm_package_config_autoIndex
 const port = process.env.PORT || process.env.npm_package_config_port
 
-const requestLogging = (redisURL) => {
+const logStats = (redisURL) => {
   const redisClient = redis.createClient(redisURL)
 
   return (req, res, next) => {
@@ -39,7 +39,7 @@ app.use(cors())
 app.use(express.static('public', { maxAge: 60000 }))
 
 if (process.env.REDIS_URL)
-  app.use(requestLogging(process.env.REDIS_URL))
+  app.use(logStats(process.env.REDIS_URL))
 
 app.use(createRequestHandler({
   registryURL: registryURL,
