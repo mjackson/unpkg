@@ -17,8 +17,15 @@ const requestLogging = (redisURL) => {
     onFinished(res, () => {
       const path = req.path
 
-      if (res.statusCode === 200 && path.charAt(path.length - 1) !== '/')
-        redisClient.zincrby([ 'requests', 1, req.path ])
+      if (res.statusCode === 200 && path.charAt(path.length - 1) !== '/') {
+        redisClient.zincrby([ 'requests', 1, path ])
+
+        const packageSpec = path.split('/')[1]
+        const atIndex = packageSpec.lastIndexOf('@')
+        const packageName = packageSpec.substring(0, atIndex)
+
+        redisClient.zincrby([ 'package-requests', 1, packageName ])
+      }
     })
 
     next()
