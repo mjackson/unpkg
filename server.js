@@ -18,7 +18,7 @@ const requestLogging = (redisURL) => {
       const path = req.path
 
       if (res.statusCode === 200 && path.charAt(path.length - 1) !== '/')
-        redisClient.zincrby('requests', 1, req.path)
+        redisClient.zincrby([ 'requests', 1, req.path ])
     })
 
     next()
