@@ -16,7 +16,7 @@ const requestLogging = (redisURL) => {
   return (req, res, next) => {
     onFinished(res, () => {
       if (res.statusCode === 200)
-        redisClient.incr(req.url)
+        redisClient.incr(req.path)
     })
 
     next()
