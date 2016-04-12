@@ -18,7 +18,7 @@ const requestLogging = (redisURL) => {
       const path = req.path
 
       if (res.statusCode === 200 && path.charAt(path.length - 1) !== '/') {
-        redisClient.zincrby([ 'requests', 1, path ])
+        redisClient.zincrby([ 'request-paths', 1, path ])
 
         const packageSpec = path.split('/')[1]
         const atIndex = packageSpec.lastIndexOf('@')
