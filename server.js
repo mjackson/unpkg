@@ -48,6 +48,6 @@ app.use(createRequestHandler({
   autoIndex: autoIndex
 }))
 
-app.listen(port, function () {
+app.listen(port, () => {
   console.log('Server started on port %s, Ctrl+C to quit', port)
 })
