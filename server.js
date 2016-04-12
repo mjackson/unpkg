@@ -10,6 +10,8 @@ const redirectTTL = process.env.npm_package_config_redirectTTL
 const autoIndex = process.env.npm_package_config_autoIndex
 const port = process.env.PORT || process.env.npm_package_config_port
 
+const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
+
 const logStats = (redisURL) => {
   const redisClient = redis.createClient(redisURL)
 
@@ -20,11 +22,12 @@ const logStats = (redisURL) => {
       if (res.statusCode === 200 && path.charAt(path.length - 1) !== '/') {
         redisClient.zincrby([ 'request-paths', 1, path ])
 
-        const packageSpec = path.split('/')[1]
-        const atIndex = packageSpec.lastIndexOf('@')
-        const packageName = packageSpec.substring(0, atIndex)
+        const match = URLFormat.exec(path)
 
-        redisClient.zincrby([ 'package-requests', 1, packageName ])
+        if (match) {
+          const packageName = match[1]
+          redisClient.zincrby([ 'package-requests', 1, packageName ])
+        }
       }
     })
 
