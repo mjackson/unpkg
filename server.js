@@ -1,56 +1,24 @@
-const cors = require('cors')
-const express = require('express')
-const createRequestHandler = require('npm-http-server').createRequestHandler
-const onFinished = require('on-finished')
-const redis = require('redis')
+require('babel-register')({
+  only: require('path').resolve(__dirname, './modules')
+})
 
-const registryURL = process.env.npm_package_config_registryURL
-const bowerBundle = process.env.npm_package_config_bowerBundle
-const redirectTTL = process.env.npm_package_config_redirectTTL
-const autoIndex = process.env.npm_package_config_autoIndex
-const port = process.env.PORT || process.env.npm_package_config_port
+const createServer = require('./modules/ServerUtils').createServer
 
-const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
+const port = process.env.PORT || 5000
+const registryURL = process.env.REGISTRY_URL || 'https://registry.npmjs.org'
+const bowerBundle = process.env.BOWER_BUNDLE || '/bower.zip'
+const redirectTTL = process.env.REDIRECT_TTL || 500
+const autoIndex = !process.env.DISABLE_INDEX
+const redisURL = process.env.REDIS_URL
 
-const logStats = (redisURL) => {
-  const redisClient = redis.createClient(redisURL)
-
-  return (req, res, next) => {
-    onFinished(res, () => {
-      const path = req.path
-
-      if (res.statusCode === 200 && path.charAt(path.length - 1) !== '/') {
-        redisClient.zincrby([ 'request-paths', 1, path ])
-
-        const match = URLFormat.exec(path)
-
-        if (match) {
-          const packageName = match[1]
-          redisClient.zincrby([ 'package-requests', 1, packageName ])
-        }
-      }
-    })
-
-    next()
-  }
-}
-
-const app = express()
-
-app.disable('x-powered-by')
-app.use(cors())
-app.use(express.static('public', { maxAge: 60000 }))
-
-if (process.env.REDIS_URL)
-  app.use(logStats(process.env.REDIS_URL))
-
-app.use(createRequestHandler({
+const server = createServer({
   registryURL: registryURL,
   bowerBundle: bowerBundle,
   redirectTTL: redirectTTL,
-  autoIndex: autoIndex
-}))
+  autoIndex: autoIndex,
+  redisURL: redisURL
+})
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log('Server started on port %s, Ctrl+C to quit', port)
 })
