@@ -1,6 +1,6 @@
 {
   "description": "The website for npmcdn.com",
-  "author": "Michael Jackson <mjijackson@gmail.com>",
+  "author": "Michael Jackson",
   "config": {
     "registryURL": "https://registry.npmjs.org",
     "bowerBundle": "/bower.zip",
