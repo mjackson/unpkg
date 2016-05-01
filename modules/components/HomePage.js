@@ -43,6 +43,7 @@ const HomePage = React.createClass({
         <head>
           <title>npmcdn</title>
           <meta name="viewport" content="width=device-width, initial-scale=1"/>
+          <meta name="rendered-at" content={(new Date).toISOString()}/>
           <style dangerouslySetInnerHTML={{ __html: styles }}/>
         </head>
         <body>
