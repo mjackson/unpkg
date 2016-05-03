@@ -1,42 +1,11 @@
 import React from 'react'
-
-const styles = `
-body {
-  font: 14px Helvetica, sans-serif;
-  line-height: 1.5;
-  padding: 5px 20px;
-}
-@media all and (min-width: 660px) {
-  body {
-    padding: 50px 20px;
-  }
-}
-header, #wrapper {
-  max-width: 600px;
-  margin: 0 auto;
-}
-header {
-  text-align: center;
-}
-code {
-  background: #eee;
-}
-table {
-  border-color: black;
-  border-style: solid;
-  border-width: 0 0 1px 1px;
-}
-table th, table td {
-  text-align: left;
-  vertical-align: top;
-  padding: 5px 7px;
-  border-color: black;
-  border-style: solid;
-  border-width: 1px 1px 0 0;
-}
-`
+import { readCSS } from '../StyleUtils'
 
 const HomePage = React.createClass({
+  statics: {
+    css: readCSS(__dirname, './HomePage.css')
+  },
+
   render() {
     return (
       <html>
@@ -44,7 +13,7 @@ const HomePage = React.createClass({
           <title>npmcdn</title>
           <meta name="viewport" content="width=device-width, initial-scale=1"/>
           <meta name="rendered-at" content={(new Date).toISOString()}/>
-          <style dangerouslySetInnerHTML={{ __html: styles }}/>
+          <style dangerouslySetInnerHTML={{ __html: HomePage.css }}/>
         </head>
         <body>
           <header>
@@ -54,8 +23,8 @@ const HomePage = React.createClass({
             <p>npmcdn is a CDN for packages that are published via <a href="https://www.npmjs.com/">npm</a>. Use it to quickly and easily load files using a simple URL like <code>https://npmcdn.com/package@version/path/to/file</code>.</p>
             <p>A few examples:</p>
             <ul>
-              <li><a href="/react@0.14.2/dist/react.min.js">https://npmcdn.com/react@0.14.2/dist/react.min.js</a></li>
-              <li><a href="/react-dom@0.14.2/dist/react-dom.min.js">https://npmcdn.com/react-dom@0.14.2/dist/react-dom.min.js</a></li>
+              <li><a href="/react@15.0.1/dist/react.min.js">https://npmcdn.com/react@15.0.1/dist/react.min.js</a></li>
+              <li><a href="/react-dom@15.0.1/dist/react-dom.min.js">https://npmcdn.com/react-dom@15.0.1/dist/react-dom.min.js</a></li>
               <li><a href="/history@1.12.5/umd/History.min.js">https://npmcdn.com/history@1.12.5/umd/History.min.js</a></li>
               <li><a href="/react-router@1.0.0/umd/ReactRouter.min.js">https://npmcdn.com/react-router@1.0.0/umd/ReactRouter.min.js</a></li>
             </ul>

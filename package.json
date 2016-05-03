@@ -6,6 +6,7 @@
     "babel-preset-react": "^6.5.0",
     "babel-register": "^6.7.2",
     "cors": "^2.7.1",
+    "csso": "^2.0.0",
     "express": "^4.13.4",
     "express-react-views": "^0.10.1",
     "npm-http-server": "^2.9.1",
