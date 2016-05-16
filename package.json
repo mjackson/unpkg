@@ -9,7 +9,7 @@
     "csso": "^2.0.0",
     "express": "^4.13.4",
     "express-react-views": "^0.10.1",
-    "npm-http-server": "^2.9.1",
+    "npm-http-server": "^2.10.0",
     "on-finished": "^2.3.0",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",
