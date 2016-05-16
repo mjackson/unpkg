@@ -3,8 +3,11 @@
   "author": "Michael Jackson",
   "scripts": {
     "start": "heroku local -f Procfile.local",
-    "build": "rimraf lib && babel ./modules -d lib",
+    "build": "npm run build-assets && npm run build-lib",
+    "build-assets": "NODE_ENV=production webpack -p --json > stats.json",
+    "build-lib": "rimraf lib && babel ./modules -d lib",
     "heroku-postbuild": "npm run build"
+
   },
   "dependencies": {
     "autoprefixer": "^6.3.6",
