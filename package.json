@@ -23,7 +23,7 @@
     "extract-text-webpack-plugin": "^1.0.1",
     "invariant": "^2.2.1",
     "morgan": "^1.7.0",
-    "npm-http-server": "^2.10.0",
+    "npm-http-server": "^2.11.0",
     "on-finished": "^2.3.0",
     "postcss-loader": "^0.9.1",
     "react": "^15.0.2",
