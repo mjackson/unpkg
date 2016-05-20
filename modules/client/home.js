@@ -1,8 +1,10 @@
 import React from 'react'
 import { render } from 'react-dom'
-import Home from './components/Home'
+import Router from './components/Router'
+
+import './styles.css'
 
 render(
-  <Home/>,
+  <Router/>,
   document.getElementById('app')
 )

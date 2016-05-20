@@ -1,16 +1,43 @@
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { getZones, getZoneAnalyticsDashboard } from './CloudFlare'
 import HomePage from './components/HomePage'
 
+const OneMinute = 1000 * 60
+const ThirtyDays = OneMinute * 60 * 24 * 30
 const DOCTYPE = '<!DOCTYPE html>'
 
-export const sendHomePage = (req, res) => {
+const fetchStats = (callback) => {
+  if (process.env.NODE_ENV === 'development') {
+    callback(null, require('./stats.json'))
+  } else {
+    getZones('npmcdn.com')
+      .then(zones => {
+        const zone = zones[0]
+        const since = new Date(Date.now() - ThirtyDays)
+        const until = new Date(Date.now() - OneMinute)
+
+        return getZoneAnalyticsDashboard(zone, since, until).then(result => {
+          callback(null, result)
+        })
+      })
+      .catch(callback)
+  }
+}
+
+export const sendHomePage = (req, res, next) => {
   const props = {
-    styles: req.assets.getStyleURLs('home'),
-    scripts: req.assets.getScriptURLs('home')
+    styles: req.assets.getStyleAssets([ 'vendor', 'home' ]),
+    scripts: req.assets.getScriptAssets([ 'vendor', 'home' ])
   }
 
-  res.send(
-    DOCTYPE + renderToStaticMarkup(<HomePage {...props}/>)
-  )
+  fetchStats((error, stats) => {
+    if (error) {
+      next(error)
+    } else {
+      res.send(
+        DOCTYPE + renderToStaticMarkup(<HomePage {...props} stats={stats}/>)
+      )
+    }
+  })
 }

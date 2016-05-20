@@ -1,22 +1,20 @@
 import React, { PropTypes } from 'react'
 
-const assetType = PropTypes.string
+class HomePage extends React.Component {
+  static propTypes = {
+    styles: PropTypes.arrayOf(PropTypes.string),
+    scripts: PropTypes.arrayOf(PropTypes.string),
+    stats: PropTypes.object
+  }
 
-const HomePage = React.createClass({
-  propTypes: {
-    styles: PropTypes.arrayOf(assetType),
-    scripts: PropTypes.arrayOf(assetType)
-  },
+  static defaultProps = {
+    styles: [],
+    scripts: [],
+    stats: {}
+  }
 
-  getDefaultProps() {
-    return {
-      styles: [],
-      scripts: []
-    }
-  },
-
-  render() {
-    const { styles, scripts } = this.props
+  render = () => {
+    const { styles, scripts, stats } = this.props
 
     return (
       <html>
@@ -26,6 +24,7 @@ const HomePage = React.createClass({
           <meta name="timestamp" content={(new Date).toISOString()}/>
           <title>npmcdn</title>
           {styles.map(style => <link key={style} rel="stylesheet" href={style}/>)}
+          <script dangerouslySetInnerHTML={{ __html: `window.NPMCDN_STATS=${JSON.stringify(stats)}` }}/>
         </head>
         <body>
           <div id="app"/>
@@ -34,6 +33,6 @@ const HomePage = React.createClass({
       </html>
     )
   }
-})
+}
 
 export default HomePage

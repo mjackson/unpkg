@@ -1,9 +1,9 @@
 import React from 'react'
-import contentHTML from './Home.md'
+import contentHTML from './About.md'
 
-class Home extends React.Component {
+class About extends React.Component {
   render = () =>
     <div className="wrapper" dangerouslySetInnerHTML={{ __html: contentHTML }}/>
 }
 
-export default Home
+export default About

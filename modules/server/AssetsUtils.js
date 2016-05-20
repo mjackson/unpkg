@@ -2,30 +2,32 @@ import fs from 'fs'
 import invariant from 'invariant'
 import webpack from 'webpack'
 
-const createAssets = (webpackStats) => {
+const createBundle = (webpackStats) => {
+  const { publicPath, assetsByChunkName } = webpackStats
+
   const createURL = (asset) =>
-    webpackStats.publicPath + asset
+    publicPath + asset
 
-  const getAssets = (chunkName = 'main') => {
-    const assets = webpackStats.assetsByChunkName[chunkName] || []
-    return Array.isArray(assets) ? assets : [ assets ]
-  }
+  const getAssets = (chunks = [ 'main' ]) =>
+    (Array.isArray(chunks) ? chunks : [ chunks ]).reduce((memo, chunk) => (
+      memo.concat(assetsByChunkName[chunk] || [])
+    ), [])
 
-  const getScriptURLs = (chunkName = 'main') =>
-    getAssets(chunkName)
+  const getScriptAssets = (...args) =>
+    getAssets(...args)
       .filter(asset => (/\.js$/).test(asset))
       .map(createURL)
 
-  const getStyleURLs = (chunkName = 'main') =>
-    getAssets(chunkName)
+  const getStyleAssets = (...args) =>
+    getAssets(...args)
       .filter(asset => (/\.css$/).test(asset))
       .map(createURL)
 
   return {
     createURL,
     getAssets,
-    getScriptURLs,
-    getStyleURLs
+    getScriptAssets,
+    getStyleAssets
   }
 }
 
@@ -46,7 +48,7 @@ export const staticAssets = (webpackStatsFile) => {
     )
   }
 
-  const assets = createAssets(stats)
+  const assets = createBundle(stats)
 
   return (req, res, next) => {
     req.assets = assets
@@ -62,7 +64,7 @@ export const staticAssets = (webpackStatsFile) => {
 export const assetsCompiler = (webpackCompiler) => {
   let assets
   webpackCompiler.plugin('done', (stats) => {
-    assets = createAssets(stats.toJson())
+    assets = createBundle(stats.toJson())
   })
 
   return (req, res, next) => {
