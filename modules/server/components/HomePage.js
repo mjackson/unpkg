@@ -20,7 +20,7 @@ class HomePage extends React.Component {
       <html>
         <head>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-          <meta name="viewport" content="user-scalable=no,initial-scale=1.0,maximum-scale=1.0,width=device-width"/>
+          <meta name="viewport" content="width=700,maximum-scale=1"/>
           <meta name="timestamp" content={(new Date).toISOString()}/>
           <title>npmcdn</title>
           {styles.map(style => <link key={style} rel="stylesheet" href={style}/>)}
