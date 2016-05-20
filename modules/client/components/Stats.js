@@ -26,7 +26,7 @@ class Stats extends React.Component {
   }
 
   state = {
-    minRequests: 1000000
+    minRequests: 5000000
   }
 
   updateMinRequests = (value) =>
