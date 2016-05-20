@@ -8,14 +8,6 @@ npmcdn is an [open source](https://github.com/mjackson/npmcdn) project built by 
 
 We'd love to talk to you more about training your team on [React](https://facebook.github.io/react/). Please [get in touch](mailto:hello@reactjs-training.com) if interested.
 
-### Cache Behavior
-
-The CDN caches all files based on their permanent URL, which includes the npm package version. This works because npm does not allow package authors to overwrite a package that has already been published with a different one at the same version number.
-
-URLs that do not specify a package version number redirect to one that does. This is the `latest` version when no version is specified, or the `maxSatisfying` version when a [semver version](https://github.com/npm/node-semver) is given. Redirects are cached for 5 minutes.
-
-Browsers are instructed (via the `Cache-Control` header) to cache assets for 4 hours.
-
 ### Sponsors
 
 The fast, global infrastructure that powers npmcdn is graciously provided by [CloudFlare](https://www.cloudflare.com) and [Heroku](https://www.heroku.com).
@@ -30,6 +22,14 @@ The fast, global infrastructure that powers npmcdn is graciously provided by [Cl
 </div>
 
 These sponsors provide some of the most robust, reliable infrastructure available today and I'm happy to be able to partner with them on npmcdn.
+
+### Cache Behavior
+
+The CDN caches all files based on their permanent URL, which includes the npm package version. This works because npm does not allow package authors to overwrite a package that has already been published with a different one at the same version number.
+
+URLs that do not specify a package version number redirect to one that does. This is the `latest` version when no version is specified, or the `maxSatisfying` version when a [semver version](https://github.com/npm/node-semver) is given. Redirects are cached for 5 minutes.
+
+Browsers are instructed (via the `Cache-Control` header) to cache assets for 4 hours.
 
 ### Support
 
