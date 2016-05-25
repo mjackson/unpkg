@@ -46,6 +46,11 @@ You may use the special `/bower.zip` file path in packages that contain a `bower
       <td>`main`</td>
       <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL (e.g. `?main=browser`).</td>
     </tr>
+    <tr>
+      <td>`json`</td>
+      <td>`undefined`</td>
+      <td>Return metadata about the resource at the current URL as JSON (e.g. `/any/path?json`). For directories, this generates a recursive listing of all files in the directory.</td>
+    </tr>
   </tbody>
 </table>
 
