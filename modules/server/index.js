@@ -116,6 +116,11 @@ export const startServer = (serverConfig) => {
     ? createServer(config)
     : createDevServer(config)
 
+  // Max request timeout on Heroku is 30s, so set our
+  // timeout to 20s to make sure we don't hang.
+  // https://devcenter.heroku.com/articles/request-timeout
+  server.timeout = 20000
+
   server.listen(config.port, () => {
     console.log('Server #%s listening on port %s, Ctrl+C to stop', config.id, config.port)
   })
