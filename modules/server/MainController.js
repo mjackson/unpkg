@@ -9,7 +9,7 @@ const DOCTYPE = '<!DOCTYPE html>'
 
 const fetchStats = (callback) => {
   if (process.env.NODE_ENV === 'development') {
-    callback(null, require('./stats.json'))
+    callback(null, require('./CloudFlareStats.json'))
   } else {
     getZones('npmcdn.com')
       .then(zones => {
@@ -27,8 +27,8 @@ const fetchStats = (callback) => {
 
 export const sendHomePage = (req, res, next) => {
   const props = {
-    styles: req.assets.getStyleAssets([ 'vendor', 'home' ]),
-    scripts: req.assets.getScriptAssets([ 'vendor', 'home' ])
+    styles: req.bundle.getStyleAssets([ 'vendor', 'home' ]),
+    scripts: req.bundle.getScriptAssets([ 'vendor', 'home' ])
   }
 
   fetchStats((error, stats) => {

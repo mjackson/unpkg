@@ -7,7 +7,7 @@ import express from 'express'
 import devErrorHandler from 'errorhandler'
 import WebpackDevServer from 'webpack-dev-server'
 import { createRequestHandler } from 'npm-http-server'
-import { staticAssets, assetsCompiler, createDevCompiler } from './AssetsUtils'
+import { staticAssets, devAssets, createDevCompiler } from './AssetsUtils'
 import webpackConfig from '../../webpack.config'
 import { sendHomePage } from './MainController'
 import { logStats } from './StatsUtils'
@@ -78,7 +78,7 @@ export const createDevServer = (config) => {
   // This runs after webpack-dev-middleware.
   server.use(devErrorHandler())
   server.use(express.static(config.publicDir))
-  server.use(assetsCompiler(compiler))
+  server.use(devAssets(compiler))
   server.use(createRouter(config))
 
   return server
