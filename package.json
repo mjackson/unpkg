@@ -41,6 +41,7 @@
     "redis": "^2.6.0-1",
     "rimraf": "^2.5.2",
     "style-loader": "^0.13.1",
+    "throng": "^4.0.0",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1"
   },
