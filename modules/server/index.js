@@ -121,7 +121,7 @@ export const startServer = (serverConfig) => {
   })
 
   if (httpServer == null)
-    httpServer = server.listeningApp
+    httpServer = server.listeningApp // WebpackDevServer
 
   // Max request timeout on Heroku is 30s, so set our
   // timeout to 20s to make sure we don't hang.
