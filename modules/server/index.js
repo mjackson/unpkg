@@ -1,4 +1,5 @@
 /*eslint-disable no-console*/
+import http from 'http'
 import path from 'path'
 import cors from 'cors'
 import throng from 'throng'
@@ -41,7 +42,29 @@ export const createServer = (config) => {
   app.use(staticAssets(config.statsFile))
   app.use(createRouter(config))
 
-  return app
+  const server = http.createServer(app)
+
+  // Heroku dynos automatically timeout after 30s. Set our
+  // own timeout here to force sockets to close before that.
+  // https://devcenter.heroku.com/articles/request-timeout
+  if (config.timeout) {
+    server.setTimeout(config.timeout, (socket) => {
+      const message = `Server timeout of ${config.timeout}ms exceeded`
+      const httpMessage = [
+        `HTTP/1.1 503 Service Unavailable`,
+        `Date: ${(new Date).toGMTString()}`,
+        `Content-Type: text/plain`,
+        `Content-Length: ${message.length}`,
+        `Connection: close`,
+        ``,
+        message
+      ].join(`\r\n`)
+
+      socket.end(httpMessage)
+    })
+  }
+
+  return server
 }
 
 export const createDevServer = (config) => {
@@ -92,6 +115,7 @@ const bowerBundle = process.env.BOWER_BUNDLE || '/bower.zip'
 const redirectTTL = process.env.REDIRECT_TTL || 500
 const autoIndex = !process.env.DISABLE_INDEX
 const redisURL = process.env.REDIS_URL
+const timeout = 20000
 
 const DefaultServerConfig = {
   id: 1,
@@ -103,7 +127,8 @@ const DefaultServerConfig = {
   bowerBundle,
   redirectTTL,
   autoIndex,
-  redisURL
+  redisURL,
+  timeout
 }
 
 export const startServer = (serverConfig) => {
@@ -116,18 +141,9 @@ export const startServer = (serverConfig) => {
     ? createServer(config)
     : createDevServer(config)
 
-  let httpServer = server.listen(config.port, () => {
+  server.listen(config.port, () => {
     console.log('Server #%s listening on port %s, Ctrl+C to stop', config.id, config.port)
   })
-
-  if (httpServer == null)
-    httpServer = server.listeningApp // WebpackDevServer
-
-  // Max request timeout on Heroku is 30s, so set our
-  // timeout to 20s to make sure we don't hang.
-  // https://devcenter.heroku.com/articles/request-timeout
-  if (httpServer)
-    httpServer.timeout = 20000
 }
 
 if (require.main === module)
