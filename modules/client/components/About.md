@@ -1,7 +1,7 @@
 npmcdn is an [open source](https://github.com/mjackson/npmcdn) project built by me, [Michael Jackson](https://twitter.com/mjackson). I built it because, as an npm package author, it felt tedious for me to use existing, git-based CDNs to make my open source work available via CDN. Development was sponsored by my company, [React Training](https://reactjs-training.com).
 
-<div class="sponsor-logos">
-  <div class="sponsor-logo">
+<div class="about-logos">
+  <div class="about-logo">
     <a href="https://reactjs-training.com"><img src="../ReactTrainingLogo.png"></a>
   </div>
 </div>
@@ -12,11 +12,11 @@ We'd love to talk to you more about training your team on [React](https://facebo
 
 The fast, global infrastructure that powers npmcdn is graciously provided by [CloudFlare](https://www.cloudflare.com) and [Heroku](https://www.heroku.com).
 
-<div class="sponsor-logos">
-  <div class="sponsor-logo">
+<div class="about-logos">
+  <div class="about-logo">
     <a href="https://www.cloudflare.com"><img src="../CloudFlareLogo.png"></a>
   </div>
-  <div class="sponsor-logo">
+  <div class="about-logo">
     <a href="https://www.heroku.com"><img src="../HerokuLogo.png"></a>
   </div>
 </div>

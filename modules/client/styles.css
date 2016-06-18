@@ -102,17 +102,17 @@ header nav a:visited {
   left: 0;
 }
 
-.sponsor-logos {
+.about-logos {
   margin: 2em 0;
   display: flex;
   justify-content: center;
 }
-.sponsor-logo {
+.about-logo {
   text-align: center;
   flex: 1;
   max-width: 80%;
 }
-.sponsor-logo img {
+.about-logo img {
   max-width: 60%;
 }
 
