@@ -1,6 +1,5 @@
 /*eslint-disable no-console*/
 import http from 'http'
-import path from 'path'
 import cors from 'cors'
 import throng from 'throng'
 import morgan from 'morgan'
@@ -8,8 +7,8 @@ import express from 'express'
 import devErrorHandler from 'errorhandler'
 import WebpackDevServer from 'webpack-dev-server'
 import { createRequestHandler } from 'npm-http-server'
+import * as DefaultServerConfig from './ServerConfig'
 import { staticAssets, devAssets, createDevCompiler } from './AssetsUtils'
-import webpackConfig from '../../webpack.config'
 import { sendHomePage } from './MainController'
 import { logStats } from './StatsUtils'
 
@@ -36,6 +35,7 @@ export const createServer = (config) => {
   const app = express()
 
   app.disable('x-powered-by')
+
   app.use(errorHandler)
   app.use(cors())
   app.use(express.static(config.publicDir, { maxAge: 60000 }))
@@ -49,8 +49,9 @@ export const createServer = (config) => {
   // https://devcenter.heroku.com/articles/request-timeout
   if (config.timeout) {
     server.setTimeout(config.timeout, (socket) => {
-      const message = `Server timeout of ${config.timeout}ms exceeded`
-      const httpMessage = [
+      const message = `Timeout of ${config.timeout}ms exceeded`
+
+      socket.end([
         `HTTP/1.1 503 Service Unavailable`,
         `Date: ${(new Date).toGMTString()}`,
         `Content-Type: text/plain`,
@@ -58,9 +59,7 @@ export const createServer = (config) => {
         `Connection: close`,
         ``,
         message
-      ].join(`\r\n`)
-
-      socket.end(httpMessage)
+      ].join(`\r\n`))
     })
   }
 
@@ -105,30 +104,6 @@ export const createDevServer = (config) => {
   server.use(createRouter(config))
 
   return server
-}
-
-const port = process.env.PORT || 5000
-const statsFile = path.resolve(__dirname, '../../stats.json')
-const publicDir = path.resolve(__dirname, '../../public')
-const registryURL = process.env.REGISTRY_URL || 'https://registry.npmjs.org'
-const bowerBundle = process.env.BOWER_BUNDLE || '/bower.zip'
-const redirectTTL = process.env.REDIRECT_TTL || 500
-const autoIndex = !process.env.DISABLE_INDEX
-const redisURL = process.env.REDIS_URL
-const timeout = 20000
-
-const DefaultServerConfig = {
-  id: 1,
-  port,
-  webpackConfig,
-  statsFile,
-  publicDir,
-  registryURL,
-  bowerBundle,
-  redirectTTL,
-  autoIndex,
-  redisURL,
-  timeout
 }
 
 export const startServer = (serverConfig) => {
