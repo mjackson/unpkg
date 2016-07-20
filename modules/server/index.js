@@ -8,7 +8,7 @@ import devErrorHandler from 'errorhandler'
 import WebpackDevServer from 'webpack-dev-server'
 import { createRequestHandler } from 'npm-http-server'
 import * as DefaultServerConfig from './ServerConfig'
-import { staticAssets, devAssets, createDevCompiler } from './AssetsUtils'
+import { assetsManifest, staticAssets, devAssets, createDevCompiler } from './AssetsUtils'
 import { sendHomePage } from './MainController'
 import { logStats } from './StatsUtils'
 
@@ -38,7 +38,8 @@ export const createServer = (config) => {
 
   app.use(errorHandler)
   app.use(cors())
-  app.use(express.static(config.publicDir, { maxAge: 60000 }))
+  app.use(express.static(config.publicDir, { maxAge: config.maxAge }))
+  app.use(assetsManifest(config.manifestFile))
   app.use(staticAssets(config.statsFile))
   app.use(createRouter(config))
 

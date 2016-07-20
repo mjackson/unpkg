@@ -5,7 +5,8 @@ class NumberTextInput extends React.Component {
   static propTypes = {
     value: PropTypes.number,
     parseNumber: PropTypes.func,
-    formatNumber: PropTypes.func
+    formatNumber: PropTypes.func,
+    onChange: PropTypes.func
   }
 
   static defaultProps = {

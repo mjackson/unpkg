@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import { findDOMNode } from 'react-dom'
 import formatBytes from 'byte-size'
 import formatDate from 'date-fns/format'
 import parseDate from 'date-fns/parse'
@@ -21,8 +20,12 @@ const addValues = (a, b) => {
 }
 
 class Stats extends React.Component {
+  static propTypes = {
+    stats: PropTypes.object
+  }
+
   static defaultProps = {
-    stats: window.NPMCDN_STATS
+    stats: window.npmcdnStats
   }
 
   state = {
@@ -83,13 +86,13 @@ class Stats extends React.Component {
     })
 
     topContinents.forEach(continent => {
-      const name = ContinentsIndex[continent]
+      const continentName = ContinentsIndex[continent]
       const { countries, requests, bandwidth } = continentData[continent]
 
       if (bandwidth !== 0) {
         regionRows.push(
           <tr key={continent} className="continent-row">
-            <td>{ContinentsIndex[continent]}</td>
+            <td>{continentName}</td>
             <td>{formatNumber(requests)} ({formatPercent(requests / totalRequests)}%)</td>
             <td>{formatBytes(bandwidth)} ({formatPercent(bandwidth / totalBandwidth)}%)</td>
           </tr>

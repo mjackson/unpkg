@@ -26,10 +26,14 @@ const fetchStats = (callback) => {
 }
 
 export const sendHomePage = (req, res, next) => {
+  const chunks = [ 'vendor', 'home' ]
   const props = {
-    styles: req.bundle.getStyleAssets([ 'vendor', 'home' ]),
-    scripts: req.bundle.getScriptAssets([ 'vendor', 'home' ])
+    styles: req.bundle.getStyleAssets(chunks),
+    scripts: req.bundle.getScriptAssets(chunks)
   }
+
+  if (req.manifest)
+    props.webpackManifest = req.manifest
 
   fetchStats((error, stats) => {
     if (error) {

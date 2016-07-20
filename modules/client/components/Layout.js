@@ -4,6 +4,11 @@ import { findDOMNode } from 'react-dom'
 import Window from './Window'
 
 class Layout extends React.Component {
+  static propTypes = {
+    location: PropTypes.object,
+    children: PropTypes.node
+  }
+
   state = {
     underlineLeft: 0,
     underlineWidth: 0,

@@ -32,6 +32,29 @@ const createBundle = (webpackStats) => {
 }
 
 /**
+ * An express middleware that sets req.manifest from the build manifest
+ * in the given file. Should be used in production to get consistent hashes.
+ */
+export const assetsManifest = (webpackManifestFile) => {
+  let manifest
+  try {
+    manifest = JSON.parse(fs.readFileSync(webpackManifestFile, 'utf8'))
+  } catch (error) {
+    invariant(
+      false,
+      'assetsManifest middleware cannot read the manifest file "%s"; ' +
+      'do `npm run build` before starting the server',
+      webpackManifestFile
+    )
+  }
+
+  return (req, res, next) => {
+    req.manifest = manifest
+    next()
+  }
+}
+
+/**
  * An express middleware that sets req.bundle from the build
  * info in the given stats file. Should be used in production.
  */
