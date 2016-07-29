@@ -11,7 +11,7 @@ You may also use a [tag](https://docs.npmjs.com/cli/dist-tag) or [version range]
   * [https://npmcdn.com/react@^0.14/dist/react.min.js](/react@^0.14/dist/react.min.js)
   * [https://npmcdn.com/react/dist/react.min.js](/react/dist/react.min.js)
 
-If you omit the file path, the [main module](https://docs.npmjs.com/files/package.json#main) will be served. This is especially useful for loading libaries that publish a UMD build as their main module.
+If you omit the file path, npmcdn will try to serve [the `browser` bundle](https://github.com/defunctzombie/package-browser-field-spec) if present, the [`main` module](https://docs.npmjs.com/files/package.json#main) otherwise.
 
   * [https://npmcdn.com/jquery](/jquery)
   * [https://npmcdn.com/angular-formly](/angular-formly)
@@ -43,8 +43,8 @@ You may use the special `/bower.zip` file path in packages that contain a `bower
   <tbody>
     <tr>
       <td>`main`</td>
-      <td>`main`</td>
-      <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL (e.g. `?main=browser`).</td>
+      <td>`browser`, `main`</td>
+      <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL.</td>
     </tr>
     <tr>
       <td>`json`</td>
