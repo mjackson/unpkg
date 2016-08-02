@@ -1,6 +1,4 @@
 {
-  "description": "The website for npmcdn.com",
-  "author": "Michael Jackson",
   "scripts": {
     "start": "heroku local -f Procfile.local",
     "build": "npm run build-assets && npm run build-lib",
@@ -62,15 +60,5 @@
   },
   "engines": {
     "node": "5.8.x"
-  },
-  "babel": {
-    "presets": [
-      "es2015-loose",
-      "stage-1",
-      "react"
-    ],
-    "plugins": [
-      "transform-object-assign"
-    ]
   }
 }
