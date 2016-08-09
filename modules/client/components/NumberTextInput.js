@@ -31,10 +31,8 @@ class NumberTextInput extends React.Component {
     const { value } = this.state
     const displayValue = this.props.formatNumber(value)
 
-    const inputValue = isNaN(displayValue) ? 0 : displayValue
-
     return (
-      <input {...this.props} type="text" value={inputValue} onChange={this.handleChange}/>
+      <input {...this.props} type="text" value={displayValue} onChange={this.handleChange}/>
     )
   }
 }
