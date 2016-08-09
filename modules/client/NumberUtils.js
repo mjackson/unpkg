@@ -9,7 +9,7 @@ export const formatNumber = (n) => {
 }
 
 export const parseNumber = (s) =>
-  parseInt(s.replace(/,/g, ''), 10)
+  parseInt(s.replace(/,/g, ''), 10) || 0
 
 export const formatPercent = (n, fixed = 1) =>
   String((n.toPrecision(2) * 100).toFixed(fixed))
