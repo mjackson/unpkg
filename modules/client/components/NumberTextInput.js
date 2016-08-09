@@ -29,10 +29,11 @@ class NumberTextInput extends React.Component {
 
   render = () => {
     const { value } = this.state
-    const displayValue = this.props.formatNumber(value)
+    const { parseNumber, formatNumber, ...props } = this.props
+    const displayValue = formatNumber(value)
 
     return (
-      <input {...this.props} type="text" value={displayValue} onChange={this.handleChange}/>
+      <input {...props} type="text" value={displayValue} onChange={this.handleChange}/>
     )
   }
 }
