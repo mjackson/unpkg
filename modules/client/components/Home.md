@@ -28,7 +28,7 @@ You may use the special `/bower.zip` file path in packages that contain a `bower
   * [https://npmcdn.com/react-swap/bower.zip](/react-swap/bower.zip)
   * [https://npmcdn.com/react-collapse@1.6.3/bower.zip](/react-collapse@1.6.3/bower.zip)
 
-**_We do NOT recommend JavaScript libraries use Bower._** Bower places additional burdens on JavaScript package authors for little to no gain. npmcdn is intended to make it easier to publish code, not harder, so Bower support will be removed in January 2017\. Please move to npm for installing packages and stop using Bower before that time. See [here](https://github.com/mjackson/npm-http-server#bower-support) for our rationale.
+**_We do NOT recommend JavaScript libraries using Bower._** Bower places additional burdens on JavaScript package authors for little to no gain. npmcdn is intended to make it easier to publish code, not harder, so Bower support will be removed in January 2017\. Please move to npm for installing packages and stop using Bower before that time. See [here](https://github.com/mjackson/npm-http-server#bower-support) for our rationale.
 
 ### Query Parameters
 
