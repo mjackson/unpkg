@@ -43,7 +43,7 @@ npmcdn is not affiliated with or supported by npm, Inc. in any way. Please do no
 
 ### Abuse
 
-npmcdn blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/mjackson/npmcdn/blob/master/PackageBlacklist.json)!
+npmcdn blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/mjackson/npmcdn/blob/master/modules/PackageBlacklist.json)!
 
 ### Feedback
 
