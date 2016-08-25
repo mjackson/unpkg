@@ -25,7 +25,7 @@ class Stats extends React.Component {
   }
 
   static defaultProps = {
-    stats: window.npmcdnStats
+    stats: window.cloudFlareStats
   }
 
   state = {
@@ -119,7 +119,7 @@ class Stats extends React.Component {
 
     return (
       <div className="wrapper">
-        <p>From <strong>{formatDate(sinceDate, 'MMM D')}</strong> to <strong>{formatDate(untilDate, 'MMM D')}</strong>, npmcdn served <strong>{formatNumber(totalRequests)}</strong> requests to <strong>{formatNumber(uniqueVisitors)}</strong> unique visitors, <strong>{formatPercent(cachedRequests / totalRequests, 0)}%</strong> of which came from the cache (CDN). Over the same period, <strong>{formatPercent(errorRequests / totalRequests, 4)}%</strong> of requests resulted in server error (returned an HTTP status &ge; 500).</p>
+        <p>From <strong>{formatDate(sinceDate, 'MMM D')}</strong> to <strong>{formatDate(untilDate, 'MMM D')}</strong>, unpkg served <strong>{formatNumber(totalRequests)}</strong> requests to <strong>{formatNumber(uniqueVisitors)}</strong> unique visitors, <strong>{formatPercent(cachedRequests / totalRequests, 0)}%</strong> of which came from the cache (CDN). Over the same period, <strong>{formatPercent(errorRequests / totalRequests, 4)}%</strong> of requests resulted in server error (returned an HTTP status &ge; 500).</p>
 
         <h3>By Region</h3>
 

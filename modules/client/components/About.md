@@ -1,4 +1,4 @@
-npmcdn is an [open source](https://github.com/mjackson/npmcdn) project built by me, [Michael Jackson](https://twitter.com/mjackson). I built it because, as an npm package author, it felt tedious for me to use existing, git-based CDNs to make my open source work available via CDN. Development was sponsored by my company, [React Training](https://reactjs-training.com).
+unpkg is an [open source](https://github.com/mjackson/unpkg) project built by me, [Michael Jackson](https://twitter.com/mjackson). I built it because, as an npm package author, it felt tedious for me to use existing, git-based CDNs to make my open source work available via CDN. Development was sponsored by my company, [React Training](https://reactjs-training.com).
 
 <div class="about-logos">
   <div class="about-logo">
@@ -10,7 +10,7 @@ We'd love to talk to you more about training your team on [React](https://facebo
 
 ### Sponsors
 
-The fast, global infrastructure that powers npmcdn is graciously provided by [CloudFlare](https://www.cloudflare.com) and [Heroku](https://www.heroku.com).
+The fast, global infrastructure that powers unpkg is graciously provided by [CloudFlare](https://www.cloudflare.com) and [Heroku](https://www.heroku.com).
 
 <div class="about-logos">
   <div class="about-logo">
@@ -21,7 +21,7 @@ The fast, global infrastructure that powers npmcdn is graciously provided by [Cl
   </div>
 </div>
 
-These sponsors provide some of the most robust, reliable infrastructure available today and I'm happy to be able to partner with them on npmcdn.
+These sponsors provide some of the most robust, reliable infrastructure available today and I'm happy to be able to partner with them on unpkg.
 
 ### Cache Behavior
 
@@ -33,17 +33,17 @@ Browsers are instructed (via the `Cache-Control` header) to cache assets for 4 h
 
 ### Support
 
-npmcdn is a free, best-effort service and cannot provide any uptime or support guarantees.
+unpkg is a free, best-effort service and cannot provide any uptime or support guarantees.
 
 I do my best to keep it running, but sometimes things go wrong. Sometimes there are network or provider issues outside my control. Sometimes abusive traffic temporarily affects response times. Sometimes I break things by doing something dumb, but I try not to.
 
-The goal of npmcdn is to provide a hassle-free CDN for npm package authors. It's also a great resource for people creating demos and instructional material. However, if you rely on it to serve files that are crucial to your business, you should probably pay for a host with well-supported infrastructure and uptime guarantees.
+The goal of unpkg is to provide a hassle-free CDN for npm package authors. It's also a great resource for people creating demos and instructional material. However, if you rely on it to serve files that are crucial to your business, you should probably pay for a host with well-supported infrastructure and uptime guarantees.
 
-npmcdn is not affiliated with or supported by npm, Inc. in any way. Please do not contact npm for help with npmcdn.
+unpkg is not affiliated with or supported by npm, Inc. in any way. Please do not contact npm for help with unpkg.
 
 ### Abuse
 
-npmcdn blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/mjackson/npmcdn/blob/master/modules/PackageBlacklist.js)!
+unpkg blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/mjackson/unpkg/blob/master/modules/PackageBlacklist.js)!
 
 ### Feedback
 

@@ -59,7 +59,7 @@ class Layout extends React.Component {
       <div>
         <Window onResize={this.adjustUnderline}/>
         <header>
-          <h1>npmcdn</h1>
+          <h1>unpkg</h1>
           <nav>
             <ol className="underlist">
               <li><a href="#/">Home</a></li>

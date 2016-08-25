@@ -11,7 +11,7 @@ const fetchStats = (callback) => {
   if (process.env.NODE_ENV === 'development') {
     callback(null, require('./CloudFlareStats.json'))
   } else {
-    getZones('npmcdn.com')
+    getZones('unpkg.com')
       .then(zones => {
         const zone = zones[0]
         const since = new Date(Date.now() - ThirtyDays)
