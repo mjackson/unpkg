@@ -41,6 +41,10 @@ The goal of npmcdn is to provide a hassle-free CDN for npm package authors. It's
 
 npmcdn is not affiliated with or supported by npm, Inc. in any way. Please do not contact npm for help with npmcdn.
 
+### Abuse
+
+npmcdn blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/mjackson/npmcdn/blob/master/PackageBlacklist.json)!
+
 ### Feedback
 
 If you think this is useful, I'd love to hear from you. Please reach out to [@mjackson](https://twitter.com/mjackson) with any questions/concerns.

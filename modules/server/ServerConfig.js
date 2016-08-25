@@ -14,3 +14,4 @@ export const bowerBundle = process.env.BOWER_BUNDLE || '/bower.zip'
 export const redirectTTL = process.env.REDIRECT_TTL || 500
 export const autoIndex = !process.env.DISABLE_INDEX
 export const redisURL = process.env.REDIS_URL
+export const blacklist = require('../../PackageBlacklist')
