@@ -51,12 +51,10 @@ You may use the special `/bower.zip` file path in packages that contain a `bower
     <tr>
       <td>`json`</td>
       <td>`undefined`</td>
-      <td>Return metadata about the resource at the current URL as JSON (e.g. `/any/path?json`). For directories, this generates a recursive listing of all files in the directory.</td>
+      <td>Return a recursive list of metadata about all the files in a directory as JSON (e.g. `/any/path/?json`). Note: this only works for directories.</td>
     </tr>
   </tbody>
 </table>
-
-**All other query parameters are invalid** and will result in a `403 Forbidden` response. This helps preserve the integrity of the cache for URLs with valid query strings.
 
 ### Suggested Workflow
 
