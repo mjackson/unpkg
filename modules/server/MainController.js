@@ -39,6 +39,8 @@ export const sendHomePage = (req, res, next) => {
     if (error) {
       next(error)
     } else {
+      res.set('Cache-Control', 'public, max-age=60')
+
       res.send(
         DOCTYPE + renderToStaticMarkup(<HomePage {...props} stats={stats}/>)
       )
