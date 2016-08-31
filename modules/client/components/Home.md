@@ -6,7 +6,7 @@ A few examples:
 
   * [https://unpkg.com/react@15.0.1/dist/react.min.js](/react@15.0.1/dist/react.min.js)
   * [https://unpkg.com/react-dom@15.0.1/dist/react-dom.min.js](/react-dom@15.0.1/dist/react-dom.min.js)
-  * [https://unpkg.com/history@1.12.5/umd/History.min.js](/history@1.12.5/umd/History.min.js)
+  * [https://unpkg.com/history@3.0.0/umd/history.min.js](/history@3.0.0/umd/history.min.js)
 
 You may also use a [tag](https://docs.npmjs.com/cli/dist-tag) or [version range](https://docs.npmjs.com/misc/semver) instead of a fixed version number, or omit the version/tag entirely to use the `latest` tag.
 
