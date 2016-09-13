@@ -1,6 +1,6 @@
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { getZones, getZoneAnalyticsDashboard } from './CloudFlare'
+import { getAnalyticsDashboards } from './CloudFlare'
 import HomePage from './components/HomePage'
 
 const OneMinute = 1000 * 60
@@ -11,17 +11,11 @@ const fetchStats = (callback) => {
   if (process.env.NODE_ENV === 'development') {
     callback(null, require('./CloudFlareStats.json'))
   } else {
-    getZones('unpkg.com')
-      .then(zones => {
-        const zone = zones[0]
-        const since = new Date(Date.now() - ThirtyDays)
-        const until = new Date(Date.now() - OneMinute)
+    const since = new Date(Date.now() - ThirtyDays)
+    const until = new Date(Date.now() - OneMinute)
 
-        return getZoneAnalyticsDashboard(zone, since, until).then(result => {
-          callback(null, result)
-        })
-      })
-      .catch(callback)
+    getAnalyticsDashboards([ 'npmcdn.com', 'unpkg.com' ], since, until)
+      .then(result => callback(null, result), callback)
   }
 }
 
