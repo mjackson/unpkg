@@ -20,11 +20,6 @@ const fetchStats = (callback) => {
 }
 
 export const sendHomePage = (req, res, next) => {
-  if (req.hostname === 'npmcdn.com') {
-    res.redirect(301, 'https://unpkg.com' + req.originalUrl)
-    return
-  }
-
   const chunks = [ 'vendor', 'home' ]
   const props = {
     styles: req.bundle.getStyleAssets(chunks),
