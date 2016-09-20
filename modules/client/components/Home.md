@@ -4,9 +4,9 @@ unpkg is a fast, global [content-delivery network](https://en.wikipedia.org/wiki
 
 A few examples:
 
-  * [https://unpkg.com/react@15.0.1/dist/react.min.js](/react@15.0.1/dist/react.min.js)
-  * [https://unpkg.com/react-dom@15.0.1/dist/react-dom.min.js](/react-dom@15.0.1/dist/react-dom.min.js)
-  * [https://unpkg.com/history@3.0.0/umd/history.min.js](/history@3.0.0/umd/history.min.js)
+  * [https://unpkg.com/react@15.3.1/dist/react.min.js](/react@15.3.1/dist/react.min.js)
+  * [https://unpkg.com/react-dom@15.3.1/dist/react-dom.min.js](/react-dom@15.3.1/dist/react-dom.min.js)
+  * [https://unpkg.com/history@4.2.0/umd/history.min.js](/history@4.2.0/umd/history.min.js)
 
 You may also use a [tag](https://docs.npmjs.com/cli/dist-tag) or [version range](https://docs.npmjs.com/misc/semver) instead of a fixed version number, or omit the version/tag entirely to use the `latest` tag.
 
@@ -28,7 +28,7 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
 You may use the special `/bower.zip` file path in packages that contain a `bower.json` file to dynamically generate a zip file that Bower can use to install the package.
 
   * [https://unpkg.com/react-swap/bower.zip](/react-swap/bower.zip)
-  * [https://unpkg.com/react-collapse@1.6.3/bower.zip](/react-collapse@1.6.3/bower.zip)
+  * [https://unpkg.com/react-collapse@2.3.3/bower.zip](/react-collapse@2.3.3/bower.zip)
 
 **_We do NOT recommend JavaScript libraries use Bower._** Bower places additional burdens on JavaScript package authors for little to no gain. unpkg is intended to make it easier to publish code, not harder, so Bower support will be removed in January 2017\. Please move to npm for installing packages and stop using Bower before that time. See [here](https://github.com/mjackson/npm-http-server#bower-support) for our rationale.
 
