@@ -1,5 +1,15 @@
-body {
-  font: 16px Helvetica, sans-serif;
+body {  
+  font-size: 16px;
+  font-family: -apple-system,
+               BlinkMacSystemFont,
+               "Segoe UI",
+               Roboto,
+               Helvetica,
+               Arial,
+               sans-serif,
+               "Apple Color Emoji", /* Emojis*/
+               "Segoe UI Emoji", /* Emojis*/
+               "Segoe UI Symbol"; /* Emojis*/
   line-height: 1.5;
   padding: 5px 20px;
 }
