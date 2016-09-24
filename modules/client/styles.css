@@ -6,10 +6,7 @@ body {
                Roboto,
                Helvetica,
                Arial,
-               sans-serif,
-               "Apple Color Emoji", /* Emojis*/
-               "Segoe UI Emoji", /* Emojis*/
-               "Segoe UI Symbol"; /* Emojis*/
+               sans-serif;
   line-height: 1.5;
   padding: 5px 20px;
 }
