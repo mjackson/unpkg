@@ -115,17 +115,3 @@ header nav a:visited {
 .about-logo img {
   max-width: 60%;
 }
-
-.bar-graph {
-  height: 200px;
-}
-
-.bar-graph svg {
-  background: #eee;
-}
-
-.y-axis line,
-.x-axis line {
-  stroke: black;
-  stroke-width: 1px;
-}
