@@ -70,6 +70,9 @@ h1, h2, h3, header nav {
   font-family: Futura, Helvetica, sans-serif;
   text-transform: uppercase;
 }
+h3 {
+  margin-top: 2em;
+}
 
 header h1 {
   font-size: 4em;
