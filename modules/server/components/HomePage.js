@@ -23,6 +23,7 @@ class HomePage extends React.Component {
         <head>
           <meta charSet="utf-8"/>
           <meta httpEquiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+          <meta name="description" content="A fast, global content delivery network for stuff that is published to npm"/>
           <meta name="viewport" content="width=700,maximum-scale=1"/>
           <meta name="timestamp" content={(new Date).toISOString()}/>
           <link rel="icon" href="/favicon.ico?v2"/>
