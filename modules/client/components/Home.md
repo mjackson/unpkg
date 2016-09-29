@@ -1,4 +1,4 @@
-unpkg is a fast, global [content-delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for stuff that is published to [npm](https://www.npmjs.com/). Use it to quickly and easily load files using a simple URL like:
+unpkg is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for stuff that is published to [npm](https://www.npmjs.com/). Use it to quickly and easily load files using a simple URL like:
 
 <div style="text-align:center">`https://unpkg.com/package@version/file`</div>
 
