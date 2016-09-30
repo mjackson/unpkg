@@ -1,12 +1,12 @@
-unpkg is an [open source](https://github.com/mjackson/unpkg) project built by me, [Michael Jackson](https://twitter.com/mjackson). I built it because, as an npm package author, it felt tedious for me to use existing, git-based CDNs to make my open source work available via CDN. Development was sponsored by my company, [React Training](https://reactjs-training.com).
+unpkg is an [open source](https://github.com/mjackson/unpkg) project built by me, [Michael Jackson](https://twitter.com/mjackson). I built it because, as an npm package author, it felt tedious for me to use existing, git-based CDNs to make my open source work available via CDN. Development was sponsored by my company, [React Training](https://reacttraining.com).
 
 <div class="about-logos">
   <div class="about-logo">
-    <a href="https://reactjs-training.com"><img src="../ReactTrainingLogo.png"></a>
+    <a href="https://reacttraining.com"><img src="../ReactTrainingLogo.png"></a>
   </div>
 </div>
 
-We'd love to talk to you more about training your team on [React](https://facebook.github.io/react/). Please [get in touch](mailto:hello@reactjs-training.com) if interested.
+We'd love to talk to you more about training your team on [React](https://facebook.github.io/react/). Please [get in touch](mailto:hello@reacttraining.com) if interested.
 
 ### Sponsors
 
