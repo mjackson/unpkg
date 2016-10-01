@@ -1,4 +1,5 @@
 {
+  "repository": "unpkg/unpkg.com",
   "scripts": {
     "start": "heroku local -f Procfile.local",
     "build": "npm run build-assets && npm run build-lib",
