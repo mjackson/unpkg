@@ -45,7 +45,7 @@ You may use the special `/bower.zip` file path in packages that contain a `bower
   <tbody>
     <tr>
       <td>`main`</td>
-      <td>`browser`, `main`</td>
+      <td>`unpkg`, `browser`, `main`</td>
       <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL.</td>
     </tr>
     <tr>
