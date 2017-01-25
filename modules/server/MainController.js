@@ -1,6 +1,6 @@
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { getAnalyticsDashboards } from './CloudFlare'
+import { getAnalyticsDashboards } from './Cloudflare'
 import HomePage from './components/HomePage'
 
 const OneMinute = 1000 * 60
@@ -9,7 +9,7 @@ const DOCTYPE = '<!DOCTYPE html>'
 
 const fetchStats = (callback) => {
   if (process.env.NODE_ENV === 'development') {
-    callback(null, require('./CloudFlareStats.json'))
+    callback(null, require('./CloudflareStats.json'))
   } else {
     const since = new Date(Date.now() - ThirtyDays)
     const until = new Date(Date.now() - OneMinute)

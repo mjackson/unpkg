@@ -10,11 +10,11 @@ We'd love to talk to you more about training your team on [React](https://facebo
 
 ### Sponsors
 
-The fast, global infrastructure that powers unpkg is graciously provided by [CloudFlare](https://www.cloudflare.com) and [Heroku](https://www.heroku.com).
+The fast, global infrastructure that powers unpkg is generously donated by [Cloudflare](https://www.cloudflare.com) and [Heroku](https://www.heroku.com).
 
 <div class="about-logos">
   <div class="about-logo">
-    <a href="https://www.cloudflare.com"><img src="../CloudFlareLogo.png"></a>
+    <a href="https://www.cloudflare.com"><img src="../CloudflareLogo.png"></a>
   </div>
   <div class="about-logo">
     <a href="https://www.heroku.com"><img src="../HerokuLogo.png"></a>

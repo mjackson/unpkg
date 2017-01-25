@@ -2,16 +2,16 @@ import 'isomorphic-fetch'
 import { createStack, createFetch, header, base, query, parseJSON, onResponse } from 'http-client'
 import invariant from 'invariant'
 
-const CloudFlareKey = process.env.CLOUDFLARE_KEY
-const CloudFlareEmail = process.env.CLOUDFLARE_EMAIL
+const CloudflareKey = process.env.CLOUDFLARE_KEY
+const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 
 invariant(
-  CloudFlareKey,
+  CloudflareKey,
   'Missing $CLOUDFLARE_KEY environment variable'
 )
 
 invariant(
-  CloudFlareEmail,
+  CloudflareEmail,
   'Missing $CLOUDFLARE_EMAIL environment variable'
 )
 
@@ -31,8 +31,8 @@ const getResult = () =>
   )
 
 const commonStack = createStack(
-  header('X-Auth-Key', CloudFlareKey),
-  header('X-Auth-Email', CloudFlareEmail),
+  header('X-Auth-Key', CloudflareKey),
+  header('X-Auth-Email', CloudflareEmail),
   base('https://api.cloudflare.com/client/v4'),
   getResult()
 )
