@@ -1,4 +1,5 @@
 {
+  "private": true,
   "repository": "unpkg/unpkg.com",
   "scripts": {
     "start": "heroku local -f Procfile.local",
