@@ -29,7 +29,7 @@ class NumberTextInput extends React.Component {
 
   render = () => {
     const { value } = this.state
-    const { parseNumber, formatNumber, ...props } = this.props
+    const { parseNumber, formatNumber, ...props } = this.props // eslint-disable-line no-unused-vars
     const displayValue = formatNumber(value)
 
     return (
