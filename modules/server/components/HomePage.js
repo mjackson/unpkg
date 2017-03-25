@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react'
+const React = require('react')
+
+const PropTypes = React.PropTypes
 
 class HomePage extends React.Component {
   static propTypes = {
@@ -43,4 +45,4 @@ class HomePage extends React.Component {
   }
 }
 
-export default HomePage
+module.exports = HomePage

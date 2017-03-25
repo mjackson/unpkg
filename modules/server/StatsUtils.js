@@ -1,9 +1,9 @@
-import redis from 'redis'
-import onFinished from 'on-finished'
+const redis = require('redis')
+const onFinished = require('on-finished')
 
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
 
-export const logStats = (redisURL) => {
+const logStats = (redisURL) => {
   const redisClient = redis.createClient(redisURL)
 
   return (req, res, next) => {
@@ -24,4 +24,8 @@ export const logStats = (redisURL) => {
 
     next()
   }
+}
+
+module.exports = {
+  logStats
 }

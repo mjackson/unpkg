@@ -1,18 +1,18 @@
 /*eslint-disable no-console*/
-import http from 'http'
-import cors from 'cors'
-import throng from 'throng'
-import morgan from 'morgan'
-import express from 'express'
-import devErrorHandler from 'errorhandler'
-import WebpackDevServer from 'webpack-dev-server'
-import { createRequestHandler } from 'express-unpkg'
-import * as DefaultServerConfig from './ServerConfig'
-import { assetsManifest, staticAssets, devAssets, createDevCompiler } from './AssetsUtils'
-import { sendHomePage } from './MainController'
-import { logStats } from './StatsUtils'
+const http = require('http')
+const cors = require('cors')
+const throng = require('throng')
+const morgan = require('morgan')
+const express = require('express')
+const devErrorHandler = require('errorhandler')
+const WebpackDevServer = require('webpack-dev-server')
+const { createRequestHandler } = require('express-unpkg')
+const DefaultServerConfig = require('./ServerConfig')
+const { assetsManifest, staticAssets, devAssets, createDevCompiler } = require('./AssetsUtils')
+const { sendHomePage } = require('./MainController')
+const { logStats } = require('./StatsUtils')
 
-export const createRouter = (config = {}) => {
+const createRouter = (config = {}) => {
   const router = express.Router()
 
   router.get('/', sendHomePage)
@@ -31,7 +31,7 @@ const errorHandler = (err, req, res, next) => {
   next(err)
 }
 
-export const createServer = (config) => {
+const createServer = (config) => {
   const app = express()
 
   app.disable('x-powered-by')
@@ -67,7 +67,7 @@ export const createServer = (config) => {
   return server
 }
 
-export const createDevServer = (config) => {
+const createDevServer = (config) => {
   const webpackConfig = config.webpackConfig
   const compiler = createDevCompiler(
     webpackConfig,
@@ -107,7 +107,7 @@ export const createDevServer = (config) => {
   return server
 }
 
-export const startServer = (serverConfig) => {
+const startServer = (serverConfig) => {
   const config = {
     ...DefaultServerConfig,
     ...serverConfig
@@ -120,6 +120,12 @@ export const startServer = (serverConfig) => {
   server.listen(config.port, () => {
     console.log('Server #%s listening on port %s, Ctrl+C to stop', config.id, config.port)
   })
+}
+
+module.exports = {
+  createServer,
+  createDevServer,
+  startServer
 }
 
 if (require.main === module)

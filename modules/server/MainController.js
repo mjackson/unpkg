@@ -1,7 +1,7 @@
-import React from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
-import { getAnalyticsDashboards } from './Cloudflare'
-import HomePage from './components/HomePage'
+const React = require('react')
+const { renderToStaticMarkup } = require('react-dom/server')
+const { getAnalyticsDashboards } = require('./Cloudflare')
+const HomePage = require('./components/HomePage')
 
 const OneMinute = 1000 * 60
 const ThirtyDays = OneMinute * 60 * 24 * 30
@@ -19,7 +19,7 @@ const fetchStats = (callback) => {
   }
 }
 
-export const sendHomePage = (req, res, next) => {
+const sendHomePage = (req, res, next) => {
   const chunks = [ 'vendor', 'home' ]
   const props = {
     styles: req.bundle.getStyleAssets(chunks),
@@ -40,4 +40,8 @@ export const sendHomePage = (req, res, next) => {
       )
     }
   })
+}
+
+module.exports = {
+  sendHomePage
 }

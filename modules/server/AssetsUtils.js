@@ -1,6 +1,6 @@
-import fs from 'fs'
-import invariant from 'invariant'
-import webpack from 'webpack'
+const fs = require('fs')
+const invariant = require('invariant')
+const webpack = require('webpack')
 
 const createBundle = (webpackStats) => {
   const { publicPath, assetsByChunkName } = webpackStats
@@ -35,7 +35,7 @@ const createBundle = (webpackStats) => {
  * An express middleware that sets req.manifest from the build manifest
  * in the given file. Should be used in production to get consistent hashes.
  */
-export const assetsManifest = (webpackManifestFile) => {
+const assetsManifest = (webpackManifestFile) => {
   let manifest
   try {
     manifest = JSON.parse(fs.readFileSync(webpackManifestFile, 'utf8'))
@@ -58,7 +58,7 @@ export const assetsManifest = (webpackManifestFile) => {
  * An express middleware that sets req.bundle from the build
  * info in the given stats file. Should be used in production.
  */
-export const staticAssets = (webpackStatsFile) => {
+const staticAssets = (webpackStatsFile) => {
   let stats
   try {
     stats = JSON.parse(fs.readFileSync(webpackStatsFile, 'utf8'))
@@ -84,7 +84,7 @@ export const staticAssets = (webpackStatsFile) => {
  * latest result from a running webpack compiler (i.e. using
  * webpack-dev-middleware). Should only be used in dev.
  */
-export const devAssets = (webpackCompiler) => {
+const devAssets = (webpackCompiler) => {
   let bundle
   webpackCompiler.plugin('done', (stats) => {
     bundle = createBundle(stats.toJson())
@@ -106,7 +106,7 @@ export const devAssets = (webpackCompiler) => {
  * Creates a webpack compiler that automatically inlines the
  * webpack dev runtime in all entry points.
  */
-export const createDevCompiler = (webpackConfig, webpackRuntimeModuleID) =>
+const createDevCompiler = (webpackConfig, webpackRuntimeModuleID) =>
   webpack({
     ...webpackConfig,
     entry: prependModuleID(
@@ -137,4 +137,11 @@ const prependModuleID = (webpackEntry, moduleID) => {
   }
 
   throw new Error('Invalid webpack entry object')
+}
+
+module.exports = {
+  assetsManifest,
+  staticAssets,
+  devAssets,
+  createDevCompiler
 }
