@@ -58,6 +58,6 @@
     "eslint-plugin-react": "^5.1.1"
   },
   "engines": {
-    "node": "5.8.x"
+    "node": "6.6.x"
   }
 }
