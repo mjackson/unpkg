@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { parseNumber, formatNumber } from '../NumberUtils'
+import { parseNumber, formatNumber } from './NumberUtils'
 
 class NumberTextInput extends React.Component {
   static propTypes = {

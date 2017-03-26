@@ -74,8 +74,20 @@ const reduceResults = (target, results) => {
   return target
 }
 
+const OneMinute = 1000 * 60
+const ThirtyDays = OneMinute * 60 * 24 * 30
+
+const fetchStats = (callback) => {
+  const since = new Date(Date.now() - ThirtyDays)
+  const until = new Date(Date.now() - OneMinute)
+
+  getAnalyticsDashboards([ 'npmcdn.com', 'unpkg.com' ], since, until)
+    .then(result => callback(null, result), callback)
+}
+
 module.exports = {
   getZones,
   getZoneAnalyticsDashboard,
-  getAnalyticsDashboards
+  getAnalyticsDashboards,
+  fetchStats
 }

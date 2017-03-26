@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react'
-import formatBytes from 'byte-size'
+import formatBytes from 'pretty-bytes'
 import formatDate from 'date-fns/format'
 import parseDate from 'date-fns/parse'
-import { formatNumber, formatPercent } from '../NumberUtils'
-import { ContinentsIndex, CountriesIndex, getCountriesByContinent } from '../CountryUtils'
+import { formatNumber, formatPercent } from './NumberUtils'
+import { ContinentsIndex, CountriesIndex, getCountriesByContinent } from './CountryUtils'
 import NumberTextInput from './NumberTextInput'
 
 const getSum = (data, countries) =>
@@ -21,23 +21,24 @@ const addValues = (a, b) => {
 
 class Stats extends React.Component {
   static propTypes = {
-    stats: PropTypes.object
+    serverData: PropTypes.object
   }
 
   static defaultProps = {
-    stats: window.cloudFlareStats
+    serverData: window.serverData
   }
 
   state = {
     minRequests: 5000000
   }
 
-  updateMinRequests = (value) =>
+  updateMinRequests = (value) => {
     this.setState({ minRequests: value })
+  }
     
-  render = () => {
+  render() {
     const { minRequests } = this.state
-    const { stats } = this.props
+    const stats = this.props.serverData.cloudflareStats
     const { timeseries, totals } = stats
 
     // Summary data

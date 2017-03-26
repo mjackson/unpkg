@@ -1,1 +1,1 @@
-web: NODE_ENV=development node -r ./modules/register.js modules/server
+web: NODE_ENV=development node server.js

@@ -2,7 +2,7 @@ unpkg is an [open source](https://github.com/mjackson/unpkg) project built by me
 
 <div class="about-logos">
   <div class="about-logo">
-    <a href="https://reacttraining.com"><img src="../ReactTrainingLogo.png"></a>
+    <a href="https://reacttraining.com"><img src="./ReactTrainingLogo.png"></a>
   </div>
 </div>
 
@@ -14,10 +14,10 @@ The fast, global infrastructure that powers unpkg is generously donated by [Clou
 
 <div class="about-logos">
   <div class="about-logo">
-    <a href="https://www.cloudflare.com"><img src="../CloudflareLogo.png"></a>
+    <a href="https://www.cloudflare.com"><img src="./CloudflareLogo.png"></a>
   </div>
   <div class="about-logo">
-    <a href="https://www.heroku.com"><img src="../HerokuLogo.png"></a>
+    <a href="https://www.heroku.com"><img src="./HerokuLogo.png"></a>
   </div>
 </div>
 

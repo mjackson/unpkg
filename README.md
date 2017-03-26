@@ -1,3 +1,11 @@
-The website for [unpkg](https://unpkg.com), built using [web-starter](https://github.com/mjackson/web-starter).
+# unpkg
 
-If you're interested in learning how the server works or you'd like to open an issue, you probably want [unpkg/npm-http-server](https://github.com/unpkg/npm-http-server)
+[unpkg](https://unpkg.com) is a fast, global CDN for everything on [npm](https://www.npmjs.com/).
+
+The project is maintained by [React Training](https://reacttraining.com) with sponsorship from [Cloudflare](https://cloudflare.com) and [Heroku](https://heroku.com).
+
+## Development
+
+The website was built using [create-react-app](https://github.com/facebookincubator/create-react-app). This is the app you see when you run `yarn start`. However, none of the package links will work.
+
+To start the backend, use `yarn run serve`. This will start the backend so the website (which is really just a static HTML file) can serve as a proxy for package requests.

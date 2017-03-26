@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react'
-import { Motion, spring } from 'react-motion'
 import { findDOMNode } from 'react-dom'
-import Window from './Window'
+import { Motion, spring } from 'react-motion'
+import { withRouter, Link } from 'react-router-dom'
+import WindowSize from './WindowSize'
 
 class Layout extends React.Component {
   static propTypes = {
@@ -39,15 +40,16 @@ class Layout extends React.Component {
     })
   }
 
-  componentDidMount = () =>
+  componentDidMount() {
     this.adjustUnderline()
+  }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname)
       this.adjustUnderline(true)
   }
 
-  render = () => {
+  render() {
     const { underlineLeft, underlineWidth, useSpring } = this.state
 
     const style = {
@@ -57,14 +59,14 @@ class Layout extends React.Component {
 
     return (
       <div>
-        <Window onResize={this.adjustUnderline}/>
+        <WindowSize onChange={this.adjustUnderline}/>
         <header>
           <h1>unpkg</h1>
           <nav>
             <ol className="underlist">
-              <li><a href="#/">Home</a></li>
-              <li><a href="#/stats">Stats</a></li>
-              <li><a href="#/about">About</a></li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/stats">Stats</Link></li>
+              <li><Link to="/about">About</Link></li>
             </ol>
             <Motion defaultStyle={{ left: underlineLeft, width: underlineWidth }} style={style}>
               {s => (
@@ -86,4 +88,4 @@ class Layout extends React.Component {
   }
 }
 
-export default Layout
+export default withRouter(Layout)

@@ -3,7 +3,7 @@ const onFinished = require('on-finished')
 
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
 
-const logStats = (redisURL) => {
+const logPackageRequests = (redisURL) => {
   const redisClient = redis.createClient(redisURL)
 
   return (req, res, next) => {
@@ -27,5 +27,5 @@ const logStats = (redisURL) => {
 }
 
 module.exports = {
-  logStats
+  logPackageRequests
 }
