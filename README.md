@@ -8,4 +8,4 @@ The project is maintained by [React Training](https://reacttraining.com) with sp
 
 The website was built using [create-react-app](https://github.com/facebookincubator/create-react-app). This is the app you see when you run `yarn start`. However, none of the package links will work.
 
-To start the backend, use `yarn run serve`. This will start the backend so the website (which is really just a static HTML file) can serve as a proxy for package requests.
+To start the backend, use `yarn run server`. This will start the backend so the website (which is really just a static HTML file) can serve as a proxy for package requests.
