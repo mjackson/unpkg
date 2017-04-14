@@ -43,7 +43,7 @@ unpkg is not affiliated with or supported by npm, Inc. in any way. Please do not
 
 ### Abuse
 
-unpkg blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/mjackson/unpkg/blob/master/modules/PackageBlacklist.js)!
+unpkg blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/unpkg/unpkg.com/blob/master/server/package-blacklist.json)!
 
 ### Feedback
 
