@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import { parseNumber, formatNumber } from './NumberUtils'
 
 class NumberTextInput extends React.Component {
@@ -15,8 +16,13 @@ class NumberTextInput extends React.Component {
     formatNumber
   }
 
-  componentWillMount = () =>
+  state = {
+    value: null
+  }
+
+  componentWillMount() {
     this.setState({ value: this.props.value })
+  }
 
   handleChange = (event) => {
     const value = this.props.parseNumber(event.target.value)
@@ -27,7 +33,7 @@ class NumberTextInput extends React.Component {
     })
   }
 
-  render = () => {
+  render() {
     const { value } = this.state
     const { parseNumber, formatNumber, ...props } = this.props // eslint-disable-line no-unused-vars
     const displayValue = formatNumber(value)

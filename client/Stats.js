@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import formatBytes from 'pretty-bytes'
 import formatDate from 'date-fns/format'
 import parseDate from 'date-fns/parse'
@@ -35,7 +36,7 @@ class Stats extends React.Component {
   updateMinRequests = (value) => {
     this.setState({ minRequests: value })
   }
-    
+
   render() {
     const { minRequests } = this.state
     const stats = this.props.serverData.cloudflareStats
