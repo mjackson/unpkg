@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react'
-import { findDOMNode } from 'react-dom'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import PropTypes from 'prop-types'
 import { Motion, spring } from 'react-motion'
 import { withRouter, Link } from 'react-router-dom'
 import WindowSize from './WindowSize'
@@ -30,7 +31,7 @@ class Layout extends React.Component {
         itemIndex = 0
     }
 
-    const itemNodes = findDOMNode(this).querySelectorAll('.underlist > li')
+    const itemNodes = ReactDOM.findDOMNode(this).querySelectorAll('.underlist > li')
     const currentNode = itemNodes[itemIndex]
 
     this.setState({
