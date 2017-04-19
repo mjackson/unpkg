@@ -16,7 +16,6 @@
     "express-unpkg": "^1.1.1",
     "http-client": "^4.3.1",
     "morgan": "^1.8.1",
-    "on-finished": "^2.3.0",
     "pretty-bytes": "^3",
     "prop-types": "^15.5.8",
     "react": "^15.5.4",

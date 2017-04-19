@@ -5,7 +5,6 @@ const cors = require('cors')
 const morgan = require('morgan')
 const unpkg = require('express-unpkg')
 const { fetchStats } = require('./cloudflare')
-const { logPackageRequests } = require('./logging')
 
 const fs = require('fs')
 const path = require('path')
@@ -51,9 +50,6 @@ const createServer = (config) => {
   app.use(express.static(config.publicDir, {
     maxAge: config.maxAge
   }))
-
-  if (config.redisURL)
-    app.use(logPackageRequests(config.redisURL))
 
   app.use(unpkg.createRequestHandler(config))
 
