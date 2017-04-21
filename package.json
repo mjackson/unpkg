@@ -9,6 +9,7 @@
     "test": "node scripts/test.js --env=jsdom"
   },
   "dependencies": {
+    "@risingstack/trace": "^3.6.2",
     "cors": "^2.8.1",
     "countries-list": "^1.3.2",
     "date-fns": "^1.28.1",

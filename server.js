@@ -1,3 +1,5 @@
+require('@risingstack/trace')
+
 const path = require('path')
 const throng = require('throng')
 const { startServer } = require('./server/index')
