@@ -14,7 +14,7 @@
     "countries-list": "^1.3.2",
     "date-fns": "^1.28.1",
     "express": "^4.15.2",
-    "express-unpkg": "^1.2.0",
+    "express-unpkg": "^1.2.2",
     "http-client": "^4.3.1",
     "morgan": "^1.8.1",
     "pretty-bytes": "^3",
