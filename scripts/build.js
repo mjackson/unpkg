@@ -3,6 +3,8 @@
 // Do this as the first thing so that any code reading it knows the right env.
 process.env.NODE_ENV = 'production';
 
+// Use dynamic server data in production by inserting a token that will be
+// replaced when the HTML page is served.
 process.env.REACT_APP_SERVER_DATA = '__SERVER_DATA__';
 
 // Load environment variables from .env file. Suppress warnings using silent

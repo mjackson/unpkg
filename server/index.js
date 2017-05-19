@@ -19,6 +19,8 @@ const sendHomePage = (publicDir) => {
       } else {
         res.set('Cache-Control', 'public, max-age=60')
         res.send(
+          // Replace the __SERVER_DATA__ token that was added to the
+          // HTML file in the build process (see scripts/build.js).
           html.replace('__SERVER_DATA__', JSON.stringify({
             cloudflareStats: stats
           }))
