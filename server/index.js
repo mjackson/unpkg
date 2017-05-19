@@ -37,7 +37,10 @@ const errorHandler = (err, req, res, next) => {
 const raven = require('raven')
 
 if (process.env.SENTRY_DSN)
-  raven.config(process.env.SENTRY_DSN).install()
+  raven.config(process.env.SENTRY_DSN, {
+    environment: process.env.NODE_ENV || 'development',
+    autoBreadcrumbs: true
+  }).install()
 
 const createServer = (config) => {
   const app = express()
