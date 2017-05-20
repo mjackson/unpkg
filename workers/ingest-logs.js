@@ -133,7 +133,7 @@ const ingestLogs = (zone, startSeconds, endSeconds) =>
           const dayKey = `${date.getUTCFullYear()}/${date.getUTCMonth()}/${date.getUTCDate()}`
           const minuteKey = `${date.getUTCHours()}/${date.getUTCMinutes()}`
 
-          // Q: How many requests do we receive per day?
+          // Q: How many requests do we receive per minute?
           incrementKey(changes, `${dayKey}/totalRequests/${minuteKey}`, 1)
 
           // Q: How many requests do we receive to edge/cache/origin per minute?
