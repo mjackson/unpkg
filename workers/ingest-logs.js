@@ -1,6 +1,5 @@
 require('isomorphic-fetch')
 const parseURL = require('url').parse
-const formatURL = require('url').format
 const crypto = require('crypto')
 const invariant = require('invariant')
 const admin = require('firebase-admin')
@@ -172,9 +171,9 @@ const computeLogChanges = (stream) =>
 
         // Q: How many requests per day do we receive from a hostname?
         const referer = clientRequest.referer
+        const hostname = referer && parseURL(referer).hostname
 
-        if (referer) {
-          const hostname = parseURL(referer).hostname
+        if (hostname) {
           const key = `requestsPerDayAndRefererHostname/${dayKey}/${hashKey(hostname)}`
 
           if (changes[key]) {
