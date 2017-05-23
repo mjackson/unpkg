@@ -170,22 +170,17 @@ const computeLogChanges = (stream) =>
           }
         }
 
-        // Q: How many requests per day do we receive from an origin?
+        // Q: How many requests per day do we receive from a hostname?
         const referer = clientRequest.referer
 
         if (referer) {
-          const url = parseURL(referer)
-          const origin = formatURL({
-            protocol: url.protocol,
-            hostname: url.hostname
-          })
-
-          const key = `originRequestsPerDay/${dayKey}/${hashKey(origin)}`
+          const hostname = parseURL(referer).hostname
+          const key = `requestsPerDayAndRefererHostname/${dayKey}/${hashKey(hostname)}`
 
           if (changes[key]) {
             changes[key].requests += 1
           } else {
-            changes[key] = { origin, requests: 1 }
+            changes[key] = { hostname, requests: 1 }
           }
         }
       })
