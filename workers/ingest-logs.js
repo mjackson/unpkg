@@ -209,7 +209,7 @@ const ingestLogs = (zone, startSeconds, endSeconds) =>
   })
 
 const startZone = (zone) => {
-  const startSecondsKey = `logsWorker-nextStartSeconds-${zone.name.replace('.', '-')}`
+  const startSecondsKey = `ingestLogsWorker-nextStartSeconds-${zone.name.replace('.', '-')}`
 
   const takeATurn = () => {
     db.get(startSecondsKey, (error, value) => {
