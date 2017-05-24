@@ -123,20 +123,20 @@ const computeLogChanges = (stream) =>
         const date = new Date(Math.round(entry.timestamp / 1000000))
         const dayKey = `${date.getUTCFullYear()}/${date.getUTCMonth()}/${date.getUTCDate()}`
         const hourKey = `${dayKey}/${date.getUTCHours()}`
-        const minuteKey = `${hourKey}/${date.getUTCMinutes()}`
 
-        // Q: How many requests do we receive per day?
+        // Q: How many requests do we receive per day/hour?
         incKey(`requestsPerDay/${dayKey}`)
+        incKey(`requestsPerHour/${hourKey}`)
 
-        // Q: How many requests do we receive per minute?
-        incKey(`requestsPerMinute/${minuteKey}`)
-
-        // Q: How many requests do we receive to edge/cache/origin per hour?
+        // Q: How many requests do we receive to edge/cache/origin per day/hour?
         if (entry.origin) {
+          incKey(`originRequestsPerDay/${dayKey}`)
           incKey(`originRequestsPerHour/${hourKey}`)
         } else if (entry.cache) {
+          incKey(`cacheRequestsPerDay/${dayKey}`)
           incKey(`cacheRequestsPerHour/${hourKey}`)
         } else {
+          incKey(`edgeRequestsPerDay/${dayKey}`)
           incKey(`edgeRequestsPerHour/${hourKey}`)
         }
 
