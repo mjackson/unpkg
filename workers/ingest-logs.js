@@ -77,16 +77,16 @@ const oneSecond = 1000
 const oneMinute = oneSecond * 60
 const oneHour = oneMinute * 60
 
-const computeLogChanges = (stream) =>
+const computeCounters = (stream) =>
   new Promise((resolve, reject) => {
     const counters = {}
 
-    const incrKey = (key, by = 1) =>
-      counters[key] = (counters[key] || 0) + by
+    const incrCounter = (counterName, by = 1) =>
+      counters[counterName] = (counters[counterName] || 0) + by
 
-    const incrKeyMember = (key, member, by = 1) => {
-      counters[key] = counters[key] || {}
-      counters[key][member] = (counters[key][member] || 0) + by
+    const incrCounterMember = (counterName, member, by = 1) => {
+      counters[counterName] = counters[counterName] || {}
+      counters[counterName][member] = (counters[counterName][member] || 0) + by
     }
 
     stream
@@ -99,20 +99,20 @@ const computeLogChanges = (stream) =>
         const minuteKey = `${hourKey}-${date.getUTCMinutes()}`
 
         // Q: How many requests do we receive per day/hour/minute?
-        incrKey(`stats-requests-${dayKey}`)
-        incrKey(`stats-requests-${hourKey}`)
-        incrKey(`stats-requests-${minuteKey}`)
+        incrCounter(`stats-requests-${dayKey}`)
+        incrCounter(`stats-requests-${hourKey}`)
+        incrCounter(`stats-requests-${minuteKey}`)
 
         // Q: How many requests are served by origin/cache/edge per day/hour?
         if (entry.origin) {
-          incrKey(`stats-originRequests-${dayKey}`)
-          incrKey(`stats-originRequests-${hourKey}`)
+          incrCounter(`stats-originRequests-${dayKey}`)
+          incrCounter(`stats-originRequests-${hourKey}`)
         } else if (entry.cache) {
-          incrKey(`stats-cacheRequests-${dayKey}`)
-          incrKey(`stats-cacheRequests-${hourKey}`)
+          incrCounter(`stats-cacheRequests-${dayKey}`)
+          incrCounter(`stats-cacheRequests-${hourKey}`)
         } else {
-          incrKey(`stats-edgeRequests-${dayKey}`)
-          incrKey(`stats-edgeRequests-${hourKey}`)
+          incrCounter(`stats-edgeRequests-${dayKey}`)
+          incrCounter(`stats-edgeRequests-${hourKey}`)
         }
 
         const clientRequest = entry.clientRequest
@@ -124,15 +124,15 @@ const computeLogChanges = (stream) =>
         const package = getPackageName(parseURL(uri).pathname)
 
         if (package) {
-          incrKeyMember(`stats-packageRequests-${dayKey}`, package)
-          incrKeyMember(`stats-packageBytes-${dayKey}`, package, edgeResponse.bytes)
+          incrCounterMember(`stats-packageRequests-${dayKey}`, package)
+          incrCounterMember(`stats-packageBytes-${dayKey}`, package, edgeResponse.bytes)
         }
 
         // Q: How many requests per day do we receive via each protocol?
         const protocol = clientRequest.httpProtocol
 
         if (protocol)
-          incrKeyMember(`stats-protocolRequests-${dayKey}`, protocol)
+          incrCounterMember(`stats-protocolRequests-${dayKey}`, protocol)
 
         // Q: How many requests do we receive from a hostname per day?
         // Q: How many bytes do we serve to a hostname per day?
@@ -140,8 +140,8 @@ const computeLogChanges = (stream) =>
         const hostname = referer && parseURL(referer).hostname
 
         if (hostname) {
-          incrKeyMember(`stats-hostnameRequests-${dayKey}`, hostname)
-          incrKeyMember(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes)
+          incrCounterMember(`stats-hostnameRequests-${dayKey}`, hostname)
+          incrCounterMember(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes)
         }
       })
       .on('end', () => {
@@ -150,7 +150,7 @@ const computeLogChanges = (stream) =>
   })
 
 const processLogs = (stream) =>
-  computeLogChanges(stream).then(counters => {
+  computeCounters(stream).then(counters => {
     Object.keys(counters).forEach(key => {
       const value = counters[key]
 
@@ -263,11 +263,3 @@ Promise.all(DomainNames.map(getZones)).then(results => {
   const zones = results.reduce((memo, zones) => memo.concat(zones))
   zones.forEach(startZone)
 })
-
-//const getValues = (object) =>
-//  Object.keys(object).map(key => object[key])
-//
-//db.ref('logs/2017/4/17/packages').orderByChild('requests').limitToLast(10).once('value', (snapshot) => {
-//  const values = getValues(snapshot.val()).sort((a, b) => b.requests - a.requests)
-//  console.log(values)
-//})
