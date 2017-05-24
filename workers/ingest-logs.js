@@ -1,15 +1,13 @@
 require('isomorphic-fetch')
 const parseURL = require('url').parse
-const crypto = require('crypto')
 const invariant = require('invariant')
-const admin = require('firebase-admin')
 const gunzip = require('gunzip-maybe')
 const ndjson = require('ndjson')
+const redis = require('redis')
 
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
-const FirebaseURL = process.env.FIREBASE_URL
-const FirebaseAccount = process.env.FIREBASE_ACCOUNT
+const RedisURL = process.env.REDIS_URL
 
 invariant(
   CloudflareEmail,
@@ -22,13 +20,8 @@ invariant(
 )
 
 invariant(
-  FirebaseURL,
-  'Missing the $FIREBASE_URL environment variable'
-)
-
-invariant(
-  FirebaseAccount,
-  'Missing the $FIREBASE_ACCOUNT environment variable'
+  RedisURL,
+  'Missing the $REDIS_URL environment variable'
 )
 
 /**
@@ -55,17 +48,7 @@ Stuff we wanna show on the website:
 - Browser usage
 */
 
-const serviceAccount = JSON.parse(FirebaseAccount)
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: FirebaseURL,
-  databaseAuthVariableOverride: {
-    uid: 'ingest-logs-worker'
-  }
-})
-
-const db = admin.database()
+const db = redis.createClient(RedisURL)
 
 const getZones = (domain) =>
   fetch(`https://api.cloudflare.com/client/v4/zones?name=${domain}`, {
@@ -91,10 +74,7 @@ const toSeconds = (millis) =>
   Math.floor(millis / 1000)
 
 const stringifySeconds = (seconds) =>
-  new Date(seconds * 1000).toGMTString()
-
-const hashKey = (key) =>
-  crypto.createHash('sha1').update(key).digest('hex')
+  new Date(seconds * 1000).toISOString()
 
 // TODO: Copied from express-unpkg, use the same function
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
@@ -106,38 +86,44 @@ const getPackageName = (pathname) => {
 
 const oneSecond = 1000
 const oneMinute = oneSecond * 60
-const thirtyMinutes = oneMinute * 30
 const oneHour = oneMinute * 60
 
 const computeLogChanges = (stream) =>
   new Promise((resolve, reject) => {
-    const changes = {}
+    const counters = {}
 
-    const incKey = (key, n = 1) =>
-      changes[key] = (changes[key] || 0) + n
+    const incrKey = (key, by = 1) =>
+      counters[key] = (counters[key] || 0) + by
+
+    const incrKeyMember = (key, member, by = 1) => {
+      counters[key] = counters[key] || {}
+      counters[key][member] = (counters[key][member] || 0) + by
+    }
 
     stream
       .pipe(ndjson.parse())
       .on('error', reject)
       .on('data', entry => {
         const date = new Date(Math.round(entry.timestamp / 1000000))
-        const dayKey = `${date.getUTCFullYear()}/${date.getUTCMonth()}/${date.getUTCDate()}`
-        const hourKey = `${dayKey}/${date.getUTCHours()}`
+        const dayKey = `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
+        const hourKey = `${dayKey}-${date.getUTCHours()}`
+        const minuteKey = `${hourKey}-${date.getUTCMinutes()}`
 
-        // Q: How many requests do we receive per day/hour?
-        incKey(`requestsPerDay/${dayKey}`)
-        incKey(`requestsPerHour/${hourKey}`)
+        // Q: How many requests do we receive per day/hour/minute?
+        incrKey(`stats-requests-${dayKey}`)
+        incrKey(`stats-requests-${hourKey}`)
+        incrKey(`stats-requests-${minuteKey}`)
 
         // Q: How many requests do we receive to edge/cache/origin per day/hour?
         if (entry.origin) {
-          incKey(`originRequestsPerDay/${dayKey}`)
-          incKey(`originRequestsPerHour/${hourKey}`)
+          incrKey(`stats-originRequests-${dayKey}`)
+          incrKey(`stats-originRequests-${hourKey}`)
         } else if (entry.cache) {
-          incKey(`cacheRequestsPerDay/${dayKey}`)
-          incKey(`cacheRequestsPerHour/${hourKey}`)
+          incrKey(`stats-cacheRequests-${dayKey}`)
+          incrKey(`stats-cacheRequests-${hourKey}`)
         } else {
-          incKey(`edgeRequestsPerDay/${dayKey}`)
-          incKey(`edgeRequestsPerHour/${hourKey}`)
+          incrKey(`stats-edgeRequests-${dayKey}`)
+          incrKey(`stats-edgeRequests-${hourKey}`)
         }
 
         const clientRequest = entry.clientRequest
@@ -146,68 +132,41 @@ const computeLogChanges = (stream) =>
         const uri = clientRequest.uri
         const package = getPackageName(parseURL(uri).pathname)
 
-        if (package) {
-          const key = `packageRequestsPerDay/${dayKey}/${hashKey(package)}`
-
-          if (changes[key]) {
-            changes[key].requests += 1
-          } else {
-            changes[key] = { package, requests: 1 }
-          }
-        }
+        if (package)
+          incrKeyMember(`stats-packageRequests-${dayKey}`, package)
 
         // Q: How many requests per day do we receive via each protocol?
         const protocol = clientRequest.httpProtocol
 
-        if (protocol) {
-          const key = `protocolRequestsPerDay/${dayKey}/${hashKey(protocol)}`
-
-          if (changes[key]) {
-            changes[key].requests += 1
-          } else {
-            changes[key] = { protocol, requests: 1 }
-          }
-        }
+        if (protocol)
+          incrKeyMember(`stats-protocolRequests-${dayKey}`, protocol)
 
         // Q: How many requests per day do we receive from a hostname?
         const referer = clientRequest.referer
         const hostname = referer && parseURL(referer).hostname
 
-        if (hostname) {
-          const key = `requestsPerDayAndRefererHostname/${dayKey}/${hashKey(hostname)}`
-
-          if (changes[key]) {
-            changes[key].requests += 1
-          } else {
-            changes[key] = { hostname, requests: 1 }
-          }
-        }
+        if (hostname)
+          incrKeyMember(`stats-hostnameRequests-${dayKey}`, hostname)
       })
       .on('end', () => {
-        resolve(changes)
+        resolve(counters)
       })
   })
 
 const processLogs = (stream) =>
-  computeLogChanges(stream).then(changes => {
-    // Record the changes.
-    Object.keys(changes).forEach(key => {
-      const ref = db.ref(`logs/${key}`)
+  computeLogChanges(stream).then(counters => {
+    Object.keys(counters).forEach(key => {
+      const value = counters[key]
 
-      ref.transaction(value => {
-        if (typeof changes[key].requests === 'number') {
-          // Nested value with a "requests" property.
-          if (value && value.requests) {
-            value.requests += changes[key].requests
-            return value
-          } else {
-            return changes[key]
-          }
-        } else {
-          // Simple counter.
-          return (value || 0) + changes[key]
-        }
-      })
+      if (typeof value === 'number') {
+        // Simple counter.
+        db.incrby(key, value)
+      } else {
+        // Sorted set.
+        Object.keys(value).forEach(member => {
+          db.zincrby(key, value[member], member)
+        })
+      }
     })
   })
 
@@ -250,11 +209,11 @@ const ingestLogs = (zone, startSeconds, endSeconds) =>
   })
 
 const startZone = (zone) => {
-  const startSecondsRef = db.ref(`logs/nextStartSeconds/${zone.name.replace('.', '-')}`)
+  const startSecondsKey = `logsWorker-nextStartSeconds-${zone.name.replace('.', '-')}`
 
   const takeATurn = () => {
-    startSecondsRef.once('value', snapshot => {
-      let startSeconds = snapshot.val()
+    db.get(startSecondsKey, (error, value) => {
+      let startSeconds = value && parseInt(value, 10)
 
       const now = Date.now()
 
@@ -283,13 +242,13 @@ const startZone = (zone) => {
       // set of logs. This will help ensure that any congestion in the log
       // pipeline has passed and a full set of logs can be ingested.
       // https://support.cloudflare.com/hc/en-us/articles/216672448-Enterprise-Log-Share-REST-API
-      const maxSeconds = toSeconds(now - thirtyMinutes)
+      const maxSeconds = toSeconds(now - (oneMinute * 30))
 
       if (startSeconds < maxSeconds) {
         const endSeconds = startSeconds + LogWindowSeconds
 
         ingestLogs(zone, startSeconds, endSeconds).then(() => {
-          startSecondsRef.set(endSeconds)
+          db.set(startSecondsKey, endSeconds)
           setTimeout(takeATurn)
         }, error => {
           console.error(error.stack)
