@@ -37,17 +37,6 @@ const DomainNames = [
  */
 const LogWindowSeconds = 30
 
-/*
-Stuff we wanna show on the website:
-
-- Most popular packages
-- Protocol usage (HTTP/1.1 vs HTTP/2)
-- Requests per minute
-- Requests per day/week/month (aggregate)
-- Edge/cache/origin hit rates
-- Browser usage
-*/
-
 const db = redis.createClient(RedisURL)
 
 const getZones = (domain) =>
@@ -114,7 +103,7 @@ const computeLogChanges = (stream) =>
         incrKey(`stats-requests-${hourKey}`)
         incrKey(`stats-requests-${minuteKey}`)
 
-        // Q: How many requests do we receive to edge/cache/origin per day/hour?
+        // Q: How many requests are served by origin/cache/edge per day/hour?
         if (entry.origin) {
           incrKey(`stats-originRequests-${dayKey}`)
           incrKey(`stats-originRequests-${hourKey}`)
@@ -127,13 +116,17 @@ const computeLogChanges = (stream) =>
         }
 
         const clientRequest = entry.clientRequest
+        const edgeResponse = entry.edgeResponse
 
-        // Q: How many requests per day do we receive for a package?
+        // Q: How many requests do we receive for a package per day?
+        // Q: How many bytes do we serve for a package per day?
         const uri = clientRequest.uri
         const package = getPackageName(parseURL(uri).pathname)
 
-        if (package)
+        if (package) {
           incrKeyMember(`stats-packageRequests-${dayKey}`, package)
+          incrKeyMember(`stats-packageBytes-${dayKey}`, package, edgeResponse.bytes)
+        }
 
         // Q: How many requests per day do we receive via each protocol?
         const protocol = clientRequest.httpProtocol
@@ -141,12 +134,15 @@ const computeLogChanges = (stream) =>
         if (protocol)
           incrKeyMember(`stats-protocolRequests-${dayKey}`, protocol)
 
-        // Q: How many requests per day do we receive from a hostname?
+        // Q: How many requests do we receive from a hostname per day?
+        // Q: How many bytes do we serve to a hostname per day?
         const referer = clientRequest.referer
         const hostname = referer && parseURL(referer).hostname
 
-        if (hostname)
+        if (hostname) {
           incrKeyMember(`stats-hostnameRequests-${dayKey}`, hostname)
+          incrKeyMember(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes)
+        }
       })
       .on('end', () => {
         resolve(counters)
