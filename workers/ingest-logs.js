@@ -28,8 +28,8 @@ invariant(
  * Domains we want to analyze.
  */
 const DomainNames = [
-  //'npmcdn.com', // We don't have log data on npmcdn.com yet :/
   'unpkg.com'
+  //'npmcdn.com' // We don't have log data on npmcdn.com yet :/
 ]
 
 /**
@@ -96,12 +96,12 @@ const computeCounters = (stream) =>
         const date = new Date(Math.round(entry.timestamp / 1000000))
         const dayKey = `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
         const hourKey = `${dayKey}-${date.getUTCHours()}`
-        const minuteKey = `${hourKey}-${date.getUTCMinutes()}`
+        // const minuteKey = `${hourKey}-${date.getUTCMinutes()}`
 
         // Q: How many requests do we receive per day/hour/minute?
-        incrCounter(`stats-requests-${dayKey}`)
-        incrCounter(`stats-requests-${hourKey}`)
-        incrCounter(`stats-requests-${minuteKey}`)
+        // incrCounter(`stats-requests-${dayKey}`) // Done by ingest_stats worker
+        // incrCounter(`stats-requests-${hourKey}`) // Done by ingest_stats worker
+        // incrCounter(`stats-requests-${minuteKey}`) // Done by ingest_stats worker
 
         // Q: How many requests are served by origin/cache/edge per day/hour?
         if (entry.origin) {
