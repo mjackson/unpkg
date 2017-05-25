@@ -1,6 +1,11 @@
 require('isomorphic-fetch')
-const invariant = require('invariant')
 const redis = require('redis')
+const invariant = require('invariant')
+const {
+  createDayKey,
+  createHourKey,
+  createMinuteKey
+} = require('../server/StatsServer')
 
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
@@ -157,7 +162,7 @@ const processPerDayTimeseries = (ts) =>
       'ERROR: per-day timeseries must span exactly one day'
     )
 
-    const dayKey = `${since.getUTCFullYear()}-${since.getUTCMonth()}-${since.getUTCDate()}`
+    const dayKey = createDayKey(since)
 
     // Q: How many requests do we serve per day?
     db.set(`stats-requests-${dayKey}`, ts.requests.all)
@@ -223,7 +228,7 @@ const processPerHourTimeseries = (ts) =>
       'ERROR: per-hour timeseries must span exactly one hour'
     )
 
-    const hourKey = `${since.getUTCFullYear()}-${since.getUTCMonth()}-${since.getUTCDate()}-${since.getUTCHours()}`
+    const hourKey = createHourKey(since)
 
     // Q: How many requests do we serve per hour? (expire after 7 days)
     db.setex(`stats-requests-${hourKey}`, (oneDaySeconds * 7), ts.requests.all)
@@ -259,7 +264,7 @@ const processPerMinuteTimeseries = (ts) =>
       'ERROR: per-minute timeseries must span exactly one minute'
     )
 
-    const minuteKey = `${since.getUTCFullYear()}-${since.getUTCMonth()}-${since.getUTCDate()}-${since.getUTCHours()}-${since.getUTCMinutes()}`
+    const minuteKey = createMinuteKey(since)
 
     // Q: How many requests do we serve per minute? (expire after 1 day)
     db.setex(`stats-requests-${minuteKey}`, oneDaySeconds, ts.requests.all)
