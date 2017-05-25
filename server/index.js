@@ -106,7 +106,6 @@ const defaultServerConfig = {
   registryURL: process.env.REGISTRY_URL || 'https://registry.npmjs.org',
   redirectTTL: process.env.REDIRECT_TTL || 500,
   autoIndex: !process.env.DISABLE_INDEX,
-  redisURL: process.env.REDIS_URL,
   blacklist: require('./package-blacklist').blacklist
 }
 

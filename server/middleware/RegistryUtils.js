@@ -21,13 +21,10 @@ const getPackageInfoFromRegistry = (registryURL, packageName) => {
   ))
 }
 
-const OneMinute = 60 * 1000
 const PackageNotFound = 'PackageNotFound'
 
 const getPackageInfo = (registryURL, packageName, callback) => {
-  const cacheKey = registryURL + packageName
-
-  RegistryCache.get(cacheKey, (error, value) => {
+  RegistryCache.get(packageName, (error, value) => {
     if (error) {
       callback(error)
     } else if (value) {
@@ -39,15 +36,16 @@ const getPackageInfo = (registryURL, packageName, callback) => {
           // from making unnecessary requests to the registry for
           // bad package names. In the worst case, a brand new
           // package's info will be available within 5 minutes.
-          RegistryCache.set(cacheKey, PackageNotFound, OneMinute * 5)
+          RegistryCache.set(packageName, PackageNotFound, 300)
         } else {
-          RegistryCache.set(cacheKey, value, OneMinute)
+          // Keep package.json in the cache for a minute.
+          RegistryCache.set(packageName, value, 60)
         }
 
         callback(null, value)
       }, error => {
         // Do not cache errors.
-        RegistryCache.del(cacheKey)
+        RegistryCache.del(packageName)
         callback(error)
       })
     }

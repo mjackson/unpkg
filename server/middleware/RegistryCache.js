@@ -1,49 +1,33 @@
 const redis = require('redis')
-const createLRUCache = require('lru-cache')
+const invariant = require('invariant')
 
-const createRedisCache = (redisURL) => {
-  const client = redis.createClient(redisURL)
+const RedisURL = process.env.REDIS_URL
 
-  const createKey = (key) => 'registry:' + key
+invariant(
+  RedisURL,
+  'Missing $REDIS_URL environment variable'
+)
 
-  const set = (key, value, expiry) => {
-    client.set(createKey(key), JSON.stringify(value))
-    client.pexpire(createKey(key), expiry)
-  }
+const db = redis.createClient(RedisURL)
 
-  const get = (key, callback) => {
-    client.get(createKey(key), (error, value) => {
-      callback(error, value && JSON.parse(value))
-    })
-  }
+const createKey = (key) => 'registryCache-' + key
 
-  const del = (key) => {
-    client.del(createKey(key))
-  }
-
-  return { set, get, del }
+const set = (key, value, expiry) => {
+  db.setex(createKey(key), expiry, JSON.stringify(value))
 }
 
-const createMemoryCache = (options) => {
-  const cache = createLRUCache(options)
-
-  const set = (key, value, expiry) => {
-    cache.set(key, value, expiry)
-  }
-
-  const get = (key, callback) => {
-    callback(null, cache.get(key))
-  }
-
-  const del = (key) => {
-    cache.del(key)
-  }
-
-  return { set, get, del }
+const get = (key, callback) => {
+  db.get(createKey(key), (error, value) => {
+    callback(error, value && JSON.parse(value))
+  })
 }
 
-const RegistryCache = process.env.REDIS_URL
-  ? createRedisCache(process.env.REDIS_URL)
-  : createMemoryCache({ max: 1000 })
+const del = (key) => {
+  db.del(createKey(key))
+}
 
-module.exports = RegistryCache
+module.exports = {
+  set,
+  get,
+  del
+}
