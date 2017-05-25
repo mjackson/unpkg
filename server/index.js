@@ -54,8 +54,11 @@ const createServer = (config) => {
 
   app.disable('x-powered-by')
 
-  if (process.env.NODE_ENV === 'development')
+  if (process.env.NODE_ENV !== 'production')
     app.use(morgan('dev'))
+
+  if (process.env.LOG_IDS)
+    app.use(morgan('[:date[clf]] :method :url req-id=:req[x-request-id] cf-ray=:req[cf-ray]'))
 
   app.use(errorHandler)
   app.use(cors())
