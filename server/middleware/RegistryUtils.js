@@ -1,11 +1,8 @@
 require('isomorphic-fetch')
-const debug = require('debug')
 const gunzip = require('gunzip-maybe')
 const mkdirp = require('mkdirp')
 const tar = require('tar-fs')
 const RegistryCache = require('./RegistryCache')
-
-const log = debug('express-unpkg')
 
 const getPackageInfoFromRegistry = (registryURL, packageName) => {
   let encodedPackageName
@@ -36,8 +33,6 @@ const getPackageInfo = (registryURL, packageName, callback) => {
     } else if (value) {
       callback(null, value === PackageNotFound ? null : value)
     } else {
-      log('Registry cache miss for package %s', packageName)
-
       getPackageInfoFromRegistry(registryURL, packageName).then(value => {
         if (value == null) {
           // Keep 404s in the cache for 5 minutes. This prevents us
