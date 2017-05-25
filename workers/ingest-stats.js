@@ -1,5 +1,4 @@
 require('isomorphic-fetch')
-const parseURL = require('url').parse
 const invariant = require('invariant')
 const redis = require('redis')
 
@@ -106,10 +105,20 @@ const ingestStatsForZones = (zones, since, processDashboard) =>
           // per-minute data. Just filter it out here for now.
           results = results.filter(Boolean)
 
-          return results.reduce(reduceResults)
+          return results.length ? results.reduce(reduceResults) : null
         }
       ).then(
         dashboard => {
+          if (dashboard == null) {
+            console.warn(
+              'WARNING: missing dashboards for %s since %d',
+              zoneNames,
+              since
+            )
+
+            return
+          }
+
           const startProcessTime = Date.now()
 
           return processDashboard(dashboard).then(() => {
