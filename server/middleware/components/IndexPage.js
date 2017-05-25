@@ -1,6 +1,5 @@
-const semver = require('semver')
 const React = require('react')
-const PropTypes = require('prop-types')
+const semver = require('semver')
 const DirectoryListing = require('./DirectoryListing')
 const { readCSS } = require('../StyleUtils')
 
