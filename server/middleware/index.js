@@ -31,7 +31,7 @@ const checkLocalCache = (dir, callback) =>
 const ResolveExtensions = [ '', '.js', '.json' ]
 
 const createTempPath = (name) =>
-  joinPaths(tmpdir(), `express-unpkg-${name}`)
+  joinPaths(tmpdir(), `unpkg-${name}`)
 
 /**
  * Resolves a path like "lib/file" into "lib/file.js" or
