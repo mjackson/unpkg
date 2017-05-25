@@ -289,8 +289,8 @@ const startZones = (zones) => {
   takePerDayTurn()
 
   setInterval(takePerMinuteTurn, oneMinute)
-  setInterval(takePerHourTurn, oneHour)
-  setInterval(takePerDayTurn, oneDay / 2)
+  setInterval(takePerHourTurn, oneHour / 2)
+  setInterval(takePerDayTurn, oneHour / 2)
 }
 
 Promise.all(DomainNames.map(getZones)).then(results => {
