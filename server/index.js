@@ -3,7 +3,7 @@ const http = require('http')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const unpkg = require('express-unpkg')
+const middleware = require('./middleware')
 const { fetchStats } = require('./cloudflare')
 
 const fs = require('fs')
@@ -69,7 +69,7 @@ const createServer = (config) => {
     maxAge: config.maxAge
   }))
 
-  app.use(unpkg.createRequestHandler(config))
+  app.use(middleware.createRequestHandler(config))
 
   const server = http.createServer(app)
 
