@@ -1,11 +1,12 @@
 require('isomorphic-fetch')
 const redis = require('redis')
+const addDays = require('date-fns/add_days')
 const invariant = require('invariant')
 const {
   createDayKey,
   createHourKey,
   createMinuteKey
-} = require('../server/StatsServer')
+} = require('./StatsServer')
 
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
@@ -64,6 +65,9 @@ const oneDay = oneHour * 24
 const oneMinuteSeconds = 60
 const oneHourSeconds = oneMinuteSeconds * 60
 const oneDaySeconds = oneHourSeconds * 24
+
+const getSeconds = (date) =>
+  Math.floor(date.getTime() / 1000)
 
 const reduceResults = (memo, results) => {
   Object.keys(results).forEach(key => {
@@ -163,27 +167,34 @@ const processPerDayTimeseries = (ts) =>
     )
 
     const dayKey = createDayKey(since)
+    const oneYearLater = getSeconds(addDays(until, 365))
+    const thirtyDaysLater = getSeconds(addDays(until, 30))
 
     // Q: How many requests do we serve per day?
     db.set(`stats-requests-${dayKey}`, ts.requests.all)
+    db.expireat(`stats-requests-${dayKey}`, oneYearLater)
+
     // Q: How many requests do we serve per day from the cache?
     db.set(`stats-requestsFromCache-${dayKey}`, ts.requests.cached)
+    db.expireat(`stats-requestsFromCache-${dayKey}`, oneYearLater)
 
     // Q: How much bandwidth do we serve per day?
     db.set(`stats-bandwidth-${dayKey}`, ts.bandwidth.all)
+    db.expireat(`stats-bandwidth-${dayKey}`, oneYearLater)
+
     // Q: How much bandwidth do we serve per day from the cache?
     db.set(`stats-bandwidthFromCache-${dayKey}`, ts.bandwidth.cached)
+    db.expireat(`stats-bandwidthFromCache-${dayKey}`, oneYearLater)
 
-    // Q: How many errors do we serve per day?
     const httpStatus = ts.requests.http_status
     const errors = Object.keys(httpStatus).reduce((memo, status) => {
       return parseInt(status, 10) >= 500 ? memo + httpStatus[status] : memo
     }, 0)
 
+    // Q: How many errors do we serve per day?
     db.set(`stats-errors-${dayKey}`, errors)
+    db.expireat(`stats-errors-${dayKey}`, oneYearLater)
 
-    // Q: How many requests do we serve to a country per day?
-    // Q: How much bandwidth do we serve to a country per day?
     const requestsByCountry = []
     const bandwidthByCountry = []
 
@@ -191,18 +202,24 @@ const processPerDayTimeseries = (ts) =>
       const requests = ts.requests.country[country]
       const bandwidth = ts.bandwidth.country[country]
 
-      // Include only countries who made at least 1M requests.
-      if (requests > 1000000) {
+      // Include only countries who made at least 100K requests.
+      if (requests > 100000) {
         requestsByCountry.push(requests, country)
         bandwidthByCountry.push(bandwidth, country)
       }
     })
 
-    if (requestsByCountry.length)
+    // Q: How many requests do we serve to a country per day?
+    if (requestsByCountry.length) {
       db.zadd([ `stats-requestsByCountry-${dayKey}`, ...requestsByCountry ])
+      db.expireat(`stats-requestsByCountry-${dayKey}`, thirtyDaysLater)
+    }
 
-    if (bandwidthByCountry.length)
+    // Q: How much bandwidth do we serve to a country per day?
+    if (bandwidthByCountry.length) {
       db.zadd([ `stats-bandwidthByCountry-${dayKey}`, ...bandwidthByCountry ])
+      db.expireat(`stats-bandwidthByCountry-${dayKey}`, thirtyDaysLater)
+    }
 
     resolve()
   })
@@ -230,14 +247,16 @@ const processPerHourTimeseries = (ts) =>
 
     const hourKey = createHourKey(since)
 
-    // Q: How many requests do we serve per hour? (expire after 7 days)
+    // Q: How many requests do we serve per hour?
     db.setex(`stats-requests-${hourKey}`, (oneDaySeconds * 7), ts.requests.all)
-    // Q: How many requests do we serve per hour from the cache? (expire after 7 days)
+
+    // Q: How many requests do we serve per hour from the cache?
     db.setex(`stats-requestsFromCache-${hourKey}`, (oneDaySeconds * 7), ts.requests.cached)
 
-    // Q: How much bandwidth do we serve per hour? (expire after 7 days)
+    // Q: How much bandwidth do we serve per hour?
     db.setex(`stats-bandwidth-${hourKey}`, (oneDaySeconds * 7), ts.bandwidth.all)
-    // Q: How much bandwidth do we serve per hour from the cache? (expire after 7 days)
+
+    // Q: How much bandwidth do we serve per hour from the cache?
     db.setex(`stats-bandwidthFromCache-${hourKey}`, (oneDaySeconds * 7), ts.bandwidth.cached)
 
     resolve()
@@ -266,14 +285,16 @@ const processPerMinuteTimeseries = (ts) =>
 
     const minuteKey = createMinuteKey(since)
 
-    // Q: How many requests do we serve per minute? (expire after 1 day)
+    // Q: How many requests do we serve per minute?
     db.setex(`stats-requests-${minuteKey}`, oneDaySeconds, ts.requests.all)
-    // Q: How many requests do we serve per minute from the cache? (expire after 1 day)
+
+    // Q: How many requests do we serve per minute from the cache?
     db.setex(`stats-requestsFromCache-${minuteKey}`, oneDaySeconds, ts.requests.cached)
 
-    // Q: How much bandwidth do we serve per minute? (expire after 1 day)
+    // Q: How much bandwidth do we serve per minute?
     db.setex(`stats-bandwidth-${minuteKey}`, oneDaySeconds, ts.bandwidth.all)
-    // Q: How much bandwidth do we serve per minute from the cache? (expire after 1 day)
+
+    // Q: How much bandwidth do we serve per minute from the cache?
     db.setex(`stats-bandwidthFromCache-${minuteKey}`, oneDaySeconds, ts.bandwidth.cached)
 
     resolve()

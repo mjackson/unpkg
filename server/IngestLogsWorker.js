@@ -4,6 +4,12 @@ const invariant = require('invariant')
 const gunzip = require('gunzip-maybe')
 const ndjson = require('ndjson')
 const redis = require('redis')
+const startOfDay = require('date-fns/start_of_day')
+const addDays = require('date-fns/add_days')
+const {
+  createDayKey,
+  createHourKey
+} = require('./StatsServer')
 
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
@@ -77,9 +83,13 @@ const oneSecond = 1000
 const oneMinute = oneSecond * 60
 const oneHour = oneMinute * 60
 
+const getSeconds = (date) =>
+  Math.floor(date.getTime() / 1000)
+
 const computeCounters = (stream) =>
   new Promise((resolve, reject) => {
     const counters = {}
+    const expireat = {}
 
     const incrCounter = (counterName, by = 1) =>
       counters[counterName] = (counters[counterName] || 0) + by
@@ -94,25 +104,31 @@ const computeCounters = (stream) =>
       .on('error', reject)
       .on('data', entry => {
         const date = new Date(Math.round(entry.timestamp / 1000000))
-        const dayKey = `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
-        const hourKey = `${dayKey}-${date.getUTCHours()}`
-        // const minuteKey = `${hourKey}-${date.getUTCMinutes()}`
+        const nextDay = startOfDay(addDays(date, 1))
+        const thirtyDaysLater = getSeconds(addDays(nextDay, 30))
 
-        // Q: How many requests do we receive per day/hour/minute?
-        // incrCounter(`stats-requests-${dayKey}`) // Done by ingest_stats worker
-        // incrCounter(`stats-requests-${hourKey}`) // Done by ingest_stats worker
-        // incrCounter(`stats-requests-${minuteKey}`) // Done by ingest_stats worker
+        const dayKey = createDayKey(date)
+        const hourKey = createHourKey(date)
 
         // Q: How many requests are served by origin/cache/edge per day/hour?
         if (entry.origin) {
           incrCounter(`stats-originRequests-${dayKey}`)
+          expireat[`stats-originRequests-${dayKey}`] = thirtyDaysLater
+
           incrCounter(`stats-originRequests-${hourKey}`)
+          expireat[`stats-originRequests-${hourKey}`] = thirtyDaysLater
         } else if (entry.cache) {
           incrCounter(`stats-cacheRequests-${dayKey}`)
+          expireat[`stats-cacheRequests-${dayKey}`] = thirtyDaysLater
+
           incrCounter(`stats-cacheRequests-${hourKey}`)
+          expireat[`stats-cacheRequests-${hourKey}`] = thirtyDaysLater
         } else {
           incrCounter(`stats-edgeRequests-${dayKey}`)
+          expireat[`stats-edgeRequests-${dayKey}`] = thirtyDaysLater
+
           incrCounter(`stats-edgeRequests-${hourKey}`)
+          expireat[`stats-edgeRequests-${hourKey}`] = thirtyDaysLater
         }
 
         const clientRequest = entry.clientRequest
@@ -125,14 +141,19 @@ const computeCounters = (stream) =>
 
         if (package) {
           incrCounterMember(`stats-packageRequests-${dayKey}`, package)
+          expireat[`stats-packageRequests-${dayKey}`] = thirtyDaysLater
+
           incrCounterMember(`stats-packageBytes-${dayKey}`, package, edgeResponse.bytes)
+          expireat[`stats-packageBytes-${dayKey}`] = thirtyDaysLater
         }
 
         // Q: How many requests per day do we receive via each protocol?
         const protocol = clientRequest.httpProtocol
 
-        if (protocol)
+        if (protocol) {
           incrCounterMember(`stats-protocolRequests-${dayKey}`, protocol)
+          expireat[`stats-protocolRequests-${dayKey}`] = thirtyDaysLater
+        }
 
         // Q: How many requests do we receive from a hostname per day?
         // Q: How many bytes do we serve to a hostname per day?
@@ -141,16 +162,19 @@ const computeCounters = (stream) =>
 
         if (hostname) {
           incrCounterMember(`stats-hostnameRequests-${dayKey}`, hostname)
+          expireat[`stats-hostnameRequests-${dayKey}`] = thirtyDaysLater
+
           incrCounterMember(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes)
+          expireat[`stats-hostnameBytes-${dayKey}`] = thirtyDaysLater
         }
       })
       .on('end', () => {
-        resolve(counters)
+        resolve({ counters, expireat })
       })
   })
 
 const processLogs = (stream) =>
-  computeCounters(stream).then(counters => {
+  computeCounters(stream).then(({ counters, expireat }) => {
     Object.keys(counters).forEach(key => {
       const value = counters[key]
 
@@ -163,6 +187,9 @@ const processLogs = (stream) =>
           db.zincrby(key, value[member], member)
         })
       }
+
+      if (expireat[key])
+        db.expireat(key, expireat[key])
     })
   })
 

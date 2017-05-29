@@ -58,14 +58,16 @@ const sumTopScores = (keys, n) =>
     }, {})
   })
 
+const createKey = (...args) => args.join('-')
+
 const createDayKey = (date) =>
-  `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
+  createKey(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
 
 const createHourKey = (date) =>
-  `${createDayKey(date)}-${date.getUTCHours()}`
+  createKey(createDayKey(date), date.getUTCHours())
 
 const createMinuteKey = (date) =>
-  `${createDayKey(date)}-${date.getUTCMinutes()}`
+  createKey(createHourKey(date), date.getUTCMinutes())
 
 module.exports = {
   getKeyValues,
