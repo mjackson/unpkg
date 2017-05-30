@@ -23,9 +23,13 @@ th {
   text-align: left;
 }
 th, td {
-  padding: 0.1em 0.25em;
+  padding: 0.25em 0.5em;
 }
 
+.content-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+}
 .version-wrapper {
   line-height: 2.25em;
   float: right;

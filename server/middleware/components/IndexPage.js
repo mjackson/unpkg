@@ -30,15 +30,17 @@ const IndexPage = ({ packageInfo, version, dir, entries }) => {
         e('style', { dangerouslySetInnerHTML: { __html: IndexPageStyle } })
       ),
       e('body', null,
-        e('div', { className: 'version-wrapper' },
-          e('select', { id: 'version', defaultValue: version }, options)
-        ),
-        e('h1', null, `Index of ${dir}`),
-        e('script', { dangerouslySetInnerHTML: { __html: IndexPageScript } }),
-        e('hr'),
-        e(DirectoryListing, { dir, entries }),
-        e('hr'),
-        e('address', null, `${packageInfo.name}@${version}`)
+        e('div', { className: 'content-wrapper' },
+          e('div', { className: 'version-wrapper' },
+            e('select', { id: 'version', defaultValue: version }, options)
+          ),
+          e('h1', null, `Index of ${dir}`),
+          e('script', { dangerouslySetInnerHTML: { __html: IndexPageScript } }),
+          e('hr'),
+          e(DirectoryListing, { dir, entries }),
+          e('hr'),
+          e('address', null, `${packageInfo.name}@${version}`)
+        )
       )
     )
   )
