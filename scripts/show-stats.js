@@ -52,16 +52,15 @@ Promise.all([
     prettyBytes(results[3])
   )
 
-  sumTopScores(pastSevenDays.map(date => `stats-packageRequests-${createDayKey(date)}`)).then(results => {
+  sumTopScores(pastSevenDays.map(date => `stats-packageRequests-${createDayKey(date)}`)).then(topPackages => {
     console.log('\n## Top Packages This Week')
 
-    const topPackages = Object.keys(results).sort((a, b) => results[b] - results[a])
+    topPackages.forEach(result => {
+      result[1] = result[1].toLocaleString()
+    })
 
     console.log(
-      table(topPackages.map(packageName => [
-        packageName,
-        results[packageName].toLocaleString()
-      ]))
+      table(topPackages)
     )
 
     process.exit()

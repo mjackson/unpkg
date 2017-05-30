@@ -36,7 +36,7 @@ const createScoresMap = (array) => {
   return map
 }
 
-const getTopScores = (key, n = 10) =>
+const getScoresMap = (key, n = 10) =>
   new Promise((resolve, reject) => {
     db.zrevrange(key, 0, n, 'withscores', (error, value) => {
       if (error) {
@@ -47,12 +47,28 @@ const getTopScores = (key, n = 10) =>
     })
   })
 
+const createTopScores = (map) =>
+  Object.keys(map)
+    .reduce((memo, key) => memo.concat([ [ key, map[key] ] ]), [])
+    .sort((a, b) => b[1] - a[1])
+
+const getTopScores = (key, n) =>
+  getScoresMap(key, n).then(createTopScores)
+
+const sumMaps = (maps) =>
+  maps.reduce((memo, map) => {
+    Object.keys(map).forEach(key => {
+      memo[key] = (memo[key] || 0) + map[key]
+    })
+
+    return memo
+  }, {})
+
 const sumTopScores = (keys, n) =>
-  Promise.all(keys.map(key => getTopScores(key, n))).then(values => {
-    return values.reduce((memo, map) => {
-      Object.keys(map).forEach(key => {
-        memo[key] = (memo[key] || 0) + map[key]
-      })
+  Promise.all(keys.map(key => getScoresMap(key, n)))
+    .then(sumMaps)
+    .then(createTopScores)
+
 
       return memo
     }, {})
