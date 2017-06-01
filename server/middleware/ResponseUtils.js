@@ -51,7 +51,7 @@ const sendRedirect = (res, relativeLocation, maxAge = 0, statusCode = 302) => {
     'Content-Type': 'text/html',
     'Content-Length': html.length,
     'Cache-Control': `public, max-age=${maxAge}`,
-    'Location': location
+    'Location': encodeURI(location)
   })
 
   res.end(html)
