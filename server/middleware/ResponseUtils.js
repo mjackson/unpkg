@@ -5,7 +5,7 @@ const { getContentType } = require('./FileUtils')
 const sendText = (res, statusCode, text) => {
   res.writeHead(statusCode, {
     'Content-Type': 'text/plain',
-    'Content-Length': text.length
+    'Content-Length': Buffer.byteLength(text)
   })
 
   res.end(text)
@@ -16,7 +16,7 @@ const sendJSON = (res, json, maxAge = 0, statusCode = 200) => {
 
   res.writeHead(statusCode, {
     'Content-Type': 'application/json',
-    'Content-Length': text.length,
+    'Content-Length': Buffer.byteLength(text),
     'Cache-Control': `public, max-age=${maxAge}`
   })
 
@@ -35,7 +35,7 @@ const sendServerError = (res, error) =>
 const sendHTML = (res, html, maxAge = 0, statusCode = 200) => {
   res.writeHead(statusCode, {
     'Content-Type': 'text/html',
-    'Content-Length': html.length,
+    'Content-Length': Buffer.byteLength(html),
     'Cache-Control': `public, max-age=${maxAge}`
   })
 
@@ -49,7 +49,7 @@ const sendRedirect = (res, relativeLocation, maxAge = 0, statusCode = 302) => {
 
   res.writeHead(statusCode, {
     'Content-Type': 'text/html',
-    'Content-Length': html.length,
+    'Content-Length': Buffer.byteLength(html),
     'Cache-Control': `public, max-age=${maxAge}`,
     'Location': encodeURI(location)
   })
