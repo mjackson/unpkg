@@ -69,11 +69,6 @@ const sumTopScores = (keys, n) =>
     .then(sumMaps)
     .then(createTopScores)
 
-
-      return memo
-    }, {})
-  })
-
 const createKey = (...args) => args.join('-')
 
 const createDayKey = (date) =>
