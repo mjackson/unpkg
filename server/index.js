@@ -54,11 +54,12 @@ const createServer = (config) => {
 
   app.disable('x-powered-by')
 
-  if (process.env.NODE_ENV !== 'production')
-    app.use(morgan('dev'))
-
-  if (process.env.LOG_IDS)
-    app.use(morgan('[:date[clf]] :method :url req-id=:req[x-request-id] cf-ray=:req[cf-ray]'))
+  app.use(morgan(process.env.NODE_ENV === 'production'
+    // Modified version of the Heroku router's log format
+    // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
+    ? 'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:req[x-forwarded-for] status=:status bytes=:res[content-length]'
+    : 'dev'
+  ))
 
   app.use(errorHandler)
   app.use(cors())
@@ -66,7 +67,7 @@ const createServer = (config) => {
   app.get('/', sendHomePage(config.publicDir))
 
   app.use(express.static(config.publicDir, {
-    maxAge: config.maxAge
+    maxAge: '365d'
   }))
 
   app.use(middleware.createRequestHandler(config))
@@ -76,21 +77,19 @@ const createServer = (config) => {
   // Heroku dynos automatically timeout after 30s. Set our
   // own timeout here to force sockets to close before that.
   // https://devcenter.heroku.com/articles/request-timeout
-  if (config.timeout) {
-    server.setTimeout(config.timeout, (socket) => {
-      const message = `Timeout of ${config.timeout}ms exceeded`
+  server.setTimeout(25000, (socket) => {
+    const message = `Timeout of 25 seconds exceeded`
 
-      socket.end([
-        `HTTP/1.1 503 Service Unavailable`,
-        `Date: ${(new Date).toGMTString()}`,
-        `Content-Type: text/plain`,
-        `Content-Length: ${message.length}`,
-        `Connection: close`,
-        ``,
-        message
-      ].join(`\r\n`))
-    })
-  }
+    socket.end([
+      `HTTP/1.1 503 Service Unavailable`,
+      `Date: ${(new Date).toGMTString()}`,
+      `Content-Type: text/plain`,
+      `Content-Length: ${Buffer.byteLength(message)}`,
+      `Connection: close`,
+      ``,
+      message
+    ].join(`\r\n`))
+  })
 
   return server
 }
@@ -99,8 +98,6 @@ const defaultServerConfig = {
   id: 1,
   port: parseInt(process.env.PORT, 10) || 5000,
   publicDir: 'public',
-  timeout: parseInt(process.env.TIMEOUT, 10) || 20000,
-  maxAge: process.env.MAX_AGE || '365d',
 
   // for express-unpkg
   registryURL: process.env.REGISTRY_URL || 'https://registry.npmjs.org',
