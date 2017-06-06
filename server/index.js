@@ -44,6 +44,8 @@ if (process.env.SENTRY_DSN)
     autoBreadcrumbs: true
   }).install()
 
+morgan.token('fwd', (req) => req.get('x-forwarded-for').replace(/\s/g, ''))
+
 const createServer = (config) => {
   const app = express()
 
@@ -57,7 +59,7 @@ const createServer = (config) => {
   app.use(morgan(process.env.NODE_ENV === 'production'
     // Modified version of the Heroku router's log format
     // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
-    ? 'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:req[x-forwarded-for] status=:status bytes=:res[content-length]'
+    ? 'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
     : 'dev'
   ))
 
