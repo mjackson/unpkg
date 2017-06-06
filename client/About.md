@@ -41,10 +41,6 @@ The goal of unpkg is to provide a hassle-free CDN for npm package authors. It's 
 
 unpkg is not affiliated with or supported by npm, Inc. in any way. Please do not contact npm for help with unpkg.
 
-### Abuse
-
-unpkg blacklists some packages to prevent abuse. If you find a malicious package on npm, please take a moment to add it to [our blacklist](https://github.com/unpkg/unpkg.com/blob/master/server/package-blacklist.json)!
-
 ### Feedback
 
 If you think this is useful, I'd love to hear from you. Please reach out to [@mjackson](https://twitter.com/mjackson) with any questions/concerns.

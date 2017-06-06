@@ -75,6 +75,7 @@ const resolveFile = (path, useIndex, callback) => {
  * - registryURL    The URL of the npm registry (defaults to https://registry.npmjs.org)
  * - redirectTTL    The TTL (in seconds) for redirects (defaults to 0)
  * - autoIndex      Automatically generate index HTML pages for directories (defaults to true)
+ * - maximumDepth   The maximum recursion depth when generating metadata
  *
  * Supported URL schemes are:
  *
@@ -94,7 +95,6 @@ const createRequestHandler = (options = {}) => {
   const redirectTTL = options.redirectTTL || 0
   const autoIndex = options.autoIndex !== false
   const maximumDepth = options.maximumDepth || Number.MAX_VALUE
-  const blacklist = options.blacklist || []
 
   const handleRequest = (req, res) => {
     let url
@@ -109,11 +109,6 @@ const createRequestHandler = (options = {}) => {
 
     const { pathname, search, query, packageName, version, filename } = url
     const displayName = `${packageName}@${version}`
-
-    const isBlacklisted = blacklist.indexOf(packageName) !== -1
-
-    if (isBlacklisted)
-      return sendText(res, 403, `Package ${packageName} is blacklisted`)
 
     // Step 1: Fetch the package from the registry and store a local copy.
     // Redirect if the URL does not specify an exact version number.
