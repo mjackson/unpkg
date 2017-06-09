@@ -124,11 +124,8 @@ const createRequestHandler = (options = {}) => {
           if (error)
             return sendServerError(res, error)
 
-          if (packageInfo == null)
+          if (packageInfo == null || packageInfo.versions == null)
             return sendNotFoundError(res, `package "${packageName}"`)
-
-          if (packageInfo.versions == null)
-            return sendServerError(res, new Error(`Unable to retrieve info for package ${packageName}`))
 
           const { versions, 'dist-tags': tags } = packageInfo
 
