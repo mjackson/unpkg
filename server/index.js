@@ -103,7 +103,6 @@ const defaultServerConfig = {
 
   // for the middleware
   registryURL: process.env.REGISTRY_URL || 'https://registry.npmjs.org',
-  redirectTTL: process.env.REDIRECT_TTL || 500,
   autoIndex: !process.env.DISABLE_INDEX
 }
 

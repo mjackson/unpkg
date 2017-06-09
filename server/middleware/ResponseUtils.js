@@ -32,25 +32,22 @@ const sendNotFoundError = (res, what) =>
 const sendServerError = (res, error) =>
   sendText(res, 500, `Server error: ${error.message || error}`)
 
-const sendHTML = (res, html, maxAge = 0, statusCode = 200) => {
+const sendHTML = (res, html, statusCode = 200) => {
   res.writeHead(statusCode, {
     'Content-Type': 'text/html',
-    'Content-Length': Buffer.byteLength(html),
-    'Cache-Control': `public, max-age=${maxAge}`
+    'Content-Length': Buffer.byteLength(html)
   })
 
   res.end(html)
 }
 
-const sendRedirect = (res, relativeLocation, maxAge = 0, statusCode = 302) => {
+const sendRedirect = (res, relativeLocation, statusCode = 302) => {
   const location = res.req && res.req.baseUrl ? res.req.baseUrl + relativeLocation : relativeLocation
-
   const html = `<p>You are being redirected to <a href="${location}">${location}</a>`
 
   res.writeHead(statusCode, {
     'Content-Type': 'text/html',
     'Content-Length': Buffer.byteLength(html),
-    'Cache-Control': `public, max-age=${maxAge}`,
     'Location': encodeURI(location)
   })
 

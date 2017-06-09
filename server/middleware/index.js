@@ -18,9 +18,9 @@ const {
   sendHTML
 } = require('./ResponseUtils')
 
-const OneMinute = 60
-const OneDay = OneMinute * 60 * 24
-const OneYear = OneDay * 365
+const oneMinute = 60
+const oneDay = oneMinute * 60 * 24
+const oneYear = oneDay * 365
 
 const checkLocalCache = (dir, callback) =>
   statFile(joinPaths(dir, 'package.json'), (error, stats) => {
@@ -72,7 +72,6 @@ const resolveFile = (path, useIndex, callback) => {
  * event of a standard node HTTP server. Options are:
  *
  * - registryURL    The URL of the npm registry (defaults to https://registry.npmjs.org)
- * - redirectTTL    The TTL (in seconds) for redirects (defaults to 0)
  * - autoIndex      Automatically generate index HTML pages for directories (defaults to true)
  * - maximumDepth   The maximum recursion depth when generating metadata
  *
@@ -91,7 +90,6 @@ const resolveFile = (path, useIndex, callback) => {
  */
 const createRequestHandler = (options = {}) => {
   const registryURL = options.registryURL || 'https://registry.npmjs.org'
-  const redirectTTL = options.redirectTTL || 0
   const autoIndex = options.autoIndex !== false
   const maximumDepth = options.maximumDepth || Number.MAX_VALUE
 
@@ -141,12 +139,12 @@ const createRequestHandler = (options = {}) => {
               }
             })
           } else if (version in tags) {
-            sendRedirect(res, createPackageURL(packageName, tags[version], filename, search), redirectTTL)
+            sendRedirect(res, createPackageURL(packageName, tags[version], filename, search))
           } else {
             const maxVersion = maxSatisfyingVersion(Object.keys(versions), version)
 
             if (maxVersion) {
-              sendRedirect(res, createPackageURL(packageName, maxVersion, filename, search), redirectTTL)
+              sendRedirect(res, createPackageURL(packageName, maxVersion, filename, search))
             } else {
               sendNotFoundError(res, `package ${displayName}`)
             }
@@ -169,7 +167,7 @@ const createRequestHandler = (options = {}) => {
             sendNotFoundError(res, `file "${filename}" in package ${displayName}`)
           } else if (stats.isDirectory() && pathname[pathname.length - 1] !== '/') {
             // Append `/` to directory URLs
-            sendRedirect(res, pathname + '/' + search, OneYear)
+            sendRedirect(res, pathname + '/' + search)
           } else {
             next(file.replace(packageDir, ''), stats)
           }
@@ -227,13 +225,13 @@ const createRequestHandler = (options = {}) => {
       if (query.json != null) {
         generateMetadata(baseDir, path, stats, maximumDepth, (error, metadata) => {
           if (metadata) {
-            sendJSON(res, metadata, OneYear)
+            sendJSON(res, metadata, oneYear)
           } else {
             sendServerError(res, `unable to generate JSON metadata for ${displayName}${filename}`)
           }
         })
       } else if (stats.isFile()) {
-        sendFile(res, joinPaths(baseDir, path), stats, OneYear)
+        sendFile(res, joinPaths(baseDir, path), stats, oneYear)
       } else if (autoIndex && stats.isDirectory()) {
         getPackageInfo(registryURL, packageName, (error, packageInfo) => {
           if (error) {
@@ -241,7 +239,7 @@ const createRequestHandler = (options = {}) => {
           } else {
             generateDirectoryIndexHTML(packageInfo, version, baseDir, path, (error, html) => {
               if (html) {
-                sendHTML(res, html, OneYear)
+                sendHTML(res, html)
               } else {
                 sendServerError(res, `unable to generate index page for ${displayName}${filename}`)
               }
