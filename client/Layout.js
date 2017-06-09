@@ -61,29 +61,36 @@ class Layout extends React.Component {
     return (
       <div>
         <WindowSize onChange={this.adjustUnderline}/>
-        <header>
-          <h1>unpkg</h1>
-          <nav>
-            <ol className="underlist">
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/stats">Stats</Link></li>
-              <li><Link to="/about">About</Link></li>
-            </ol>
-            <Motion defaultStyle={{ left: underlineLeft, width: underlineWidth }} style={style}>
-              {s => (
-                <div
-                  className="underlist-underline"
-                  style={{
-                    WebkitTransform: `translate3d(${s.left}px,0,0)`,
-                    transform: `translate3d(${s.left}px,0,0)`,
-                    width: s.width
-                  }}
-                />
-              )}
-            </Motion>
-          </nav>
-        </header>
+        <div className="wrapper">
+          <header>
+            <h1>unpkg</h1>
+            <nav>
+              <ol className="underlist">
+                <li><Link to="/">Home</Link></li>
+                <li><Link to="/stats">Stats</Link></li>
+                <li><Link to="/about">About</Link></li>
+              </ol>
+              <Motion defaultStyle={{ left: underlineLeft, width: underlineWidth }} style={style}>
+                {s => (
+                  <div
+                    className="underlist-underline"
+                    style={{
+                      WebkitTransform: `translate3d(${s.left}px,0,0)`,
+                      transform: `translate3d(${s.left}px,0,0)`,
+                      width: s.width
+                    }}
+                  />
+                )}
+              </Motion>
+            </nav>
+          </header>
+        </div>
         {this.props.children}
+        <div className="wrapper">
+          <footer>
+            <p>&copy; 2016-{(new Date).getFullYear()} Michael Jackson</p>
+          </footer>
+        </div>
       </div>
     )
   }

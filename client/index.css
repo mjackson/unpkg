@@ -1,4 +1,4 @@
-body {  
+body {
   font-size: 16px;
   font-family: -apple-system,
                BlinkMacSystemFont,
@@ -62,7 +62,7 @@ table th, table td {
   color: #999;
 }
 
-header, .wrapper {
+.wrapper {
   max-width: 600px;
   margin: 0 auto;
 }
@@ -124,4 +124,11 @@ header nav a:visited {
 }
 .about-logo img {
   max-width: 60%;
+}
+
+footer {
+  margin-top: 40px;
+  border-top: 1px solid black;
+  font-size: 0.8em;
+  text-align: right;
 }
