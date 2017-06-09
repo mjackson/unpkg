@@ -72,7 +72,7 @@ const createServer = (config) => {
     maxAge: '365d'
   }))
 
-  app.use(middleware.createRequestHandler(config))
+  app.use(middleware(config))
 
   const server = http.createServer(app)
 
@@ -101,7 +101,7 @@ const defaultServerConfig = {
   port: parseInt(process.env.PORT, 10) || 5000,
   publicDir: 'public',
 
-  // for express-unpkg
+  // for the middleware
   registryURL: process.env.REGISTRY_URL || 'https://registry.npmjs.org',
   redirectTTL: process.env.REDIRECT_TTL || 500,
   autoIndex: !process.env.DISABLE_INDEX

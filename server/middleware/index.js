@@ -1,4 +1,3 @@
-const http = require('http')
 const tmpdir = require('os-tmpdir')
 const { join: joinPaths } = require('path')
 const { stat: statFile, readFile } = require('fs')
@@ -28,10 +27,10 @@ const checkLocalCache = (dir, callback) =>
     callback(stats && stats.isFile())
   })
 
-const ResolveExtensions = [ '', '.js', '.json' ]
-
 const createTempPath = (name) =>
   joinPaths(tmpdir(), `unpkg-${name}`)
+
+const ResolveExtensions = [ '', '.js', '.json' ]
 
 /**
  * Resolves a path like "lib/file" into "lib/file.js" or
@@ -264,15 +263,4 @@ const createRequestHandler = (options = {}) => {
   return handleRequest
 }
 
-/**
- * Creates and returns an HTTP server that serves files from NPM packages.
- */
-const createServer = (options) =>
-  http.createServer(
-    createRequestHandler(options)
-  )
-
-module.exports = {
-  createRequestHandler,
-  createServer
-}
+module.exports = createRequestHandler
