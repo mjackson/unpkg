@@ -61,34 +61,60 @@ const normalizeTarHeader = (header) => {
   return header
 }
 
-const getPackage = (tarballURL, outputDir, callback) => {
-  mkdirp(outputDir, (error) => {
+const extractions = {}
+
+const triggerCallbacks = (tarballURL, error) => {
+  const callbacks = extractions[tarballURL]
+
+  for (let i = 0; i < callbacks.length; i++) {
     if (error) {
-      callback(error)
+      callbacks[i](error)
     } else {
-      let callbackWasCalled = false
-
-      fetch(tarballURL).then(response => {
-        response.body
-          .pipe(gunzip())
-          .pipe(
-            tar.extract(outputDir, {
-              dmode: 0o666, // All dirs should be writable
-              fmode: 0o444, // All files should be readable
-              map: normalizeTarHeader
-            })
-          )
-          .on('finish', callback)
-          .on('error', (error) => {
-            if (callbackWasCalled) // LOL node streams
-              return
-
-            callbackWasCalled = true
-            callback(error)
-          })
-      })
+      callbacks[i]()
     }
-  })
+  }
+}
+
+const getPackage = (tarballURL, outputDir, callback) => {
+  if (!extractions[tarballURL]) {
+    extractions[tarballURL] = [];
+  }
+
+  if (!extractions[tarballURL].length) {
+    extractions[tarballURL].push(callback)
+
+    mkdirp(outputDir, (error) => {
+      if (error) {
+        triggerCallbacks(tarballURL, error)
+      } else {
+        let callbackWasCalled = false
+
+        fetch(tarballURL).then(response => {
+          response.body
+            .pipe(gunzip())
+            .pipe(
+              tar.extract(outputDir, {
+                dmode: 0o666, // All dirs should be writable
+                fmode: 0o444, // All files should be readable
+                map: normalizeTarHeader
+              })
+            )
+            .on('finish', () => {
+              triggerCallbacks(tarballURL)
+            })
+            .on('error', (error) => {
+              if (callbackWasCalled) // LOL node streams
+                return
+
+              callbackWasCalled = true
+              triggerCallbacks(tarballURL, error)
+            })
+        })
+      }
+    })
+  } else {
+    extractions[tarballURL].push(callback)
+  }
 }
 
 module.exports = {
