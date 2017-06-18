@@ -22,13 +22,10 @@ const oneMinute = 60
 const oneDay = oneMinute * 60 * 24
 const oneYear = oneDay * 365
 
-const checkLocalCache = (dir, callback) =>
-  statFile(joinPaths(dir, 'package.json'), (error, stats) => {
+const checkLocalCache = (dir, filename, callback) =>
+  statFile(joinPaths(dir, filename || 'package.json'), (error, stats) => {
     callback(stats && stats.isFile())
   })
-
-const createTempPath = (name) =>
-  joinPaths(tmpdir(), `unpkg-${name}`)
 
 const ResolveExtensions = [ '', '.js', '.json' ]
 
@@ -110,9 +107,9 @@ const createRequestHandler = (options = {}) => {
     // Step 1: Fetch the package from the registry and store a local copy.
     // Redirect if the URL does not specify an exact version number.
     const fetchPackage = (next) => {
-      const packageDir = createTempPath(displayName)
+      const packageDir = joinPaths(tmpdir(), `unpkg-${displayName}`)
 
-      checkLocalCache(packageDir, (isCached) => {
+      checkLocalCache(packageDir, filename, (isCached) => {
         if (isCached)
           return next(packageDir) // Best case: we already have this package on disk.
 
