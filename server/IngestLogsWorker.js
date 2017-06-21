@@ -13,7 +13,7 @@ const {
 
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
-const RedisURL = process.env.REDIS_URL
+const RedisURL = process.env.OPENREDIS_URL
 
 invariant(
   CloudflareEmail,
@@ -27,7 +27,7 @@ invariant(
 
 invariant(
   RedisURL,
-  'Missing the $REDIS_URL environment variable'
+  'Missing the $OPENREDIS_URL environment variable'
 )
 
 /**

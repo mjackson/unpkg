@@ -1,11 +1,11 @@
 const redis = require('redis')
 const invariant = require('invariant')
 
-const RedisURL = process.env.REDIS_URL
+const RedisURL = process.env.OPENREDIS_URL
 
 invariant(
   RedisURL,
-  'Missing $REDIS_URL environment variable'
+  'Missing $OPENREDIS_URL environment variable'
 )
 
 const db = redis.createClient(RedisURL)
