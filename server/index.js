@@ -103,7 +103,8 @@ const defaultServerConfig = {
 
   // for the middleware
   registryURL: process.env.REGISTRY_URL || 'https://registry.npmjs.org',
-  autoIndex: !process.env.DISABLE_INDEX
+  autoIndex: !process.env.DISABLE_INDEX,
+  blacklist: require('./package-blacklist').blacklist
 }
 
 const startServer = (serverConfig = {}) => {
