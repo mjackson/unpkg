@@ -2,7 +2,7 @@
 
 [unpkg](https://unpkg.com) is a fast, global CDN for everything on [npm](https://www.npmjs.com/).
 
-The project is maintained by [React Training](https://reacttraining.com) with sponsorship from [Cloudflare](https://cloudflare.com) and [Heroku](https://heroku.com).
+The project is sponsored by [Cloudflare](https://cloudflare.com) and [Heroku](https://heroku.com).
 
 ## Development
 
