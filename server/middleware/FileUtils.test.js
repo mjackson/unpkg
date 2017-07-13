@@ -23,3 +23,8 @@ it('gets a contextType of text/plain for .*ignore files', () => {
   expect(getContentType('.eslintignore')).toBe('text/plain');
   expect(getContentType('.anythingignore')).toBe('text/plain');
 });
+
+it('gets a contextType of text/plain for .ts files', () => {
+  expect(getContentType('app.ts')).toBe('text/plain');
+  expect(getContentType('app.d.ts')).toBe('text/plain');
+});
