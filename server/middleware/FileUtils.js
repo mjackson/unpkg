@@ -4,7 +4,14 @@ const mime = require('mime')
 const TextFiles = /\/?(\.[a-z]*rc|\.git[a-z]*|\.[a-z]*ignore)$/i
 
 mime.define({
-  'text/plain': ['license', 'readme', 'changes', 'authors', 'makefile', 'ts'],
+  'text/plain': [
+    'license',
+    'readme',
+    'changes',
+    'authors',
+    'makefile',
+    'ts'
+  ]
 })
 
 const getContentType = (file) =>
