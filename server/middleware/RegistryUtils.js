@@ -4,6 +4,9 @@ const mkdirp = require('mkdirp')
 const tar = require('tar-fs')
 const RegistryCache = require('./RegistryCache')
 
+const authHeader =
+  process.env.REGISTRY_AUTH ? { 'Authorization': `Basic ${process.env.REGISTRY_AUTH}` } : {}
+
 const getPackageInfoFromRegistry = (registryURL, packageName) => {
   let encodedPackageName
   if (packageName.charAt(0) === '@') {
@@ -15,7 +18,9 @@ const getPackageInfoFromRegistry = (registryURL, packageName) => {
   const url = `${registryURL}/${encodedPackageName}`
 
   return fetch(url, {
-    headers: { 'Accept': 'application/json' }
+    headers: Object.assign({
+      'Accept': 'application/json'
+    }, authHeader)
   }).then(response => (
     response.status === 404 ? null : response.json()
   ))
@@ -68,7 +73,9 @@ const getPackage = (tarballURL, outputDir, callback) => {
     } else {
       let callbackWasCalled = false
 
-      fetch(tarballURL).then(response => {
+      fetch(tarballURL, {
+        headers: authHeader
+      }).then(response => {
         response.body
           .pipe(gunzip())
           .pipe(
