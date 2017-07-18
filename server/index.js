@@ -4,7 +4,6 @@ const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
 const middleware = require('./middleware')
-const { fetchStats } = require('./cloudflare')
 
 const fs = require('fs')
 const path = require('path')
@@ -13,20 +12,8 @@ const sendHomePage = (publicDir) => {
   const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8')
 
   return (req, res, next) => {
-    fetchStats((error, stats) => {
-      if (error) {
-        next(error)
-      } else {
-        res.set('Cache-Control', 'public, max-age=60')
-        res.send(
-          // Replace the __SERVER_DATA__ token that was added to the
-          // HTML file in the build process (see scripts/build.js).
-          html.replace('__SERVER_DATA__', JSON.stringify({
-            cloudflareStats: stats
-          }))
-        )
-      }
-    })
+    res.set('Cache-Control', 'public, max-age=60')
+    res.send(html)
   }
 }
 
