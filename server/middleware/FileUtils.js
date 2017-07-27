@@ -1,8 +1,6 @@
 const fs = require('fs')
 const mime = require('mime')
 
-const TextFiles = /\/?(\.[a-z]*rc|\.git[a-z]*|\.[a-z]*ignore)$/i
-
 mime.define({
   'text/plain': [
     'license',
@@ -13,6 +11,8 @@ mime.define({
     'ts'
   ]
 })
+
+const TextFiles = /\/?(\.[a-z]*rc|\.git[a-z]*|\.[a-z]*ignore)$/i
 
 const getContentType = (file) =>
   TextFiles.test(file) ? 'text/plain' : mime.lookup(file)
