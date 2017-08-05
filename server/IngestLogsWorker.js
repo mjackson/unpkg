@@ -7,6 +7,9 @@ const redis = require('redis')
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
 const {
+  parsePackageURL
+} = require('./middleware/PackageUtils')
+const {
   createDayKey,
   createHourKey
 } = require('./StatsServer')
@@ -71,12 +74,9 @@ const toSeconds = (millis) =>
 const stringifySeconds = (seconds) =>
   new Date(seconds * 1000).toISOString()
 
-// TODO: Copied from express-unpkg, use the same function
-const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
-
 const getPackageName = (pathname) => {
-  const match = URLFormat.exec(pathname)
-  return match && match[1]
+  const parsed = parsePackageURL(pathname)
+  return parsed && parsed.packageName
 }
 
 const oneSecond = 1000
