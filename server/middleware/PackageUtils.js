@@ -3,7 +3,7 @@ const { parse: parseURL } = require('url')
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
 
 const decodeParam = (param) =>
-  param && decodeURIComponent(param)
+  param ? decodeURIComponent(param) : ''
 
 const ValidQueryKeys = {
   main: true,
@@ -44,7 +44,7 @@ const createPackageURL = (packageName, version, filename, search) => {
   if (version != null)
     pathname += `@${version}`
 
-  if (filename != null)
+  if (filename)
     pathname += filename
 
   if (search)
