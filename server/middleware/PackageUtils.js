@@ -25,16 +25,16 @@ const parsePackageURL = (url) => {
     return null
 
   const packageName = match[1]
-  const version = decodeParam(match[2]) || 'latest'
+  const packageVersion = decodeParam(match[2]) || 'latest'
   const filename = decodeParam(match[3])
 
-  return {        // If the URL is /@scope/name@version/path.js?main=browser:
-    pathname,     // /@scope/name@version/path.js
-    search,       // ?main=browser
-    query,        // { main: 'browser' }
-    packageName,  // @scope/name
-    version,      // version
-    filename      // /path.js
+  return {          // If the URL is /@scope/name@version/file.js?main=browser:
+    pathname,       // /@scope/name@version/path.js
+    search,         // ?main=browser
+    query,          // { main: 'browser' }
+    packageName,    // @scope/name
+    packageVersion, // version
+    filename        // /file.js
   }
 }
 
