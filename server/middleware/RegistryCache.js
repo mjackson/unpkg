@@ -1,12 +1,6 @@
 const redis = require('redis')
-const invariant = require('invariant')
 
-const RedisURL = process.env.OPENREDIS_URL
-
-invariant(
-  RedisURL,
-  'Missing $OPENREDIS_URL environment variable'
-)
+const RedisURL = process.env.OPENREDIS_URL || 'redis://localhost:6379'
 
 const db = redis.createClient(RedisURL)
 
