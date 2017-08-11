@@ -54,7 +54,7 @@ function serveFile(autoIndex, maximumDepth) {
         }
       })
     } else {
-      res.status(403).send(`Cannot serve ${req.packageSpec}${req.filename}; it's not a req.file`)
+      res.status(403).send(`Cannot serve ${req.packageSpec}${req.filename}; it's not a file`)
     }
   }
 }
