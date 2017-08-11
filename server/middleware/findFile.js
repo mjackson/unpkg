@@ -71,7 +71,7 @@ function findFile(req, res, next) {
 
     if (queryMain) {
       if (!(queryMain in packageConfig))
-        return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec}/package.json`)
+        return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec} package config`)
 
       mainFilename = packageConfig[queryMain]
     } else {

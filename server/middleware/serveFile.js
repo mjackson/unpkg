@@ -1,7 +1,32 @@
+const fs = require('fs')
 const path = require('path')
+const etag = require('etag')
 const { generateMetadata } = require('./MetadataUtils')
 const { generateDirectoryIndexHTML } = require('./IndexUtils')
-const { sendFile } = require('./ResponseUtils')
+const { getContentType } = require('./FileUtils')
+
+function sendFile(res, file, stats, maxAge = 0) {
+  let contentType = getContentType(file)
+
+  if (contentType === 'text/html')
+    contentType = 'text/plain' // We can't serve HTML because bad people :(
+
+  res.writeHead(200, {
+    'Content-Type': contentType,
+    'Content-Length': stats.size,
+    'Cache-Control': `public, max-age=${maxAge}`,
+    'ETag': etag(stats)
+  })
+
+  const stream = fs.createReadStream(file)
+
+  stream.on('error', (error) => {
+    console.error(error)
+    res.status(500).send('There was an error serving this file')
+  })
+
+  stream.pipe(res)
+}
 
 /**
  * Send the file, JSON metadata, or HTML directory listing.
@@ -18,7 +43,7 @@ function serveFile(autoIndex, maximumDepth) {
         }
       })
     } else if (req.stats.isFile()) {
-      // TODO: use res.sendFile instead of our own custom function?
+      // TODO: use res.sendFile instead of our own sendFile?
       sendFile(res, path.join(req.packageDir, req.file), req.stats, 31536000)
     } else if (autoIndex && req.stats.isDirectory()) {
       generateDirectoryIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
