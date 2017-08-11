@@ -64,53 +64,41 @@ function findFile(req, res, next) {
   } else {
     // No filename in the URL. Try to figure out which file they want by
     // checking package.json's "unpkg", "browser", and "main" fields.
-    fs.readFile(path.join(req.packageDir, 'package.json'), 'utf8', function (error, data) {
-      if (error) {
-        console.error(error)
-        return res.status(500).send(`Cannot read ${req.packageSpec}/package.json`)
-      }
+    let mainFilename
 
-      let packageConfig
-      try {
-        packageConfig = JSON.parse(data)
-      } catch (error) {
-        return res.status(500).send(`Cannot parse ${req.packageSpec}/package.json: ${error.message}`)
-      }
+    const packageConfig = req.packageConfig
+    const queryMain = req.query.main
 
-      let mainFilename
-      const queryMain = query && query.main
+    if (queryMain) {
+      if (!(queryMain in packageConfig))
+        return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec}/package.json`)
 
-      if (queryMain) {
-        if (!(queryMain in packageConfig))
-          return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec}/package.json`)
-
-        mainFilename = packageConfig[queryMain]
+      mainFilename = packageConfig[queryMain]
+    } else {
+      if (typeof packageConfig.unpkg === 'string') {
+        // The "unpkg" field allows packages to explicitly declare the
+        // file to serve at the bare URL (see #59).
+        mainFilename = packageConfig.unpkg
+      } else if (typeof packageConfig.browser === 'string') {
+        // Fall back to the "browser" field if declared (only support strings).
+        mainFilename = packageConfig.browser
       } else {
-        if (typeof packageConfig.unpkg === 'string') {
-          // The "unpkg" field allows packages to explicitly declare the
-          // file to serve at the bare URL (see #59).
-          mainFilename = packageConfig.unpkg
-        } else if (typeof packageConfig.browser === 'string') {
-          // Fall back to the "browser" field if declared (only support strings).
-          mainFilename = packageConfig.browser
-        } else {
-          // If there is no main, use "index" (same as npm).
-          mainFilename = packageConfig.main || 'index'
-        }
+        // If there is no main, use "index" (same as npm).
+        mainFilename = packageConfig.main || 'index'
       }
+    }
 
-      resolveFile(path.join(req.packageDir, mainFilename), true, function (error, file, stats) {
-        if (error)
-          console.error(error)
+    resolveFile(path.join(req.packageDir, mainFilename), true, function (error, file, stats) {
+      if (error)
+        console.error(error)
 
-        if (file == null) {
-          res.status(404).send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
-        } else {
-          req.file = file.replace(req.packageDir, '')
-          req.stats = stats
-          next()
-        }
-      })
+      if (file == null) {
+        res.status(404).send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
+      } else {
+        req.file = file.replace(req.packageDir, '')
+        req.stats = stats
+        next()
+      }
     })
   }
 }
