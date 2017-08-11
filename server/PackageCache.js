@@ -37,7 +37,7 @@ function extractResponse(response, outputDir) {
 }
 
 function fetchAndExtract(tarballURL, outputDir) {
-  console.log(`Fetching ${tarballURL} and extracting to ${outputDir}`)
+  console.log(`info: Fetching ${tarballURL} and extracting to ${outputDir}`)
 
   return fetch(tarballURL).then(function (response) {
     return extractResponse(response, outputDir)

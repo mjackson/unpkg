@@ -5,7 +5,7 @@ const createMutex = require('./createMutex')
 const RegistryURL = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org'
 
 function fetchPackageInfo(packageName) {
-  console.log(`Fetching info for package ${packageName} from NPM`)
+  console.log(`info: Fetching package info for ${packageName}`)
 
   let encodedPackageName
   if (packageName.charAt(0) === '@') {
