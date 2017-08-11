@@ -7,7 +7,7 @@ describe('parsePackageURL', () => {
       search: '',
       query: {},
       packageName: 'history',
-      version: '1.0.0',
+      packageVersion: '1.0.0',
       filename: '/umd/history.min.js'
     })
   })
@@ -18,7 +18,7 @@ describe('parsePackageURL', () => {
       search: '',
       query: {},
       packageName: 'query-string',
-      version: '5.0.0',
+      packageVersion: '5.0.0',
       filename: '/index.js'
     })
   })
@@ -29,18 +29,18 @@ describe('parsePackageURL', () => {
       search: '',
       query: {},
       packageName: 'query-string',
-      version: 'latest',
+      packageVersion: 'latest',
       filename: '/index.js'
     })
   })
 
-  it('parses plain packages with version specs', () => {
+  it('parses plain packages with version spec', () => {
     expect(parsePackageURL('/query-string@>=4.0.0/index.js')).toEqual({
       pathname: '/query-string@>=4.0.0/index.js',
       search: '',
       query: {},
       packageName: 'query-string',
-      version: '>=4.0.0',
+      packageVersion: '>=4.0.0',
       filename: '/index.js'
     })
   })
@@ -51,7 +51,7 @@ describe('parsePackageURL', () => {
       search: '',
       query: {},
       packageName: '@angular/router',
-      version: '4.3.3',
+      packageVersion: '4.3.3',
       filename: '/src/index.d.ts'
     })
   })
@@ -62,7 +62,7 @@ describe('parsePackageURL', () => {
       search: '',
       query: {},
       packageName: 'index.js',
-      version: 'latest',
+      packageVersion: 'latest',
       filename: ''
     })
   })
@@ -73,7 +73,7 @@ describe('parsePackageURL', () => {
       search: '?main=browser',
       query: { main: 'browser' },
       packageName: 'history',
-      version: 'latest',
+      packageVersion: 'latest',
       filename: ''
     })
   })
