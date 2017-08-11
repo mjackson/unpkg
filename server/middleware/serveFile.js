@@ -1,5 +1,5 @@
 const path = require('path')
-const { getPackageInfo } = require('./RegistryUtils')
+const PackageInfo = require('../PackageInfo')
 const { generateMetadata } = require('./MetadataUtils')
 const { generateDirectoryIndexHTML } = require('./IndexUtils')
 const { sendFile } = require('./ResponseUtils')
@@ -7,9 +7,9 @@ const { sendFile } = require('./ResponseUtils')
 /**
  * Send the file, JSON metadata, or HTML directory listing.
  */
-function serveFile(registryURL, autoIndex, maximumDepth) {
+function serveFile(autoIndex, maximumDepth) {
   return function (req, res, next) {
-    // TODO: change query param from "json" => "meta"
+    // TODO: change query param from "json" to "meta"
     if (req.query.json != null) {
       generateMetadata(req.packageDir, req.file, req.stats, maximumDepth, function (error, metadata) {
         if (metadata) {
@@ -22,8 +22,7 @@ function serveFile(registryURL, autoIndex, maximumDepth) {
       // TODO: use res.sendFile instead of our own custom function?
       sendFile(res, path.join(req.packageDir, req.file), req.stats, 31536000)
     } else if (autoIndex && req.stats.isDirectory()) {
-      // TODO: re-use packageInfo from fetchPackage middleware
-      getPackageInfo(registryURL, req.packageName, function (error, packageInfo) {
+      PackageInfo.get(req.packageName, function (error, packageInfo) {
         if (error) {
           res.status(500).send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
         } else {

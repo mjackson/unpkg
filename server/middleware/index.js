@@ -25,8 +25,7 @@ const serveFile = require('./serveFile')
  * /history@latest/umd/History.min.js (redirects to version)
  * /history@^1/umd/History.min.js (redirects to max satisfying version)
  */
-const createRequestHandler = (options = {}) => {
-  const registryURL = options.registryURL || 'https://registry.npmjs.org'
+function createRequestHandler(options = {}) {
   const autoIndex = options.autoIndex !== false
   const maximumDepth = options.maximumDepth || Number.MAX_VALUE
   const blacklist = options.blacklist || []
@@ -36,9 +35,9 @@ const createRequestHandler = (options = {}) => {
   app.use(
     parseURL(),
     checkBlacklist(blacklist),
-    fetchPackage(registryURL),
+    fetchPackage(),
     findFile(),
-    serveFile(registryURL, autoIndex, maximumDepth)
+    serveFile(autoIndex, maximumDepth)
   )
 
   return app

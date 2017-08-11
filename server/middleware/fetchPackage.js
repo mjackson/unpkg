@@ -2,8 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const tmpdir = require('os-tmpdir')
 const { maxSatisfying: maxSatisfyingVersion } = require('semver')
+const PackageInfo = require('../PackageInfo')
 const { createPackageURL } = require('./PackageUtils')
-const { getPackageInfo, getPackage } = require('./RegistryUtils')
+const { getPackage } = require('./RegistryUtils')
 
 function checkLocalCache(dir, callback) {
   fs.stat(path.join(dir, 'package.json'), function (error, stats) {
@@ -19,20 +20,20 @@ function createTempPath(name) {
  * Fetch the package from the registry and store a local copy on disk.
  * Redirect if the URL does not specify an exact req.packageVersion number.
  */
-function fetchPackage(registryURL) {
+function fetchPackage() {
   return function (req, res, next) {
     req.packageDir = createTempPath(req.packageSpec)
 
     // TODO: fix race condition! (see #38)
-    // TODO: ensure req.packageInfo is always populated so we can re-use later
     checkLocalCache(req.packageDir, function (isCached) {
       if (isCached)
         return next() // Best case: we already have this package on disk.
 
-      // Fetch package info from NPM.
-      getPackageInfo(registryURL, req.packageName, function (error, packageInfo) {
-        if (error)
-          return res.status(500).send(error.message || error)
+      PackageInfo.get(req.packageName, function (error, packageInfo) {
+        if (error) {
+          console.error(error)
+          return res.status(500).send(`Cannot get info for package "${req.packageName}"`)
+        }
 
         if (packageInfo == null || packageInfo.versions == null)
           return res.status(404).send(`Cannot find package "${req.packageName}"`)
