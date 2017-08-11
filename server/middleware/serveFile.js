@@ -1,5 +1,4 @@
 const path = require('path')
-const PackageInfo = require('../PackageInfo')
 const { generateMetadata } = require('./MetadataUtils')
 const { generateDirectoryIndexHTML } = require('./IndexUtils')
 const { sendFile } = require('./ResponseUtils')
@@ -22,17 +21,11 @@ function serveFile(autoIndex, maximumDepth) {
       // TODO: use res.sendFile instead of our own custom function?
       sendFile(res, path.join(req.packageDir, req.file), req.stats, 31536000)
     } else if (autoIndex && req.stats.isDirectory()) {
-      PackageInfo.get(req.packageName, function (error, packageInfo) {
-        if (error) {
-          res.status(500).send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
+      generateDirectoryIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
+        if (html) {
+          res.send(html)
         } else {
-          generateDirectoryIndexHTML(packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
-            if (html) {
-              res.send(html)
-            } else {
-              res.status(500).send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
-            }
-          })
+          res.status(500).send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
         }
       })
     } else {

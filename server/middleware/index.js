@@ -33,10 +33,10 @@ function createRequestHandler(options = {}) {
   const app = express.Router()
 
   app.use(
-    parseURL(),
+    parseURL,
     checkBlacklist(blacklist),
-    fetchPackage(),
-    findFile(),
+    fetchPackage,
+    findFile,
     serveFile(autoIndex, maximumDepth)
   )
 

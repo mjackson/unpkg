@@ -1,7 +1,7 @@
 function createMutex(doWork) {
   const mutex = {}
 
-  return function (key, callback) {
+  return function (key, payload, callback) {
     if (mutex[key]) {
       mutex[key].push(callback)
     } else {
@@ -9,7 +9,7 @@ function createMutex(doWork) {
         delete mutex[key]
       }, callback ]
 
-      doWork(key, function (error, value) {
+      doWork(payload, function (error, value) {
         mutex[key].forEach(function (callback) {
           callback(error, value)
         })

@@ -41,79 +41,77 @@ function resolveFile(base, useIndex, callback) {
  * Determine which file we're going to serve and get its stats.
  * Redirect if the request targets a directory with no trailing slash.
  */
-function findFile() {
-  return function (req, res, next) {
-    if (req.filename) {
-      const base = path.join(req.packageDir, req.filename)
+function findFile(req, res, next) {
+  if (req.filename) {
+    const base = path.join(req.packageDir, req.filename)
 
-      // Based on the URL, figure out which file they want.
-      resolveFile(base, false, function (error, file, stats) {
+    // Based on the URL, figure out which file they want.
+    resolveFile(base, false, function (error, file, stats) {
+      if (error)
+        console.error(error)
+
+      if (file == null) {
+        res.status(404).send(`Cannot find file "${req.filename}" in package ${req.packageSpec}`)
+      } else if (stats.isDirectory() && req.pathname[req.pathname.length - 1] !== '/') {
+        // Append / to directory URLs.
+        res.redirect(`${req.pathname}/${req.search}`)
+      } else {
+        req.file = file.replace(req.packageDir, '')
+        req.stats = stats
+        next()
+      }
+    })
+  } else {
+    // No filename in the URL. Try to figure out which file they want by
+    // checking package.json's "unpkg", "browser", and "main" fields.
+    fs.readFile(path.join(req.packageDir, 'package.json'), 'utf8', function (error, data) {
+      if (error) {
+        console.error(error)
+        return res.status(500).send(`Cannot read ${req.packageSpec}/package.json`)
+      }
+
+      let packageConfig
+      try {
+        packageConfig = JSON.parse(data)
+      } catch (error) {
+        return res.status(500).send(`Cannot parse ${req.packageSpec}/package.json: ${error.message}`)
+      }
+
+      let mainFilename
+      const queryMain = query && query.main
+
+      if (queryMain) {
+        if (!(queryMain in packageConfig))
+          return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec}/package.json`)
+
+        mainFilename = packageConfig[queryMain]
+      } else {
+        if (typeof packageConfig.unpkg === 'string') {
+          // The "unpkg" field allows packages to explicitly declare the
+          // file to serve at the bare URL (see #59).
+          mainFilename = packageConfig.unpkg
+        } else if (typeof packageConfig.browser === 'string') {
+          // Fall back to the "browser" field if declared (only support strings).
+          mainFilename = packageConfig.browser
+        } else {
+          // If there is no main, use "index" (same as npm).
+          mainFilename = packageConfig.main || 'index'
+        }
+      }
+
+      resolveFile(path.join(req.packageDir, mainFilename), true, function (error, file, stats) {
         if (error)
           console.error(error)
 
         if (file == null) {
-          res.status(404).send(`Cannot find file "${req.filename}" in package ${req.packageSpec}`)
-        } else if (stats.isDirectory() && req.pathname[req.pathname.length - 1] !== '/') {
-          // Append / to directory URLs.
-          res.redirect(`${req.pathname}/${req.search}`)
+          res.status(404).send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
         } else {
           req.file = file.replace(req.packageDir, '')
           req.stats = stats
           next()
         }
       })
-    } else {
-      // No filename in the URL. Try to figure out which file they want by
-      // checking package.json's "unpkg", "browser", and "main" fields.
-      fs.readFile(path.join(req.packageDir, 'package.json'), 'utf8', function (error, data) {
-        if (error) {
-          console.error(error)
-          return res.status(500).send(`Cannot read ${req.packageSpec}/package.json`)
-        }
-
-        let packageConfig
-        try {
-          packageConfig = JSON.parse(data)
-        } catch (error) {
-          return res.status(500).send(`Cannot parse ${req.packageSpec}/package.json: ${error.message}`)
-        }
-
-        let mainFilename
-        const queryMain = query && query.main
-
-        if (queryMain) {
-          if (!(queryMain in packageConfig))
-            return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec}/package.json`)
-
-          mainFilename = packageConfig[queryMain]
-        } else {
-          if (typeof packageConfig.unpkg === 'string') {
-            // The "unpkg" field allows packages to explicitly declare the
-            // file to serve at the bare URL (see #59).
-            mainFilename = packageConfig.unpkg
-          } else if (typeof packageConfig.browser === 'string') {
-            // Fall back to the "browser" field if declared (only support strings).
-            mainFilename = packageConfig.browser
-          } else {
-            // If there is no main, use "index" (same as npm).
-            mainFilename = packageConfig.main || 'index'
-          }
-        }
-
-        resolveFile(path.join(req.packageDir, mainFilename), true, function (error, file, stats) {
-          if (error)
-            console.error(error)
-
-          if (file == null) {
-            res.status(404).send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
-          } else {
-            req.file = file.replace(req.packageDir, '')
-            req.stats = stats
-            next()
-          }
-        })
-      })
-    }
+    })
   }
 }
 

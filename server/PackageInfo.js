@@ -58,7 +58,7 @@ function getPackageInfo(packageName, callback) {
     } else if (value) {
       callback(null, value === PackageNotFound ? null : value)
     } else {
-      fetchMutex(packageName, callback)
+      fetchMutex(packageName, packageName, callback)
     }
   })
 }
