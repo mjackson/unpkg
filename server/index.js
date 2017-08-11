@@ -36,23 +36,10 @@ const errorHandler = (err, req, res, next) => {
   next(err)
 }
 
-const raven = require('raven')
-
-if (process.env.SENTRY_DSN)
-  raven.config(process.env.SENTRY_DSN, {
-    environment: process.env.NODE_ENV || 'development',
-    autoBreadcrumbs: true
-  }).install()
-
 morgan.token('fwd', (req) => req.get('x-forwarded-for').replace(/\s/g, ''))
 
 const createServer = (config) => {
   const app = express()
-
-  if (process.env.SENTRY_DSN) {
-    app.use(raven.requestHandler())
-    app.use(raven.errorHandler())
-  }
 
   app.disable('x-powered-by')
 

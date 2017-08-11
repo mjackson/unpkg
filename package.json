@@ -26,7 +26,6 @@
     "os-tmpdir": "^1.0.2",
     "pretty-bytes": "^3",
     "prop-types": "^15.5.8",
-    "raven": "^1.2.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-motion": "^0.4.7",
