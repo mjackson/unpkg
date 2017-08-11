@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const etag = require('etag')
-const { generateMetadata } = require('./MetadataUtils')
+const Metadata = require('./MetadataUtils')
 const { generateDirectoryIndexHTML } = require('./IndexUtils')
 const { getContentType } = require('./FileUtils')
 
@@ -33,9 +33,9 @@ function sendFile(res, file, stats, maxAge = 0) {
  */
 function serveFile(autoIndex, maximumDepth) {
   return function (req, res, next) {
-    // TODO: change query param from "json" to "meta"
-    if (req.query.json != null) {
-      generateMetadata(req.packageDir, req.file, req.stats, maximumDepth, function (error, metadata) {
+    // TODO: remove support for "json" query param
+    if (req.query.meta != null || req.query.json != null) {
+      Metadata.get(req.packageDir, req.file, req.stats, maximumDepth, function (error, metadata) {
         if (metadata) {
           res.set('Cache-Control', 'public, max-age=31536000').send(metadata)
         } else {

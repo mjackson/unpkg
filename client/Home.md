@@ -39,12 +39,12 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
     <tr>
       <td>`main`</td>
       <td>`unpkg`, `browser`, `main`</td>
-      <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL.</td>
+      <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL</td>
     </tr>
     <tr>
-      <td>`json`</td>
+      <td>`meta`</td>
       <td>`undefined`</td>
-      <td>Return a recursive list of metadata about all the files in a directory as JSON (e.g. `/any/path/?json`). Note: this only works for directories.</td>
+      <td>Return metadata about a file in a package as JSON (e.g. `/any/file?meta`)</td>
     </tr>
   </tbody>
 </table>

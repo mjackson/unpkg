@@ -7,6 +7,7 @@ const decodeParam = (param) =>
 
 const ValidQueryKeys = {
   main: true,
+  meta: true,
   json: true
 }
 
