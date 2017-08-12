@@ -1,7 +1,7 @@
 const { maxSatisfying: maxSatisfyingVersion } = require('semver')
 const PackageCache = require('../PackageCache')
 const PackageInfo = require('../PackageInfo')
-const { createPackageURL } = require('./PackageUtils')
+const PackageURL = require('../PackageURL')
 
 /**
  * Fetch the package from the registry and store a local copy on disk.
@@ -35,12 +35,12 @@ function fetchPackage(req, res, next) {
         }
       })
     } else if (req.packageVersion in tags) {
-      res.redirect(createPackageURL(req.packageName, tags[req.packageVersion], req.filename, req.search))
+      res.redirect(PackageURL.create(req.packageName, tags[req.packageVersion], req.filename, req.search))
     } else {
       const maxVersion = maxSatisfyingVersion(Object.keys(versions), req.packageVersion)
 
       if (maxVersion) {
-        res.redirect(createPackageURL(req.packageName, maxVersion, req.filename, req.search))
+        res.redirect(PackageURL.create(req.packageName, maxVersion, req.filename, req.search))
       } else {
         res.status(404).send(`Cannot find package ${req.packageSpec}`)
       }

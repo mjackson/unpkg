@@ -1,9 +1,18 @@
-const { parse: parseURL } = require('url')
+const url = require('url')
 
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
 
-const decodeParam = (param) =>
-  param ? decodeURIComponent(param) : ''
+function decodeParam(param) {
+  if (param) {
+    try {
+      return decodeURIComponent(param) : ''
+    } catch (error) {
+      // Ignore param parsing errors.
+    }
+  }
+
+  return null
+}
 
 const ValidQueryKeys = {
   main: true,
@@ -11,12 +20,17 @@ const ValidQueryKeys = {
   json: true
 }
 
-const queryIsValid = (query) =>
-  Object.keys(query).every(key => ValidQueryKeys[key])
+function queryIsValid(query) {
+  return Object.keys(query).every(function (key) {
+    return ValidQueryKeys[key]
+  })
+}
 
-const parsePackageURL = (url) => {
-  const { pathname, search, query } = parseURL(url, true)
+function parsePackageURL(packageURL) {
+  const { pathname, search, query } = url.parse(packageURL, true)
 
+  // Do not allow unrecognized query parameters because
+  // some people use them to bust the cache.
   if (!queryIsValid(query))
     return null
 
@@ -39,7 +53,7 @@ const parsePackageURL = (url) => {
   }
 }
 
-const createPackageURL = (packageName, version, filename, search) => {
+function createPackageURL(packageName, version, filename, search) {
   let pathname = `/${packageName}`
 
   if (version != null)
@@ -55,6 +69,6 @@ const createPackageURL = (packageName, version, filename, search) => {
 }
 
 module.exports = {
-  parsePackageURL,
-  createPackageURL
+  parse: parsePackageURL,
+  create: createPackageURL
 }

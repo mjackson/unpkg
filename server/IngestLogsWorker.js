@@ -6,9 +6,7 @@ const ndjson = require('ndjson')
 const redis = require('redis')
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
-const {
-  parsePackageURL
-} = require('./middleware/PackageUtils')
+const PackageURL = require('./PackageURL')
 const {
   createDayKey,
   createHourKey
@@ -75,7 +73,7 @@ const stringifySeconds = (seconds) =>
   new Date(seconds * 1000).toISOString()
 
 const getPackageName = (pathname) => {
-  const parsed = parsePackageURL(pathname)
+  const parsed = PackageURL.parse(pathname)
   return parsed && parsed.packageName
 }
 

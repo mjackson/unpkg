@@ -1,15 +1,10 @@
-const { parsePackageURL } = require('./PackageUtils')
+const PackageURL = require('../PackageURL')
 
 /**
  * Parse and validate the URL.
  */
 function parseURL(req, res, next) {
-  let url
-  try {
-    url = parsePackageURL(req.url)
-  } catch (error) {
-    return res.status(403).send(`Invalid URL: ${req.url}`)
-  }
+  const url = PackageURL.parse(req.url)
 
   if (url == null)
     return res.status(403).send(`Invalid URL: ${req.url}`)

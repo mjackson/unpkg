@@ -1,4 +1,4 @@
-const { parsePackageURL } = require('./PackageUtils')
+const { parsePackageURL } = require('./PackageURL').parse
 
 describe('parsePackageURL', () => {
   it('parses plain packages', () => {
