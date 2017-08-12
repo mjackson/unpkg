@@ -64,7 +64,7 @@ const ingestStatsForZones = (zones, since, processDashboard) =>
     const zoneNames = zones.map(zone => zone.name).join(', ')
 
     console.log(
-      'LOG: start ingesting stats for zones %s since %d',
+      'info: Started ingesting stats for zones %s since %d',
       zoneNames,
       since
     )
@@ -79,7 +79,7 @@ const ingestStatsForZones = (zones, since, processDashboard) =>
           const endFetchTime = Date.now()
 
           console.log(
-            'LOG: fetched zone analytics dashboards for %s since %d in %dms',
+            'info: Fetched zone analytics dashboards for %s since %d in %dms',
             zoneNames,
             since,
             endFetchTime - startFetchTime
@@ -96,7 +96,7 @@ const ingestStatsForZones = (zones, since, processDashboard) =>
         dashboard => {
           if (dashboard == null) {
             console.warn(
-              'WARNING: missing dashboards for %s since %d',
+              'warning: Missing dashboards for %s since %d',
               zoneNames,
               since
             )
@@ -110,7 +110,7 @@ const ingestStatsForZones = (zones, since, processDashboard) =>
             const endProcessTime = Date.now()
 
             console.log(
-              'LOG: processed zone analytics dashboards for %s since %d in %dms',
+              'info: Processed zone analytics dashboards for %s since %d in %dms',
               zoneNames,
               since,
               endProcessTime - startProcessTime
@@ -134,12 +134,12 @@ const processPerDayTimeseries = (ts) =>
 
     invariant(
       since.getUTCHours() === 0 && since.getUTCMinutes() === 0 && since.getUTCSeconds() === 0,
-      'ERROR: per-day timeseries.since must begin exactly on the day'
+      'error: Per-day timeseries.since must begin exactly on the day'
     )
 
     invariant(
       (until - since) === oneDay,
-      'ERROR: per-day timeseries must span exactly one day'
+      'error: Per-day timeseries must span exactly one day'
     )
 
     const dayKey = createDayKey(since)
@@ -213,12 +213,12 @@ const processPerHourTimeseries = (ts) =>
 
     invariant(
       since.getUTCMinutes() === 0 && since.getUTCSeconds() === 0,
-      'ERROR: per-hour timeseries.since must begin exactly on the hour'
+      'error: Per-hour timeseries.since must begin exactly on the hour'
     )
 
     invariant(
       (until - since) === oneHour,
-      'ERROR: per-hour timeseries must span exactly one hour'
+      'error: Per-hour timeseries must span exactly one hour'
     )
 
     const hourKey = createHourKey(since)
@@ -251,12 +251,12 @@ const processPerMinuteTimeseries = (ts) =>
 
     invariant(
       since.getUTCSeconds() === 0,
-      'ERROR: per-minute timeseries.since must begin exactly on the minute'
+      'error: Per-minute timeseries.since must begin exactly on the minute'
     )
 
     invariant(
       (until - since) === oneMinute,
-      'ERROR: per-minute timeseries must span exactly one minute'
+      'error: Per-minute timeseries must span exactly one minute'
     )
 
     const minuteKey = createMinuteKey(since)

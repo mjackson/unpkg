@@ -175,7 +175,7 @@ const processLogs = (stream) =>
 const ingestLogs = (zone, startSeconds, endSeconds) =>
   new Promise(resolve => {
     console.log(
-      'LOG: start ingesting logs for %s from %s to %s',
+      'info: Started ingesting logs for %s from %s to %s',
       zone.name,
       stringifySeconds(startSeconds),
       stringifySeconds(endSeconds)
@@ -188,7 +188,7 @@ const ingestLogs = (zone, startSeconds, endSeconds) =>
         const endFetchTime = Date.now()
 
         console.log(
-          'LOG: fetched %ds worth of logs for %s in %dms',
+          'info: Fetched %ds worth of logs for %s in %dms',
           endSeconds - startSeconds,
           zone.name,
           endFetchTime - startFetchTime
@@ -200,7 +200,7 @@ const ingestLogs = (zone, startSeconds, endSeconds) =>
           const endProcessTime = Date.now()
 
           console.log(
-            'LOG: processed %ds worth of logs for %s in %dms',
+            'info: Processed %ds worth of logs for %s in %dms',
             endSeconds - startSeconds,
             zone.name,
             endProcessTime - startProcessTime
@@ -227,7 +227,7 @@ const startZone = (zone) => {
         startSeconds = minSeconds
       } else if (startSeconds < minSeconds) {
         console.warn(
-          'WARNING: dropped logs for %s from %s to %s!',
+          'warning: Dropped logs for %s from %s to %s!',
           zone.name,
           stringifySeconds(startSeconds),
           stringifySeconds(minSeconds)
