@@ -1,4 +1,3 @@
-require('isomorphic-fetch')
 const parseURL = require('url').parse
 const invariant = require('invariant')
 const gunzip = require('gunzip-maybe')
@@ -7,29 +6,20 @@ const redis = require('redis')
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
 const PackageURL = require('./PackageURL')
+const CloudflareAPI = require('./CloudflareAPI')
 const {
   createDayKey,
   createHourKey
 } = require('./StatsServer')
 
-const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
-const CloudflareKey = process.env.CLOUDFLARE_KEY
 const RedisURL = process.env.OPENREDIS_URL
-
-invariant(
-  CloudflareEmail,
-  'Missing the $CLOUDFLARE_EMAIL environment variable'
-)
-
-invariant(
-  CloudflareKey,
-  'Missing the $CLOUDFLARE_KEY environment variable'
-)
 
 invariant(
   RedisURL,
   'Missing the $OPENREDIS_URL environment variable'
 )
+
+const db = redis.createClient(RedisURL)
 
 /**
  * Domains we want to analyze.
@@ -44,27 +34,18 @@ const DomainNames = [
  */
 const LogWindowSeconds = 30
 
-const db = redis.createClient(RedisURL)
+function getZones(domain) {
+  return CloudflareAPI.getJSON(`/zones?name=${domain}`)
+}
 
-const getZones = (domain) =>
-  fetch(`https://api.cloudflare.com/client/v4/zones?name=${domain}`, {
-    method: 'GET',
-    headers: {
-      'X-Auth-Email': CloudflareEmail,
-      'X-Auth-Key': CloudflareKey
-    }
-  }).then(res => res.json())
-    .then(data => data.result)
-
-const getLogs = (zoneId, startTime, endTime) =>
-  fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`, {
-    method: 'GET',
-    headers: {
-      'X-Auth-Email': CloudflareEmail,
-      'X-Auth-Key': CloudflareKey,
-      'Accept-Encoding': 'gzip'
-    }
-  }).then(res => res.body.pipe(gunzip()))
+function getLogs(zoneId, startTime, endTime) {
+  return CloudflareAPI.get(
+    `/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`,
+    { 'Accept-Encoding': 'gzip' }
+  ).then(function (res) {
+    return res.body.pipe(gunzip())
+  })
+}
 
 const toSeconds = (millis) =>
   Math.floor(millis / 1000)

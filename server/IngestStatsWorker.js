@@ -1,31 +1,21 @@
-require('isomorphic-fetch')
 const redis = require('redis')
 const addDays = require('date-fns/add_days')
 const invariant = require('invariant')
+const CloudflareAPI = require('./CloudflareAPI')
 const {
   createDayKey,
   createHourKey,
   createMinuteKey
 } = require('./StatsServer')
 
-const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
-const CloudflareKey = process.env.CLOUDFLARE_KEY
 const RedisURL = process.env.OPENREDIS_URL
-
-invariant(
-  CloudflareEmail,
-  'Missing the $CLOUDFLARE_EMAIL environment variable'
-)
-
-invariant(
-  CloudflareKey,
-  'Missing the $CLOUDFLARE_KEY environment variable'
-)
 
 invariant(
   RedisURL,
   'Missing the $OPENREDIS_URL environment variable'
 )
+
+const db = redis.createClient(RedisURL)
 
 /**
  * Domains we want to analyze.
@@ -35,27 +25,13 @@ const DomainNames = [
   'npmcdn.com'
 ]
 
-const db = redis.createClient(RedisURL)
+function getZones(domain) {
+  return CloudflareAPI.getJSON(`/zones?name=${domain}`)
+}
 
-const getZones = (domain) =>
-  fetch(`https://api.cloudflare.com/client/v4/zones?name=${domain}`, {
-    method: 'GET',
-    headers: {
-      'X-Auth-Email': CloudflareEmail,
-      'X-Auth-Key': CloudflareKey
-    }
-  }).then(res => res.json())
-    .then(data => data.result)
-
-const getZoneAnalyticsDashboard = (zoneId, since) =>
-  fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`, {
-    method: 'GET',
-    headers: {
-      'X-Auth-Email': CloudflareEmail,
-      'X-Auth-Key': CloudflareKey
-    }
-  }).then(res => res.json())
-    .then(data => data.result)
+function getZoneAnalyticsDashboard(zoneId, since) {
+  return CloudflareAPI.getJSON(`/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`)
+}
 
 const oneSecond = 1000
 const oneMinute = oneSecond * 60
