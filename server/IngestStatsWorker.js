@@ -59,8 +59,8 @@ const reduceResults = (memo, results) => {
   return memo
 }
 
-const ingestStatsForZones = (zones, since, processDashboard) =>
-  new Promise(resolve => {
+function ingestStatsForZones(zones, since, processDashboard) {
+  return new Promise(resolve => {
     const zoneNames = zones.map(zone => zone.name).join(', ')
 
     console.log(
@@ -120,15 +120,18 @@ const ingestStatsForZones = (zones, since, processDashboard) =>
       )
     )
   })
+}
 
-const ingestPerDayStats = (zones) =>
-  ingestStatsForZones(zones, -10080, processPerDayDashboard)
+function ingestPerDayStats(zones) {
+  return ingestStatsForZones(zones, -10080, processPerDayDashboard)
+}
 
-const processPerDayDashboard = (dashboard) =>
-  Promise.all(dashboard.timeseries.map(processPerDayTimeseries))
+function processPerDayDashboard(dashboard) {
+  return Promise.all(dashboard.timeseries.map(processPerDayTimeseries))
+}
 
-const processPerDayTimeseries = (ts) =>
-  new Promise(resolve => {
+function processPerDayTimeseries(ts) {
+  return new Promise(resolve => {
     const since = new Date(ts.since)
     const until = new Date(ts.until)
 
@@ -199,15 +202,18 @@ const processPerDayTimeseries = (ts) =>
 
     resolve()
   })
+}
 
-const ingestPerHourStats = (zones) =>
-  ingestStatsForZones(zones, -1440, processPerHourDashboard)
+function ingestPerHourStats(zones) {
+  return ingestStatsForZones(zones, -1440, processPerHourDashboard)
+}
 
-const processPerHourDashboard = (dashboard) =>
-  Promise.all(dashboard.timeseries.map(processPerHourTimeseries))
+function processPerHourDashboard(dashboard) {
+  return Promise.all(dashboard.timeseries.map(processPerHourTimeseries))
+}
 
-const processPerHourTimeseries = (ts) =>
-  new Promise(resolve => {
+function processPerHourTimeseries(ts) {
+  return new Promise(resolve => {
     const since = new Date(ts.since)
     const until = new Date(ts.until)
 
@@ -237,15 +243,18 @@ const processPerHourTimeseries = (ts) =>
 
     resolve()
   })
+}
 
-const ingestPerMinuteStats = (zones) =>
-  ingestStatsForZones(zones, -30, processPerMinuteDashboard)
+function ingestPerMinuteStats(zones) {
+  return ingestStatsForZones(zones, -30, processPerMinuteDashboard)
+}
 
-const processPerMinuteDashboard = (dashboard) =>
-  Promise.all(dashboard.timeseries.map(processPerMinuteTimeseries))
+function processPerMinuteDashboard(dashboard) {
+  return Promise.all(dashboard.timeseries.map(processPerMinuteTimeseries))
+}
 
-const processPerMinuteTimeseries = (ts) =>
-  new Promise(resolve => {
+function processPerMinuteTimeseries(ts) {
+  return new Promise(resolve => {
     const since = new Date(ts.since)
     const until = new Date(ts.until)
 
@@ -275,8 +284,9 @@ const processPerMinuteTimeseries = (ts) =>
 
     resolve()
   })
+}
 
-const startZones = (zones) => {
+function startZones(zones) {
   const takePerMinuteTurn = () =>
     ingestPerMinuteStats(zones)
 
