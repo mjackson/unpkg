@@ -1,4 +1,4 @@
-const { maxSatisfying: maxSatisfyingVersion } = require('semver')
+const semver = require('semver')
 const PackageCache = require('../PackageCache')
 const PackageInfo = require('../PackageInfo')
 const PackageURL = require('../PackageURL')
@@ -37,7 +37,7 @@ function fetchPackage(req, res, next) {
     } else if (req.packageVersion in tags) {
       res.redirect(PackageURL.create(req.packageName, tags[req.packageVersion], req.filename, req.search))
     } else {
-      const maxVersion = maxSatisfyingVersion(Object.keys(versions), req.packageVersion)
+      const maxVersion = semver.maxSatisfying(Object.keys(versions), req.packageVersion)
 
       if (maxVersion) {
         res.redirect(PackageURL.create(req.packageName, maxVersion, req.filename, req.search))
