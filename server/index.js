@@ -59,7 +59,7 @@ const createServer = (config) => {
     maxAge: '365d'
   }))
 
-  app.use(middleware(config))
+  app.use(middleware())
 
   const server = http.createServer(app)
 
@@ -86,11 +86,7 @@ const createServer = (config) => {
 const defaultServerConfig = {
   id: 1,
   port: parseInt(process.env.PORT, 10) || 5000,
-  publicDir: 'public',
-
-  // for the middleware
-  autoIndex: !process.env.DISABLE_INDEX,
-  blacklist: require('./PackageBlacklist').blacklist
+  publicDir: 'public'
 }
 
 const startServer = (serverConfig = {}) => {

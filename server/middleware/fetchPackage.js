@@ -5,7 +5,7 @@ const PackageURL = require('../PackageURL')
 
 /**
  * Fetch the package from the registry and store a local copy on disk.
- * Redirect if the URL does not specify an exact req.packageVersion number.
+ * Redirect if the URL does not specify an exact version number.
  */
 function fetchPackage(req, res, next) {
   PackageInfo.get(req.packageName, function (error, packageInfo) {
