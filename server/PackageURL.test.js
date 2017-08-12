@@ -1,4 +1,4 @@
-const { parsePackageURL } = require('./PackageURL').parse
+const parsePackageURL = require('./PackageURL').parse
 
 describe('parsePackageURL', () => {
   it('parses plain packages', () => {
@@ -80,9 +80,5 @@ describe('parsePackageURL', () => {
 
   it('returns null for invalid pathnames', () => {
     expect(parsePackageURL('history')).toBe(null)
-  })
-
-  it('returns null for invalid query parameters', () => {
-    expect(parsePackageURL('/query-string@5.0.0/index.js?invalid')).toBe(null)
   })
 })

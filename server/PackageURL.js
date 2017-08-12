@@ -3,11 +3,15 @@ const url = require('url')
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
 
 function decodeParam(param) {
-  try {
-    return decodeURIComponent(param)
-  } catch (error) {
-    return null
+  if (param) {
+    try {
+      return decodeURIComponent(param)
+    } catch (error) {
+      // Ignore invalid params.
+    }
   }
+
+  return ''
 }
 
 function parsePackageURL(packageURL) {
