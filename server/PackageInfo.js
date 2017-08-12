@@ -38,7 +38,7 @@ const fetchMutex = createMutex(function (packageName, callback) {
         callback(null, value)
       })
     } else {
-      // Cache valid package info for one minute.
+      // Cache valid package info for 1 minute.
       PackageInfoCache.set(packageName, value, 60, function () {
         callback(null, value)
       })

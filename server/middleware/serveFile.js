@@ -5,7 +5,7 @@ const Metadata = require('./MetadataUtils')
 const { generateDirectoryIndexHTML } = require('./IndexUtils')
 const { getContentType } = require('./FileUtils')
 
-function sendFile(res, file, stats, maxAge = 0) {
+function sendFile(res, file, stats) {
   let contentType = getContentType(file)
 
   if (contentType === 'text/html')
@@ -14,7 +14,6 @@ function sendFile(res, file, stats, maxAge = 0) {
   res.writeHead(200, {
     'Content-Type': contentType,
     'Content-Length': stats.size,
-    'Cache-Control': `public, max-age=${maxAge}`,
     'ETag': etag(stats)
   })
 
@@ -36,21 +35,28 @@ function serveFile(autoIndex, maximumDepth) {
     // TODO: remove support for "json" query param
     if (req.query.meta != null || req.query.json != null) {
       Metadata.get(req.packageDir, req.file, req.stats, maximumDepth, function (error, metadata) {
-        if (metadata) {
-          res.set('Cache-Control', 'public, max-age=31536000').send(metadata)
-        } else {
+        if (error) {
+          console.error(error)
           res.status(500).send(`Cannot generate JSON metadata for ${req.packageSpec}${req.filename}`)
+        } else {
+          // Cache metadata for 1 year.
+          res.set('Cache-Control', 'public, max-age=31536000').send(metadata)
         }
       })
     } else if (req.stats.isFile()) {
+      // Cache files for 1 year.
+      res.set('Cache-Control', 'public, max-age=31536000')
+
       // TODO: use res.sendFile instead of our own sendFile?
-      sendFile(res, path.join(req.packageDir, req.file), req.stats, 31536000)
+      sendFile(res, path.join(req.packageDir, req.file), req.stats)
     } else if (autoIndex && req.stats.isDirectory()) {
       generateDirectoryIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
-        if (html) {
-          res.send(html)
-        } else {
+        if (error) {
+          console.error(error)
           res.status(500).send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
+        } else {
+          // Cache HTML directory listings for 1 minute.
+          res.set('Cache-Control', 'public, max-age=60').send(html)
         }
       })
     } else {
