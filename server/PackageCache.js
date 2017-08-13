@@ -8,23 +8,29 @@ const tar = require('tar-fs')
 const createMutex = require('./createMutex')
 
 function createTempPath(name, version) {
-  return path.join(tmpdir(), `unpkg-${name}-${version}`)
+  const normalName = name.replace(/\//g, '-')
+  return path.join(tmpdir(), `unpkg-${normalName}-${version}`)
 }
 
-function normalizeTarHeader(header) {
+function stripNamePrefix(headers) {
   // Most packages have header names that look like "package/index.js"
   // so we shorten that to just "index.js" here. A few packages use a
   // prefix other than "package/". e.g. the firebase package uses the
   // "firebase_npm/" prefix. So we just strip the first dir name.
-  header.name = header.name.replace(/^[^\/]+\//, '')
-  return header
+  headers.name = headers.name.replace(/^[^\/]+\//, '')
+  return headers
+}
+
+function ignoreSymlinks(file, headers) {
+  return headers.type === 'link'
 }
 
 function extractResponse(response, outputDir) {
   return new Promise(function (resolve, reject) {
     const extract = tar.extract(outputDir, {
       readable: true, // All dirs/files should be readable.
-      map: normalizeTarHeader
+      map: stripNamePrefix,
+      ignore: ignoreSymlinks
     })
 
     response.body
