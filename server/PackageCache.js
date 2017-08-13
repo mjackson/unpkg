@@ -23,8 +23,7 @@ function normalizeTarHeader(header) {
 function extractResponse(response, outputDir) {
   return new Promise(function (resolve, reject) {
     const extract = tar.extract(outputDir, {
-      dmode: 0o666, // All dirs should be writable
-      fmode: 0o444, // All files should be readable
+      readable: true, // All dirs/files should be readable.
       map: normalizeTarHeader
     })
 
