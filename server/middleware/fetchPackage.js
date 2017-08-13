@@ -11,11 +11,11 @@ function fetchPackage(req, res, next) {
   PackageInfo.get(req.packageName, function (error, packageInfo) {
     if (error) {
       console.error(error)
-      return res.status(500).send(`Cannot get info for package "${req.packageName}"`)
+      return res.status(500).type('text').send(`Cannot get info for package "${req.packageName}"`)
     }
 
     if (packageInfo == null || packageInfo.versions == null)
-      return res.status(404).send(`Cannot find package "${req.packageName}"`)
+      return res.status(404).type('text').send(`Cannot find package "${req.packageName}"`)
 
     req.packageInfo = packageInfo
 
@@ -28,7 +28,7 @@ function fetchPackage(req, res, next) {
       PackageCache.get(req.packageConfig, function (error, outputDir) {
         if (error) {
           console.error(error)
-          res.status(500).send(`Cannot fetch package ${req.packageSpec}`)
+          res.status(500).type('text').send(`Cannot fetch package ${req.packageSpec}`)
         } else {
           req.packageDir = outputDir
           next()
@@ -42,7 +42,7 @@ function fetchPackage(req, res, next) {
       if (maxVersion) {
         res.redirect(PackageURL.create(req.packageName, maxVersion, req.filename, req.search))
       } else {
-        res.status(404).send(`Cannot find package ${req.packageSpec}`)
+        res.status(404).type('text').send(`Cannot find package ${req.packageSpec}`)
       }
     }
   })

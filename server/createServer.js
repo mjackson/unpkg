@@ -1,23 +1,34 @@
-/*eslint-disable no-console*/
+const fs = require('fs')
+const path = require('path')
 const http = require('http')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
-const middleware = require('./middleware')
+
 const { fetchStats } = require('./cloudflare')
+const parseURL = require('./middleware/parseURL')
+const checkBlacklist = require('./middleware/checkBlacklist')
+const fetchPackage = require('./middleware/fetchPackage')
+const findFile = require('./middleware/findFile')
+const serveFile = require('./middleware/serveFile')
 
-const fs = require('fs')
-const path = require('path')
+morgan.token('fwd', function (req) {
+  return req.get('x-forwarded-for').replace(/\s/g, '')
+})
 
-const sendHomePage = (publicDir) => {
+function sendHomePage(publicDir) {
   const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8')
 
-  return (req, res, next) => {
-    fetchStats((error, stats) => {
+  return function (req, res, next) {
+    fetchStats(function (error, stats) {
       if (error) {
         next(error)
       } else {
-        res.set('Cache-Control', 'public, max-age=60')
+        res.set({
+          'Cache-Control': 'public, max-age=60',
+          'Cache-Tag': 'home'
+        })
+
         res.send(
           // Replace the __SERVER_DATA__ token that was added to the
           // HTML file in the build process (see scripts/build.js).
@@ -30,15 +41,13 @@ const sendHomePage = (publicDir) => {
   }
 }
 
-const errorHandler = (err, req, res, next) => {
-  res.status(500).send('<p>Internal Server Error</p>')
+function errorHandler(err, req, res, next) {
+  res.status(500).type('text').send('Internal Server Error')
   console.error(err.stack)
   next(err)
 }
 
-morgan.token('fwd', (req) => req.get('x-forwarded-for').replace(/\s/g, ''))
-
-const createServer = (config) => {
+function createServer() {
   const app = express()
 
   app.disable('x-powered-by')
@@ -53,20 +62,24 @@ const createServer = (config) => {
   app.use(errorHandler)
   app.use(cors())
 
-  app.get('/', sendHomePage(config.publicDir))
+  app.get('/', sendHomePage('build'))
 
-  app.use(express.static(config.publicDir, {
+  app.use(express.static('build', {
     maxAge: '365d'
   }))
 
-  app.use(middleware())
+  app.use(parseURL)
+  app.use(checkBlacklist)
+  app.use(fetchPackage)
+  app.use(findFile)
+  app.use(serveFile)
 
   const server = http.createServer(app)
 
   // Heroku dynos automatically timeout after 30s. Set our
   // own timeout here to force sockets to close before that.
   // https://devcenter.heroku.com/articles/request-timeout
-  server.setTimeout(25000, (socket) => {
+  server.setTimeout(25000, function (socket) {
     const message = `Timeout of 25 seconds exceeded`
 
     socket.end([
@@ -83,22 +96,4 @@ const createServer = (config) => {
   return server
 }
 
-const defaultServerConfig = {
-  id: 1,
-  port: parseInt(process.env.PORT, 10) || 5000,
-  publicDir: 'public'
-}
-
-const startServer = (serverConfig = {}) => {
-  const config = Object.assign({}, defaultServerConfig, serverConfig)
-  const server = createServer(config)
-
-  server.listen(config.port, () => {
-    console.log('Server #%s listening on port %s, Ctrl+C to stop', config.id, config.port)
-  })
-}
-
-module.exports = {
-  createServer,
-  startServer
-}
+module.exports = createServer

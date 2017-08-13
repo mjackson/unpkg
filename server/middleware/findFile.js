@@ -51,7 +51,7 @@ function findFile(req, res, next) {
         console.error(error)
 
       if (file == null) {
-        res.status(404).send(`Cannot find file "${req.filename}" in package ${req.packageSpec}`)
+        res.status(404).type('text').send(`Cannot find file "${req.filename}" in package ${req.packageSpec}`)
       } else if (stats.isDirectory() && req.pathname[req.pathname.length - 1] !== '/') {
         // Append / to directory URLs.
         res.redirect(`${req.pathname}/${req.search}`)
@@ -71,7 +71,7 @@ function findFile(req, res, next) {
 
     if (queryMain) {
       if (!(queryMain in packageConfig))
-        return res.status(404).send(`Cannot find field "${queryMain}" in ${req.packageSpec} package config`)
+        return res.status(404).type('text').send(`Cannot find field "${queryMain}" in ${req.packageSpec} package config`)
 
       mainFilename = packageConfig[queryMain]
     } else {
@@ -93,7 +93,7 @@ function findFile(req, res, next) {
         console.error(error)
 
       if (file == null) {
-        res.status(404).send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
+        res.status(404).type('text').send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
       } else {
         req.file = file.replace(req.packageDir, '')
         req.stats = stats

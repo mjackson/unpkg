@@ -19,12 +19,12 @@ function parseURL(req, res, next) {
   const url = PackageURL.parse(req.url)
 
   if (url == null)
-    return res.status(403).send(`Invalid URL: ${req.url}`)
+    return res.status(403).type('text').send(`Invalid URL: ${req.url}`)
 
   // Do not allow unrecognized query parameters because
   // some people use them to bust the cache.
   if (!queryIsValid(url.query))
-    return res.status(403).send(`Invalid query: ${JSON.stringify(url.query)}`)
+    return res.status(403).type('text').send(`Invalid query: ${JSON.stringify(url.query)}`)
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion

@@ -5,7 +5,7 @@ const blacklist = require('../PackageBlacklist').blacklist
  */
 function checkBlacklist(req, res, next) {
   if (blacklist.includes(req.packageName)) {
-    res.status(403).send(`Package ${req.packageName} is blacklisted`)
+    res.status(403).type('text').send(`Package ${req.packageName} is blacklisted`)
   } else {
     next()
   }

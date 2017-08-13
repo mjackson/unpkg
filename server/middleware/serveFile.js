@@ -31,7 +31,7 @@ function sendFile(res, file, stats) {
 
   stream.on('error', (error) => {
     console.error(error)
-    res.status(500).send('There was an error serving this file')
+    res.status(500).type('text').send('There was an error serving this file')
   })
 
   stream.pipe(res)
@@ -46,15 +46,21 @@ function serveFile(req, res, next) {
     Metadata.get(req.packageDir, req.file, req.stats, MaximumDepth, function (error, metadata) {
       if (error) {
         console.error(error)
-        res.status(500).send(`Cannot generate JSON metadata for ${req.packageSpec}${req.filename}`)
+        res.status(500).type('text').send(`Cannot generate JSON metadata for ${req.packageSpec}${req.filename}`)
       } else {
         // Cache metadata for 1 year.
-        res.set('Cache-Control', 'public, max-age=31536000').send(metadata)
+        res.set({
+          'Cache-Control': 'public, max-age=31536000',
+          'Cache-Tag': 'meta'
+        }).send(metadata)
       }
     })
   } else if (req.stats.isFile()) {
     // Cache files for 1 year.
-    res.set('Cache-Control', 'public, max-age=31536000')
+    res.set({
+      'Cache-Control': 'public, max-age=31536000',
+      'Cache-Tag': 'file'
+    })
 
     // TODO: use res.sendFile instead of our own sendFile?
     sendFile(res, path.join(req.packageDir, req.file), req.stats)
@@ -62,14 +68,17 @@ function serveFile(req, res, next) {
     generateDirectoryIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
       if (error) {
         console.error(error)
-        res.status(500).send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
+        res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
       } else {
         // Cache HTML directory listings for 1 minute.
-        res.set('Cache-Control', 'public, max-age=60').send(html)
+        res.set({
+          'Cache-Control': 'public, max-age=60',
+          'Cache-Tag': 'index'
+        }).send(html)
       }
     })
   } else {
-    res.status(403).send(`Cannot serve ${req.packageSpec}${req.filename}; it's not a file`)
+    res.status(403).type('text').send(`Cannot serve ${req.packageSpec}${req.filename}; it's not a file`)
   }
 }
 
