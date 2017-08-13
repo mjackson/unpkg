@@ -28,3 +28,7 @@ it('gets a content type of text/plain for .ts files', () => {
   expect(getContentType('app.ts')).toBe('text/plain')
   expect(getContentType('app.d.ts')).toBe('text/plain')
 })
+
+it('gets a content type of text/plain for .flow files', () => {
+  expect(getContentType('app.js.flow')).toBe('text/plain')
+})

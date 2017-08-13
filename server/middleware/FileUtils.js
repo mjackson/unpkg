@@ -8,17 +8,19 @@ mime.define({
     'changes',
     'authors',
     'makefile',
-    'ts'
+    'ts',
+    'flow'
   ]
 })
 
 const TextFiles = /\/?(\.[a-z]*rc|\.git[a-z]*|\.[a-z]*ignore)$/i
 
-const getContentType = (file) =>
-  TextFiles.test(file) ? 'text/plain' : mime.lookup(file)
+function getContentType(file) {
+  return TextFiles.test(file) ? 'text/plain' : mime.lookup(file)
+}
 
-const getStats = (file) =>
-  new Promise((resolve, reject) => {
+function getStats(file) {
+  return new Promise((resolve, reject) => {
     fs.lstat(file, (error, stats) => {
       if (error) {
         reject(error)
@@ -27,8 +29,9 @@ const getStats = (file) =>
       }
     })
   })
+}
 
-const getFileType = (stats) => {
+function getFileType(stats) {
   if (stats.isFile()) return 'file'
   if (stats.isDirectory()) return 'directory'
   if (stats.isBlockDevice()) return 'blockDevice'
