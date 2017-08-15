@@ -4,9 +4,7 @@ const PackageURL = require('../PackageURL')
 const ValidQueryKeys = {
   main: true,
   meta: true,
-  json: true, // deprecated
-  v: true // we don't do anything with this, but some icon font libraries
-          // use it to bust the cache on private servers (see #52)
+  json: true // deprecated
 }
 
 function queryIsValid(query) {
