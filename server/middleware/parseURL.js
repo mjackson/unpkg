@@ -1,3 +1,4 @@
+const validateNPMPackageName = require('validate-npm-package-name')
 const PackageURL = require('../PackageURL')
 
 const ValidQueryKeys = {
@@ -21,10 +22,16 @@ function parseURL(req, res, next) {
   if (url == null)
     return res.status(403).type('text').send(`Invalid URL: ${req.url}`)
 
+  const nameErrors = validateNPMPackageName(url.packageName).errors
+
+  // Do not allow invalid package names.
+  if (nameErrors)
+    return res.status(403).type('text').send(`Invalid package name: ${url.packageName} (${nameErrors.join(', ')})`)
+
   // Do not allow unrecognized query parameters because
   // some people use them to bust the cache.
   if (!queryIsValid(url.query))
-    return res.status(403).type('text').send(`Invalid query: ${JSON.stringify(url.query)}`)
+    return res.status(403).type('text').send(`Invalid query: ${url.search}`)
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion
