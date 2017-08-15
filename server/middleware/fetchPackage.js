@@ -35,12 +35,20 @@ function fetchPackage(req, res, next) {
         }
       })
     } else if (req.packageVersion in tags) {
-      res.redirect(PackageURL.create(req.packageName, tags[req.packageVersion], req.filename, req.search))
+      // Cache tag redirects for 1 minute.
+      res.set({
+        'Cache-Control': 'public, max-age=60',
+        'Cache-Tag': 'redirect'
+      }).redirect(PackageURL.create(req.packageName, tags[req.packageVersion], req.filename, req.search))
     } else {
       const maxVersion = semver.maxSatisfying(Object.keys(versions), req.packageVersion)
 
       if (maxVersion) {
-        res.redirect(PackageURL.create(req.packageName, maxVersion, req.filename, req.search))
+        // Cache semver redirects for 1 minute.
+        res.set({
+          'Cache-Control': 'public, max-age=60',
+          'Cache-Tag': 'redirect'
+        }).redirect(PackageURL.create(req.packageName, maxVersion, req.filename, req.search))
       } else {
         res.status(404).type('text').send(`Cannot find package ${req.packageSpec}`)
       }
