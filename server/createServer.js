@@ -6,8 +6,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 
 const { fetchStats } = require('./cloudflare')
-const parseURL = require('./middleware/parseURL')
-const checkBlacklist = require('./middleware/checkBlacklist')
+const parsePackageURL = require('./middleware/parsePackageURL')
 const fetchPackage = require('./middleware/fetchPackage')
 const findFile = require('./middleware/findFile')
 const serveFile = require('./middleware/serveFile')
@@ -68,8 +67,7 @@ function createServer() {
     maxAge: '365d'
   }))
 
-  app.use(parseURL)
-  app.use(checkBlacklist)
+  app.use(parsePackageURL)
   app.use(fetchPackage)
   app.use(findFile)
   app.use(serveFile)
