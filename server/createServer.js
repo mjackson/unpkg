@@ -7,8 +7,7 @@ const morgan = require('morgan')
 
 const { fetchStats } = require('./cloudflare')
 const parsePackageURL = require('./middleware/parsePackageURL')
-const fetchPackage = require('./middleware/fetchPackage')
-const findFile = require('./middleware/findFile')
+const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
 
 morgan.token('fwd', function (req) {
@@ -68,8 +67,7 @@ function createServer() {
   }))
 
   app.use(parsePackageURL)
-  app.use(fetchPackage)
-  app.use(findFile)
+  app.use(fetchFile)
   app.use(serveFile)
 
   const server = http.createServer(app)
