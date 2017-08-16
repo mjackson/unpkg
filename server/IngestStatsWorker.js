@@ -1,21 +1,12 @@
-const redis = require('redis')
 const addDays = require('date-fns/add_days')
 const invariant = require('invariant')
-const CloudflareAPI = require('./CloudflareAPI')
+const cf = require('./CloudflareAPI')
+const db = require('./RedisClient')
 const {
   createDayKey,
   createHourKey,
   createMinuteKey
 } = require('./StatsServer')
-
-const RedisURL = process.env.OPENREDIS_URL
-
-invariant(
-  RedisURL,
-  'Missing the $OPENREDIS_URL environment variable'
-)
-
-const db = redis.createClient(RedisURL)
 
 /**
  * Domains we want to analyze.
@@ -26,11 +17,11 @@ const DomainNames = [
 ]
 
 function getZones(domain) {
-  return CloudflareAPI.getJSON(`/zones?name=${domain}`)
+  return cf.getJSON(`/zones?name=${domain}`)
 }
 
 function getZoneAnalyticsDashboard(zoneId, since) {
-  return CloudflareAPI.getJSON(`/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`)
+  return cf.getJSON(`/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`)
 }
 
 const oneSecond = 1000

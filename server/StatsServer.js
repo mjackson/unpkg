@@ -1,14 +1,4 @@
-const redis = require('redis')
-const invariant = require('invariant')
-
-const RedisURL = process.env.OPENREDIS_URL
-
-invariant(
-  RedisURL,
-  'Missing the $OPENREDIS_URL environment variable'
-)
-
-const db = redis.createClient(RedisURL)
+const db = require('./RedisClient')
 
 const sumValues = (array) =>
   array.reduce((memo, n) => memo + (parseInt(n, 10) || 0), 0)

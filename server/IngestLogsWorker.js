@@ -2,24 +2,15 @@ const parseURL = require('url').parse
 const invariant = require('invariant')
 const gunzip = require('gunzip-maybe')
 const ndjson = require('ndjson')
-const redis = require('redis')
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
 const PackageURL = require('./PackageURL')
-const CloudflareAPI = require('./CloudflareAPI')
+const cf = require('./CloudflareAPI')
+const db = require('./RedisClient')
 const {
   createDayKey,
   createHourKey
 } = require('./StatsServer')
-
-const RedisURL = process.env.OPENREDIS_URL
-
-invariant(
-  RedisURL,
-  'Missing the $OPENREDIS_URL environment variable'
-)
-
-const db = redis.createClient(RedisURL)
 
 /**
  * Domains we want to analyze.
@@ -35,11 +26,11 @@ const DomainNames = [
 const LogWindowSeconds = 30
 
 function getZones(domain) {
-  return CloudflareAPI.getJSON(`/zones?name=${domain}`)
+  return cf.getJSON(`/zones?name=${domain}`)
 }
 
 function getLogs(zoneId, startTime, endTime) {
-  return CloudflareAPI.get(
+  return cf.get(
     `/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`,
     { 'Accept-Encoding': 'gzip' }
   ).then(function (res) {

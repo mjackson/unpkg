@@ -1,8 +1,4 @@
-const redis = require('redis')
-
-const RedisURL = process.env.OPENREDIS_URL || 'redis://localhost:6379'
-
-const db = redis.createClient(RedisURL)
+const db = require('./RedisClient')
 
 function createKey(packageName) {
   return 'packageInfo-' + packageName
