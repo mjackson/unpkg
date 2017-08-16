@@ -33,11 +33,12 @@ const oneMinuteSeconds = 60
 const oneHourSeconds = oneMinuteSeconds * 60
 const oneDaySeconds = oneHourSeconds * 24
 
-const getSeconds = (date) =>
-  Math.floor(date.getTime() / 1000)
+function getSeconds(date) {
+  return Math.floor(date.getTime() / 1000)
+}
 
-const reduceResults = (memo, results) => {
-  Object.keys(results).forEach(key => {
+function reduceResults(memo, results) {
+  Object.keys(results).forEach(function (key) {
     const value = results[key]
 
     if (typeof value === 'object' && value) {
@@ -51,8 +52,10 @@ const reduceResults = (memo, results) => {
 }
 
 function ingestStatsForZones(zones, since, processDashboard) {
-  return new Promise(resolve => {
-    const zoneNames = zones.map(zone => zone.name).join(', ')
+  return new Promise(function (resolve) {
+    const zoneNames = zones.map(function (zone) {
+      return zone.name
+    }).join(', ')
 
     console.log(
       'info: Started ingesting stats for zones %s since %d',
@@ -64,9 +67,10 @@ function ingestStatsForZones(zones, since, processDashboard) {
 
     resolve(
       Promise.all(
-        zones.map(zone => getZoneAnalyticsDashboard(zone.id, since))
-      ).then(
-        results => {
+        zones.map(function (zone) {
+          return getZoneAnalyticsDashboard(zone.id, since)
+        })
+      ).then(function (results) {
           const endFetchTime = Date.now()
 
           console.log(
@@ -82,33 +86,30 @@ function ingestStatsForZones(zones, since, processDashboard) {
           results = results.filter(Boolean)
 
           return results.length ? results.reduce(reduceResults) : null
+      }).then(function (dashboard) {
+        if (dashboard == null) {
+          console.warn(
+            'warning: Missing dashboards for %s since %d',
+            zoneNames,
+            since
+          )
+
+          return
         }
-      ).then(
-        dashboard => {
-          if (dashboard == null) {
-            console.warn(
-              'warning: Missing dashboards for %s since %d',
-              zoneNames,
-              since
-            )
 
-            return
-          }
+        const startProcessTime = Date.now()
 
-          const startProcessTime = Date.now()
+        return processDashboard(dashboard).then(function () {
+          const endProcessTime = Date.now()
 
-          return processDashboard(dashboard).then(() => {
-            const endProcessTime = Date.now()
-
-            console.log(
-              'info: Processed zone analytics dashboards for %s since %d in %dms',
-              zoneNames,
-              since,
-              endProcessTime - startProcessTime
-            )
-          })
-        }
-      )
+          console.log(
+            'info: Processed zone analytics dashboards for %s since %d in %dms',
+            zoneNames,
+            since,
+            endProcessTime - startProcessTime
+          )
+        })
+      })
     )
   })
 }
@@ -122,7 +123,7 @@ function processPerDayDashboard(dashboard) {
 }
 
 function processPerDayTimeseries(ts) {
-  return new Promise(resolve => {
+  return new Promise(function (resolve) {
     const since = new Date(ts.since)
     const until = new Date(ts.until)
 
@@ -157,7 +158,7 @@ function processPerDayTimeseries(ts) {
     db.expireat(`stats-bandwidthFromCache-${dayKey}`, oneYearLater)
 
     const httpStatus = ts.requests.http_status
-    const errors = Object.keys(httpStatus).reduce((memo, status) => {
+    const errors = Object.keys(httpStatus).reduce(function (memo, status) {
       return parseInt(status, 10) >= 500 ? memo + httpStatus[status] : memo
     }, 0)
 
@@ -168,7 +169,7 @@ function processPerDayTimeseries(ts) {
     const requestsByCountry = []
     const bandwidthByCountry = []
 
-    Object.keys(ts.requests.country).forEach(country => {
+    Object.keys(ts.requests.country).forEach(function (country) {
       const requests = ts.requests.country[country]
       const bandwidth = ts.bandwidth.country[country]
 
@@ -204,7 +205,7 @@ function processPerHourDashboard(dashboard) {
 }
 
 function processPerHourTimeseries(ts) {
-  return new Promise(resolve => {
+  return new Promise(function (resolve) {
     const since = new Date(ts.since)
     const until = new Date(ts.until)
 
@@ -245,7 +246,7 @@ function processPerMinuteDashboard(dashboard) {
 }
 
 function processPerMinuteTimeseries(ts) {
-  return new Promise(resolve => {
+  return new Promise(function (resolve) {
     const since = new Date(ts.since)
     const until = new Date(ts.until)
 
@@ -278,14 +279,17 @@ function processPerMinuteTimeseries(ts) {
 }
 
 function startZones(zones) {
-  const takePerMinuteTurn = () =>
-    ingestPerMinuteStats(zones)
+  function takePerMinuteTurn() {
+    return ingestPerMinuteStats(zones)
+  }
 
-  const takePerHourTurn = () =>
-    ingestPerHourStats(zones)
+  function takePerHourTurn() {
+    return ingestPerHourStats(zones)
+  }
 
-  const takePerDayTurn = () =>
-    ingestPerDayStats(zones)
+  function takePerDayTurn() {
+    return ingestPerDayStats(zones)
+  }
 
   takePerMinuteTurn()
   takePerHourTurn()
@@ -296,7 +300,10 @@ function startZones(zones) {
   setInterval(takePerDayTurn, oneHour / 2)
 }
 
-Promise.all(DomainNames.map(getZones)).then(results => {
-  const zones = results.reduce((memo, zones) => memo.concat(zones))
+Promise.all(DomainNames.map(getZones)).then(function (results) {
+  const zones = results.reduce(function (memo, zones) {
+    return memo.concat(zones)
+  })
+
   startZones(zones)
 })

@@ -1,11 +1,14 @@
 const db = require('./RedisClient')
 
-const sumValues = (array) =>
-  array.reduce((memo, n) => memo + (parseInt(n, 10) || 0), 0)
+function sumValues(array) {
+  return array.reduce(function (memo, n) {
+    return memo + (parseInt(n, 10) || 0)
+  }, 0)
+}
 
-const getKeyValues = (keys) =>
-  new Promise((resolve, reject) => {
-    db.mget(keys, (error, values) => {
+function getKeyValues(keys) {
+  return new Promise(function (resolve, reject) {
+    db.mget(keys, function (error, values) {
       if (error) {
         reject(error)
       } else {
@@ -13,11 +16,13 @@ const getKeyValues = (keys) =>
       }
     })
   })
+}
 
-const sumKeys = (keys) =>
-  getKeyValues(keys).then(sumValues)
+function sumKeys(keys) {
+  return getKeyValues(keys).then(sumValues)
+}
 
-const createScoresMap = (array) => {
+function createScoresMap(array) {
   const map = {}
 
   for (let i = 0; i < array.length; i += 2)
@@ -26,9 +31,9 @@ const createScoresMap = (array) => {
   return map
 }
 
-const getScoresMap = (key, n = 10) =>
-  new Promise((resolve, reject) => {
-    db.zrevrange(key, 0, n, 'withscores', (error, value) => {
+function getScoresMap(key, n = 10) {
+  return new Promise(function (resolve, reject) {
+    db.zrevrange(key, 0, n, 'withscores', function (error, value) {
       if (error) {
         reject(error)
       } else {
@@ -36,39 +41,53 @@ const getScoresMap = (key, n = 10) =>
       }
     })
   })
+}
 
-const createTopScores = (map) =>
-  Object.keys(map)
-    .reduce((memo, key) => memo.concat([ [ key, map[key] ] ]), [])
-    .sort((a, b) => b[1] - a[1])
+function createTopScores(map) {
+  return Object.keys(map).reduce(function (memo, key) {
+    return memo.concat([ [ key, map[key] ] ])
+  }, []).sort(function (a, b) {
+    return b[1] - a[1]
+  })
+}
 
-const getTopScores = (key, n) =>
-  getScoresMap(key, n).then(createTopScores)
+function getTopScores(key, n) {
+  return getScoresMap(key, n).then(createTopScores)
+}
 
-const sumMaps = (maps) =>
-  maps.reduce((memo, map) => {
-    Object.keys(map).forEach(key => {
+function sumMaps(maps) {
+  return maps.reduce(function (memo, map) {
+    Object.keys(map).forEach(function (key) {
       memo[key] = (memo[key] || 0) + map[key]
     })
 
     return memo
   }, {})
+}
 
-const sumTopScores = (keys, n) =>
-  Promise.all(keys.map(key => getScoresMap(key, n)))
-    .then(sumMaps)
-    .then(createTopScores)
+function sumTopScores(keys, n) {
+  return Promise.all(
+    keys.map(function (key) {
+      return getScoresMap(key, n)
+    })
+  ).then(sumMaps).then(createTopScores)
+}
 
-const createKey = (...args) => args.join('-')
+function createKey(...args) {
+  return args.join('-')
+}
 
-const createDayKey = (date) =>
-  createKey(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+function createDayKey(date) {
+  return createKey(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+}
 
-const createHourKey = (date) =>
-  createKey(createDayKey(date), date.getUTCHours())
+function createHourKey(date) {
+  return createKey(createDayKey(date), date.getUTCHours())
+}
 
-const createMinuteKey = (date) =>
-  createKey(createHourKey(date), date.getUTCMinutes())
+function createMinuteKey(date) {
+  return createKey(createHourKey(date), date.getUTCMinutes())
+}
 
 module.exports = {
   getKeyValues,
