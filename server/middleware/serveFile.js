@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
+const qs = require('querystring')
 const etag = require('etag')
-const Metadata = require('./MetadataUtils')
 const { generateDirectoryIndexHTML } = require('./IndexUtils')
 const { getContentType } = require('./FileUtils')
 
@@ -9,11 +9,6 @@ const { getContentType } = require('./FileUtils')
  * Automatically generate HTML pages that show package contents.
  */
 const AutoIndex = !process.env.DISABLE_INDEX
-
-/**
- * Maximum recursion depth for ?meta listings.
- */
-const MaximumDepth = 128
 
 function sendFile(res, file, stats) {
   let contentType = getContentType(file)
@@ -41,20 +36,12 @@ function sendFile(res, file, stats) {
  * Send the file, JSON metadata, or HTML directory listing.
  */
 function serveFile(req, res, next) {
-  // TODO: remove support for "json" query param
   if (req.query.meta != null || req.query.json != null) {
-    Metadata.get(req.packageDir, req.file, req.stats, MaximumDepth, function (error, metadata) {
-      if (error) {
-        console.error(error)
-        res.status(500).type('text').send(`Cannot generate JSON metadata for ${req.packageSpec}${req.filename}`)
-      } else {
-        // Cache metadata for 1 year.
-        res.set({
-          'Cache-Control': 'public, max-age=31536000',
-          'Cache-Tag': 'meta'
-        }).send(metadata)
-      }
-    })
+    // Preserve support for ?meta and ?json for backwards compat.
+    delete req.query.meta
+    delete req.query.json
+    const search = qs.stringify(req.query)
+    res.status(301).redirect(`/_meta${req.pathname}${search}`)
   } else if (req.stats.isFile()) {
     // Cache files for 1 year.
     res.set({

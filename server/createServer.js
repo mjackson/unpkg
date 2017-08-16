@@ -9,6 +9,7 @@ const { fetchStats } = require('./cloudflare')
 const parsePackageURL = require('./middleware/parsePackageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
+const serveMetadata = require('./middleware/serveMetadata')
 
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
@@ -66,9 +67,8 @@ function createServer() {
     maxAge: '365d'
   }))
 
-  app.use(parsePackageURL)
-  app.use(fetchFile)
-  app.use(serveFile)
+  app.use('/_meta', parsePackageURL, fetchFile, serveMetadata)
+  app.use('/', parsePackageURL, fetchFile, serveFile)
 
   const server = http.createServer(app)
 
