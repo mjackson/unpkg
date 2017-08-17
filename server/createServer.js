@@ -23,7 +23,7 @@ const PackageBlacklist = require('./PackageBlacklist').blacklist
  * The minimum number of times a package must be downloaded on
  * average in order to be available on the CDN.
  */
-const MinDailyDownloads = 100
+const MinDailyDownloads = 50
 
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
@@ -87,6 +87,10 @@ function createServer() {
     checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveMetadata
+  )
+
+  app.use('/_stats',
+    parsePackageURL
   )
 
   app.use('/',
