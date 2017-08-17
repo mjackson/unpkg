@@ -21,7 +21,10 @@ const PackageBlacklist = require('./PackageBlacklist').blacklist
 
 /**
  * The minimum number of times a package must be downloaded on
- * average in order to be available on the CDN.
+ * average in order to be available on the CDN. We need to set this
+ * sufficiently high to avoid serving packages that are only ever
+ * downloaded by bots.
+ * See https://twitter.com/seldo/status/892840020377075712
  */
 const MinDailyDownloads = 50
 
@@ -84,7 +87,7 @@ function createServer() {
   app.use('/_meta',
     parsePackageURL,
     checkBlacklist(PackageBlacklist),
-    checkMinDailyDownloads(MinDailyDownloads),
+    // checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveMetadata
   )
@@ -96,7 +99,7 @@ function createServer() {
   app.use('/',
     parsePackageURL,
     checkBlacklist(PackageBlacklist),
-    checkMinDailyDownloads(MinDailyDownloads),
+    // checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveFile
   )
