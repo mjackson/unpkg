@@ -1,5 +1,6 @@
-const addDays = require('date-fns/add_days')
 const invariant = require('invariant')
+const startOfDay = require('date-fns/start_of_day')
+const addDays = require('date-fns/add_days')
 const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
 const {
@@ -16,22 +17,10 @@ const DomainNames = [
   'npmcdn.com'
 ]
 
-function getZones(domain) {
-  return cf.getJSON(`/zones?name=${domain}`)
-}
-
-function getZoneAnalyticsDashboard(zoneId, since) {
-  return cf.getJSON(`/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`)
-}
-
 const oneSecond = 1000
 const oneMinute = oneSecond * 60
 const oneHour = oneMinute * 60
 const oneDay = oneHour * 24
-
-const oneMinuteSeconds = 60
-const oneHourSeconds = oneMinuteSeconds * 60
-const oneDaySeconds = oneHourSeconds * 24
 
 function getSeconds(date) {
   return Math.floor(date.getTime() / 1000)
@@ -68,7 +57,7 @@ function ingestStatsForZones(zones, since, processDashboard) {
     resolve(
       Promise.all(
         zones.map(function (zone) {
-          return getZoneAnalyticsDashboard(zone.id, since)
+          return cf.getZoneAnalyticsDashboard(zone.id, since)
         })
       ).then(function (results) {
           const endFetchTime = Date.now()
@@ -129,33 +118,33 @@ function processPerDayTimeseries(ts) {
 
     invariant(
       since.getUTCHours() === 0 && since.getUTCMinutes() === 0 && since.getUTCSeconds() === 0,
-      'error: Per-day timeseries.since must begin exactly on the day'
+      'Per-day timeseries.since must begin exactly on the day'
     )
 
     invariant(
       (until - since) === oneDay,
-      'error: Per-day timeseries must span exactly one day'
+      'Per-day timeseries must span exactly one day'
     )
 
+    const nextDay = startOfDay(addDays(until, 1))
+    const oneYearLater = getSeconds(addDays(nextDay, 365))
     const dayKey = createDayKey(since)
-    const oneYearLater = getSeconds(addDays(until, 365))
-    const thirtyDaysLater = getSeconds(addDays(until, 30))
 
     // Q: How many requests do we serve per day?
     db.set(`stats-requests-${dayKey}`, ts.requests.all)
     db.expireat(`stats-requests-${dayKey}`, oneYearLater)
 
     // Q: How many requests do we serve per day from the cache?
-    db.set(`stats-requestsFromCache-${dayKey}`, ts.requests.cached)
-    db.expireat(`stats-requestsFromCache-${dayKey}`, oneYearLater)
+    db.set(`stats-cachedRequests-${dayKey}`, ts.requests.cached)
+    db.expireat(`stats-cachedRequests-${dayKey}`, oneYearLater)
 
     // Q: How much bandwidth do we serve per day?
     db.set(`stats-bandwidth-${dayKey}`, ts.bandwidth.all)
     db.expireat(`stats-bandwidth-${dayKey}`, oneYearLater)
 
     // Q: How much bandwidth do we serve per day from the cache?
-    db.set(`stats-bandwidthFromCache-${dayKey}`, ts.bandwidth.cached)
-    db.expireat(`stats-bandwidthFromCache-${dayKey}`, oneYearLater)
+    db.set(`stats-cachedBandwidth-${dayKey}`, ts.bandwidth.cached)
+    db.expireat(`stats-cachedBandwidth-${dayKey}`, oneYearLater)
 
     const httpStatus = ts.requests.http_status
     const errors = Object.keys(httpStatus).reduce(function (memo, status) {
@@ -180,16 +169,18 @@ function processPerDayTimeseries(ts) {
       }
     })
 
+    const thirtyDaysLater = getSeconds(addDays(nextDay, 30))
+
     // Q: How many requests do we serve to a country per day?
     if (requestsByCountry.length) {
-      db.zadd([ `stats-requestsByCountry-${dayKey}`, ...requestsByCountry ])
-      db.expireat(`stats-requestsByCountry-${dayKey}`, thirtyDaysLater)
+      db.zadd([ `stats-countryRequests-${dayKey}`, ...requestsByCountry ])
+      db.expireat(`stats-countryRequests-${dayKey}`, thirtyDaysLater)
     }
 
     // Q: How much bandwidth do we serve to a country per day?
     if (bandwidthByCountry.length) {
-      db.zadd([ `stats-bandwidthByCountry-${dayKey}`, ...bandwidthByCountry ])
-      db.expireat(`stats-bandwidthByCountry-${dayKey}`, thirtyDaysLater)
+      db.zadd([ `stats-countryBandwidth-${dayKey}`, ...bandwidthByCountry ])
+      db.expireat(`stats-countryBandwidth-${dayKey}`, thirtyDaysLater)
     }
 
     resolve()
@@ -211,27 +202,33 @@ function processPerHourTimeseries(ts) {
 
     invariant(
       since.getUTCMinutes() === 0 && since.getUTCSeconds() === 0,
-      'error: Per-hour timeseries.since must begin exactly on the hour'
+      'Per-hour timeseries.since must begin exactly on the hour'
     )
 
     invariant(
       (until - since) === oneHour,
-      'error: Per-hour timeseries must span exactly one hour'
+      'Per-hour timeseries must span exactly one hour'
     )
 
+    const nextDay = startOfDay(addDays(until, 1))
+    const sevenDaysLater = getSeconds(addDays(nextDay, 7))
     const hourKey = createHourKey(since)
 
     // Q: How many requests do we serve per hour?
-    db.setex(`stats-requests-${hourKey}`, (oneDaySeconds * 7), ts.requests.all)
+    db.set(`stats-requests-${hourKey}`, ts.requests.all)
+    db.expireat(`stats-requests-${hourKey}`, sevenDaysLater)
 
     // Q: How many requests do we serve per hour from the cache?
-    db.setex(`stats-requestsFromCache-${hourKey}`, (oneDaySeconds * 7), ts.requests.cached)
+    db.set(`stats-cachedRequests-${hourKey}`, ts.requests.cached)
+    db.expireat(`stats-cachedRequests-${hourKey}`, sevenDaysLater)
 
     // Q: How much bandwidth do we serve per hour?
-    db.setex(`stats-bandwidth-${hourKey}`, (oneDaySeconds * 7), ts.bandwidth.all)
+    db.set(`stats-bandwidth-${hourKey}`, ts.bandwidth.all)
+    db.expireat(`stats-bandwidth-${hourKey}`, sevenDaysLater)
 
     // Q: How much bandwidth do we serve per hour from the cache?
-    db.setex(`stats-bandwidthFromCache-${hourKey}`, (oneDaySeconds * 7), ts.bandwidth.cached)
+    db.set(`stats-cachedBandwidth-${hourKey}`, ts.bandwidth.cached)
+    db.expireat(`stats-cachedBandwidth-${hourKey}`, sevenDaysLater)
 
     resolve()
   })
@@ -252,27 +249,33 @@ function processPerMinuteTimeseries(ts) {
 
     invariant(
       since.getUTCSeconds() === 0,
-      'error: Per-minute timeseries.since must begin exactly on the minute'
+      'Per-minute timeseries.since must begin exactly on the minute'
     )
 
     invariant(
       (until - since) === oneMinute,
-      'error: Per-minute timeseries must span exactly one minute'
+      'Per-minute timeseries must span exactly one minute'
     )
 
+    const nextDay = startOfDay(addDays(until, 1))
+    const oneDayLater = getSeconds(addDays(nextDay, 1))
     const minuteKey = createMinuteKey(since)
 
     // Q: How many requests do we serve per minute?
-    db.setex(`stats-requests-${minuteKey}`, oneDaySeconds, ts.requests.all)
+    db.set(`stats-requests-${minuteKey}`, ts.requests.all)
+    db.expireat(`stats-requests-${minuteKey}`, oneDayLater)
 
     // Q: How many requests do we serve per minute from the cache?
-    db.setex(`stats-requestsFromCache-${minuteKey}`, oneDaySeconds, ts.requests.cached)
+    db.set(`stats-cachedRequests-${minuteKey}`, ts.requests.cached)
+    db.expireat(`stats-cachedRequests-${minuteKey}`, oneDayLater)
 
     // Q: How much bandwidth do we serve per minute?
-    db.setex(`stats-bandwidth-${minuteKey}`, oneDaySeconds, ts.bandwidth.all)
+    db.set(`stats-bandwidth-${minuteKey}`, ts.bandwidth.all)
+    db.expireat(`stats-bandwidth-${minuteKey}`, oneDayLater)
 
     // Q: How much bandwidth do we serve per minute from the cache?
-    db.setex(`stats-bandwidthFromCache-${minuteKey}`, oneDaySeconds, ts.bandwidth.cached)
+    db.set(`stats-cachedBandwidth-${minuteKey}`, ts.bandwidth.cached)
+    db.expireat(`stats-cachedBandwidth-${minuteKey}`, oneDayLater)
 
     resolve()
   })
@@ -280,15 +283,15 @@ function processPerMinuteTimeseries(ts) {
 
 function startZones(zones) {
   function takePerMinuteTurn() {
-    return ingestPerMinuteStats(zones)
+    ingestPerMinuteStats(zones)
   }
 
   function takePerHourTurn() {
-    return ingestPerHourStats(zones)
+    ingestPerHourStats(zones)
   }
 
   function takePerDayTurn() {
-    return ingestPerDayStats(zones)
+    ingestPerDayStats(zones)
   }
 
   takePerMinuteTurn()
@@ -300,7 +303,7 @@ function startZones(zones) {
   setInterval(takePerDayTurn, oneHour / 2)
 }
 
-Promise.all(DomainNames.map(getZones)).then(function (results) {
+Promise.all(DomainNames.map(cf.getZones)).then(function (results) {
   const zones = results.reduce(function (memo, zones) {
     return memo.concat(zones)
   })

@@ -1,9 +1,7 @@
 const parseURL = require('url').parse
-const invariant = require('invariant')
-const gunzip = require('gunzip-maybe')
-const ndjson = require('ndjson')
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
+const validateNPMPackageName = require('validate-npm-package-name')
 const PackageURL = require('./PackageURL')
 const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
@@ -25,109 +23,63 @@ const DomainNames = [
  */
 const LogWindowSeconds = 30
 
-function getZones(domain) {
-  return cf.getJSON(`/zones?name=${domain}`)
-}
-
-function getLogs(zoneId, startTime, endTime) {
-  return cf.get(
-    `/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`,
-    { 'Accept-Encoding': 'gzip' }
-  ).then(function (res) {
-    return res.body.pipe(gunzip())
-  })
-}
-
-function toSeconds(millis) {
-  return Math.floor(millis / 1000)
+function getSeconds(date) {
+  return Math.floor(date.getTime() / 1000)
 }
 
 function stringifySeconds(seconds) {
   return new Date(seconds * 1000).toISOString()
 }
 
-function getPackageName(pathname) {
-  const parsed = PackageURL.parse(pathname)
-  return parsed && parsed.packageName
+function toSeconds(millis) {
+  return Math.floor(millis / 1000)
 }
 
 const oneSecond = 1000
 const oneMinute = oneSecond * 60
 const oneHour = oneMinute * 60
 
-function getSeconds(date) {
-  return Math.floor(date.getTime() / 1000)
-}
-
 function computeCounters(stream) {
   return new Promise(function (resolve, reject) {
     const counters = {}
     const expireat = {}
 
-    function incrCounter(counterName, by = 1) {
-      counters[counterName] = (counters[counterName] || 0) + by
-    }
-
-    function incrCounterMember(counterName, member, by = 1) {
-      counters[counterName] = counters[counterName] || {}
-      counters[counterName][member] = (counters[counterName][member] || 0) + by
+    function incr(key, member, by, expiry) {
+      counters[key] = counters[key] || {}
+      counters[key][member] = (counters[key][member] || 0) + by
+      expireat[key] = expiry
     }
 
     stream
-      .pipe(ndjson.parse())
       .on('error', reject)
       .on('data', function (entry) {
         const date = new Date(Math.round(entry.timestamp / 1000000))
+
         const nextDay = startOfDay(addDays(date, 1))
+        const sevenDaysLater = getSeconds(addDays(nextDay, 7))
         const thirtyDaysLater = getSeconds(addDays(nextDay, 30))
-
         const dayKey = createDayKey(date)
-        const hourKey = createHourKey(date)
-
-        // Q: How many requests are served by origin/cache/edge per day/hour?
-        if (entry.origin) {
-          incrCounter(`stats-originRequests-${dayKey}`)
-          expireat[`stats-originRequests-${dayKey}`] = thirtyDaysLater
-
-          incrCounter(`stats-originRequests-${hourKey}`)
-          expireat[`stats-originRequests-${hourKey}`] = thirtyDaysLater
-        } else if (entry.cache) {
-          incrCounter(`stats-cacheRequests-${dayKey}`)
-          expireat[`stats-cacheRequests-${dayKey}`] = thirtyDaysLater
-
-          incrCounter(`stats-cacheRequests-${hourKey}`)
-          expireat[`stats-cacheRequests-${hourKey}`] = thirtyDaysLater
-        } else {
-          incrCounter(`stats-edgeRequests-${dayKey}`)
-          expireat[`stats-edgeRequests-${dayKey}`] = thirtyDaysLater
-
-          incrCounter(`stats-edgeRequests-${hourKey}`)
-          expireat[`stats-edgeRequests-${hourKey}`] = thirtyDaysLater
-        }
 
         const clientRequest = entry.clientRequest
         const edgeResponse = entry.edgeResponse
 
-        // Q: How many requests do we receive for a package per day?
-        // Q: How many bytes do we serve for a package per day?
-        const uri = clientRequest.uri
-        const package = getPackageName(parseURL(uri).pathname)
+        if (edgeResponse.status === 200) {
+          // Q: How many requests do we serve for a package per day?
+          // Q: How many bytes do we serve for a package per day?
+          const url = PackageURL.parse(parseURL(clientRequest.uri).pathname)
+          const packageName = url && url.packageName
 
-        if (package) {
-          incrCounterMember(`stats-packageRequests-${dayKey}`, package)
-          expireat[`stats-packageRequests-${dayKey}`] = thirtyDaysLater
-
-          incrCounterMember(`stats-packageBytes-${dayKey}`, package, edgeResponse.bytes)
-          expireat[`stats-packageBytes-${dayKey}`] = thirtyDaysLater
+          if (packageName && validateNPMPackageName(packageName).errors == null) {
+            incr(`stats-packageRequests-${dayKey}`, packageName, 1, thirtyDaysLater)
+            incr(`stats-packageBytes-${dayKey}`, packageName, edgeResponse.bytes, thirtyDaysLater)
+          }
         }
 
-        // Q: How many requests per day do we receive via each protocol?
+        // Q: How many requests per day do we receive via a protocol?
         const protocol = clientRequest.httpProtocol
 
-        if (protocol) {
-          incrCounterMember(`stats-protocolRequests-${dayKey}`, protocol)
-          expireat[`stats-protocolRequests-${dayKey}`] = thirtyDaysLater
-        }
+        if (protocol)
+          incr(`stats-protocolRequests-${dayKey}`, protocol, 1, thirtyDaysLater)
 
         // Q: How many requests do we receive from a hostname per day?
         // Q: How many bytes do we serve to a hostname per day?
@@ -135,11 +87,8 @@ function computeCounters(stream) {
         const hostname = referer && parseURL(referer).hostname
 
         if (hostname) {
-          incrCounterMember(`stats-hostnameRequests-${dayKey}`, hostname)
-          expireat[`stats-hostnameRequests-${dayKey}`] = thirtyDaysLater
-
-          incrCounterMember(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes)
-          expireat[`stats-hostnameBytes-${dayKey}`] = thirtyDaysLater
+          incr(`stats-hostnameRequests-${dayKey}`, hostname, 1, sevenDaysLater)
+          incr(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes, sevenDaysLater)
         }
       })
       .on('end', function () {
@@ -151,17 +100,11 @@ function computeCounters(stream) {
 function processLogs(stream) {
   return computeCounters(stream).then(function ({ counters, expireat }) {
     Object.keys(counters).forEach(function (key) {
-      const value = counters[key]
+      const values = counters[key]
 
-      if (typeof value === 'number') {
-        // Simple counter.
-        db.incrby(key, value)
-      } else {
-        // Sorted set.
-        Object.keys(value).forEach(function (member) {
-          db.zincrby(key, value[member], member)
-        })
-      }
+      Object.keys(values).forEach(function (member) {
+        db.zincrby(key, values[member], member)
+      })
 
       if (expireat[key])
         db.expireat(key, expireat[key])
@@ -181,7 +124,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
     const startFetchTime = Date.now()
 
     resolve(
-      getLogs(zone.id, startSeconds, endSeconds).then(function (stream) {
+      cf.getLogs(zone.id, startSeconds, endSeconds).then(function (stream) {
         const endFetchTime = Date.now()
 
         console.log(
@@ -263,7 +206,7 @@ function startZone(zone) {
   takeATurn()
 }
 
-Promise.all(DomainNames.map(getZones)).then(function (results) {
+Promise.all(DomainNames.map(cf.getZones)).then(function (results) {
   const zones = results.reduce(function (memo, zones) {
     return memo.concat(zones)
   })
