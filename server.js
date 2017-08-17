@@ -6,6 +6,7 @@ const port = parseInt(process.env.PORT, 10) || 5000
 throng({
   workers: process.env.WEB_CONCURRENCY || 1,
   lifetime: Infinity,
+  grace: 25000,
   start: function (id) {
     const server = createServer()
 
