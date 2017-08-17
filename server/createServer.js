@@ -7,11 +7,23 @@ const morgan = require('morgan')
 
 const { fetchStats } = require('./cloudflare')
 
+const checkBlacklist = require('./middleware/checkBlacklist')
 const checkMinDailyDownloads = require('./middleware/checkMinDailyDownloads')
 const parsePackageURL = require('./middleware/parsePackageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
 const serveMetadata = require('./middleware/serveMetadata')
+
+/**
+ * A list of packages we refuse to serve.
+ */
+const PackageBlacklist = require('./PackageBlacklist').blacklist
+
+/**
+ * The minimum number of times a package must be downloaded on
+ * average in order to be available on the CDN.
+ */
+const MinDailyDownloads = 100
 
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
@@ -71,14 +83,16 @@ function createServer() {
 
   app.use('/_meta',
     parsePackageURL,
-    checkMinDailyDownloads(100),
+    checkBlacklist(PackageBlacklist),
+    checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveMetadata
   )
 
   app.use('/',
     parsePackageURL,
-    checkMinDailyDownloads(100),
+    checkBlacklist(PackageBlacklist),
+    checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveFile
   )

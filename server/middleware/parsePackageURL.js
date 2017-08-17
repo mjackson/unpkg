@@ -1,5 +1,4 @@
 const validateNPMPackageName = require('validate-npm-package-name')
-const PackageBlacklist = require('../PackageBlacklist').blacklist
 const PackageURL = require('../PackageURL')
 
 /**
@@ -16,10 +15,6 @@ function parsePackageURL(req, res, next) {
   // Do not allow invalid package names.
   if (nameErrors)
     return res.status(403).type('text').send(`Invalid package name: ${url.packageName} (${nameErrors.join(', ')})`)
-
-  // Do not allow packages that have been blacklisted.
-  if (PackageBlacklist.includes(req.packageName))
-    return res.status(403).type('text').send(`Package ${req.packageName} is blacklisted`)
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion
