@@ -1,6 +1,7 @@
 require('isomorphic-fetch')
 const invariant = require('invariant')
 
+const CloudflareAPIURL = 'https://api.cloudflare.com'
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
 
@@ -15,8 +16,7 @@ invariant(
 )
 
 function get(path, headers) {
-  return fetch(`https://api.cloudflare.com/client/v4${path}`, {
-    method: 'GET',
+  return fetch(`${CloudflareAPIURL}/client/v4${path}`, {
     headers: Object.assign({}, headers, {
       'X-Auth-Email': CloudflareEmail,
       'X-Auth-Key': CloudflareKey

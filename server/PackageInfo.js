@@ -1,8 +1,10 @@
 require('isomorphic-fetch')
-const PackageInfoCache = require('./PackageInfoCache')
+const createCache = require('./createCache')
 const createMutex = require('./createMutex')
 
 const RegistryURL = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org'
+
+const PackageInfoCache = createCache('packageInfo')
 
 function fetchPackageInfo(packageName) {
   console.log(`info: Fetching package info for ${packageName}`)
@@ -18,8 +20,8 @@ function fetchPackageInfo(packageName) {
 
   return fetch(url, {
     headers: { 'Accept': 'application/json' }
-  }).then(function (response) {
-    return response.status === 404 ? null : response.json()
+  }).then(function (res) {
+    return res.status === 404 ? null : res.json()
   })
 }
 
@@ -53,10 +55,8 @@ const fetchMutex = createMutex(function (packageName, callback) {
 
 function getPackageInfo(packageName, callback) {
   PackageInfoCache.get(packageName, function (error, value) {
-    if (error) {
-      callback(error)
-    } else if (value) {
-      callback(null, value === PackageNotFound ? null : value)
+    if (error || value != null) {
+      callback(error, value === PackageNotFound ? null : value)
     } else {
       fetchMutex(packageName, packageName, callback)
     }

@@ -6,6 +6,8 @@ const cors = require('cors')
 const morgan = require('morgan')
 
 const { fetchStats } = require('./cloudflare')
+
+const checkMinDailyDownloads = require('./middleware/checkMinDailyDownloads')
 const parsePackageURL = require('./middleware/parsePackageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
@@ -67,8 +69,19 @@ function createServer() {
     maxAge: '365d'
   }))
 
-  app.use('/_meta', parsePackageURL, fetchFile, serveMetadata)
-  app.use('/', parsePackageURL, fetchFile, serveFile)
+  app.use('/_meta',
+    parsePackageURL,
+    checkMinDailyDownloads(100),
+    fetchFile,
+    serveMetadata
+  )
+
+  app.use('/',
+    parsePackageURL,
+    checkMinDailyDownloads(100),
+    fetchFile,
+    serveFile
+  )
 
   const server = http.createServer(app)
 
