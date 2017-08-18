@@ -88,7 +88,7 @@ class Layout extends React.Component {
         {this.props.children}
         <div className="wrapper">
           <footer>
-            <p>&copy; 2016-{(new Date).getFullYear()} Michael Jackson</p>
+            <p>&copy; 2016-{(new Date()).getFullYear()} Michael Jackson</p>
           </footer>
         </div>
       </div>
