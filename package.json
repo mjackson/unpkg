@@ -1,10 +1,10 @@
 {
-  "name": "unpkg.com",
+  "private": true,
+  "name": "unpkg-website",
   "proxy": "http://localhost:3001",
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "heroku-postbuild": "node scripts/build.js",
     "server": "heroku local -f Procfile.local -p 3001",
     "test": "node scripts/test.js --env=jsdom"
   },
