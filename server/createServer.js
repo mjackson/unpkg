@@ -8,7 +8,6 @@ const morgan = require('morgan')
 const { fetchStats } = require('./cloudflare')
 
 const checkBlacklist = require('./middleware/checkBlacklist')
-const checkMinDailyDownloads = require('./middleware/checkMinDailyDownloads')
 const parsePackageURL = require('./middleware/parsePackageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
@@ -18,15 +17,6 @@ const serveMetadata = require('./middleware/serveMetadata')
  * A list of packages we refuse to serve.
  */
 const PackageBlacklist = require('./PackageBlacklist').blacklist
-
-/**
- * The minimum number of times a package must be downloaded on
- * average in order to be available on the CDN. We need to set this
- * sufficiently high to avoid serving packages that are only ever
- * downloaded by bots.
- * See https://twitter.com/seldo/status/892840020377075712
- */
-const MinDailyDownloads = 50
 
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
@@ -58,8 +48,8 @@ function sendHomePage(publicDir) {
 }
 
 function errorHandler(err, req, res, next) {
-  res.status(500).type('text').send('Internal Server Error')
   console.error(err.stack)
+  res.status(500).type('text').send('Internal Server Error')
   next(err)
 }
 
@@ -87,19 +77,13 @@ function createServer() {
   app.use('/_meta',
     parsePackageURL,
     checkBlacklist(PackageBlacklist),
-    // checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveMetadata
-  )
-
-  app.use('/_stats',
-    parsePackageURL
   )
 
   app.use('/',
     parsePackageURL,
     checkBlacklist(PackageBlacklist),
-    // checkMinDailyDownloads(MinDailyDownloads),
     fetchFile,
     serveFile
   )
