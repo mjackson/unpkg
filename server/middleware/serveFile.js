@@ -2,8 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const qs = require('querystring')
 const etag = require('etag')
-const { generateDirectoryIndexHTML } = require('./IndexUtils')
-const { getContentType } = require('./FileUtils')
+const getFileContentType = require('./utils/getFileContentType')
+const getIndexHTML = require('./utils/getIndexHTML')
 
 /**
  * Automatically generate HTML pages that show package contents.
@@ -11,7 +11,7 @@ const { getContentType } = require('./FileUtils')
 const AutoIndex = !process.env.DISABLE_INDEX
 
 function sendFile(res, file, stats) {
-  let contentType = getContentType(file)
+  let contentType = getFileContentType(file)
 
   if (contentType === 'text/html')
     contentType = 'text/plain' // We can't serve HTML because bad people :(
@@ -52,7 +52,7 @@ function serveFile(req, res, next) {
     // TODO: use res.sendFile instead of our own sendFile?
     sendFile(res, path.join(req.packageDir, req.file), req.stats)
   } else if (AutoIndex && req.stats.isDirectory()) {
-    generateDirectoryIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
+    getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
       if (error) {
         console.error(error)
         res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)

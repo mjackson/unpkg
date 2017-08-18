@@ -1,7 +1,9 @@
 const fs = require('fs')
 const path = require('path')
 const SRIToolbox = require('sri-toolbox')
-const { getContentType, getStats, getFileType } = require('./FileUtils')
+const getFileContentType = require('./getFileContentType')
+const getFileStats = require('./getFileStats')
+const getFileType = require('./getFileType')
 
 function getEntries(dir, file, maximumDepth) {
   return new Promise(function (resolve, reject) {
@@ -12,7 +14,7 @@ function getEntries(dir, file, maximumDepth) {
         resolve(
           Promise.all(
             files.map(function (f) {
-              return getStats(path.join(dir, file, f))
+              return getFileStats(path.join(dir, file, f))
             })
           ).then(function (statsArray) {
             return Promise.all(statsArray.map(function (stats, index) {
@@ -44,7 +46,7 @@ function getIntegrity(file) {
 function getMetadataRecursive(dir, file, stats, maximumDepth) {
   const metadata = {
     lastModified: formatTime(stats.mtime),
-    contentType: getContentType(file),
+    contentType: getFileContentType(file),
     path: file,
     size: stats.size,
     type: getFileType(stats)
@@ -72,6 +74,4 @@ function getMetadata(baseDir, path, stats, maximumDepth, callback) {
   }, callback)
 }
 
-module.exports = {
-  get: getMetadata
-}
+module.exports = getMetadata

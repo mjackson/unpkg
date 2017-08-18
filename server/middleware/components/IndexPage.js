@@ -1,7 +1,7 @@
 const React = require('react')
 const semver = require('semver')
 const DirectoryListing = require('./DirectoryListing')
-const { readCSS } = require('../StyleUtils')
+const readCSS = require('../utils/readCSS')
 
 const e = React.createElement
 

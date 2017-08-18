@@ -1,6 +1,6 @@
 const React = require('react')
 const prettyBytes = require('pretty-bytes')
-const { getContentType } = require('../FileUtils')
+const getFileContentType = require('../utils/getFileContentType')
 
 const e = React.createElement
 
@@ -15,7 +15,7 @@ const DirectoryListing = ({ dir, entries }) => {
     return (
       e('tr', { key: file, className: index % 2 ? 'odd' : 'even' },
         e('td', null, e('a', { title: file, href }, file)),
-        e('td', null, isDir ? '-' : getContentType(file)),
+        e('td', null, isDir ? '-' : getFileContentType(file)),
         e('td', null, isDir ? '-' : prettyBytes(stats.size)),
         e('td', null, isDir ? '-' : formatTime(stats.mtime))
       )
