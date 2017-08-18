@@ -41,7 +41,7 @@ function serveFile(req, res, next) {
     delete req.query.meta
     delete req.query.json
     const search = qs.stringify(req.query)
-    res.status(301).redirect(`/_meta${req.pathname}${search}`)
+    res.redirect(`/_meta${req.pathname}${search}`)
   } else if (req.stats.isFile()) {
     // Cache files for 1 year.
     res.set({
