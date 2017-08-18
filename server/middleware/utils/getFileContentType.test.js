@@ -1,11 +1,12 @@
 const getFileContentType = require('./getFileContentType')
 
 it('gets a content type of text/plain for LICENSE|README|CHANGES|AUTHORS|Makefile', () => {
-  expect(getFileContentType('LICENSE')).toBe('text/plain')
-  expect(getFileContentType('README')).toBe('text/plain')
-  expect(getFileContentType('CHANGES')).toBe('text/plain')
   expect(getFileContentType('AUTHORS')).toBe('text/plain')
+  expect(getFileContentType('CHANGES')).toBe('text/plain')
+  expect(getFileContentType('LICENSE')).toBe('text/plain')
   expect(getFileContentType('Makefile')).toBe('text/plain')
+  expect(getFileContentType('PATENTS')).toBe('text/plain')
+  expect(getFileContentType('README')).toBe('text/plain')
 })
 
 it('gets a content type of text/plain for .*rc files', () => {

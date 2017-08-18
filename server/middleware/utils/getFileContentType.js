@@ -2,11 +2,12 @@ const mime = require('mime')
 
 mime.define({
   'text/plain': [
-    'license',
-    'readme',
-    'changes',
     'authors',
+    'changes',
+    'license',
     'makefile',
+    'patents',
+    'readme',
     'ts',
     'flow'
   ]
