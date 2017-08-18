@@ -43,8 +43,8 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
     </tr>
     <tr>
       <td>`meta`</td>
-      <td>`undefined`</td>
-      <td>Return metadata about a file in a package as JSON (e.g. `/any/file?meta`)</td>
+      <td></td>
+      <td>Return metadata about any file in a package as JSON (e.g. `/any/file?meta`)</td>
     </tr>
   </tbody>
 </table>

@@ -11,7 +11,6 @@ const checkBlacklist = require('./middleware/checkBlacklist')
 const parsePackageURL = require('./middleware/parsePackageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
-const serveMetadata = require('./middleware/serveMetadata')
 
 /**
  * A list of packages we refuse to serve.
@@ -73,13 +72,6 @@ function createServer() {
   app.use(express.static('build', {
     maxAge: '365d'
   }))
-
-  app.use('/_meta',
-    parsePackageURL,
-    checkBlacklist(PackageBlacklist),
-    fetchFile,
-    serveMetadata
-  )
 
   app.use('/',
     parsePackageURL,

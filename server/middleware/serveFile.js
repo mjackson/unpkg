@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const qs = require('querystring')
 const etag = require('etag')
+const getMetadata = require('./utils/getMetadata')
 const getFileContentType = require('./utils/getFileContentType')
 const getIndexHTML = require('./utils/getIndexHTML')
 
@@ -9,6 +9,11 @@ const getIndexHTML = require('./utils/getIndexHTML')
  * Automatically generate HTML pages that show package contents.
  */
 const AutoIndex = !process.env.DISABLE_INDEX
+
+/**
+ * Maximum recursion depth for meta listings.
+ */
+const MaximumDepth = 128
 
 function sendFile(res, file, stats) {
   let contentType = getFileContentType(file)
@@ -36,12 +41,19 @@ function sendFile(res, file, stats) {
  * Send the file, JSON metadata, or HTML directory listing.
  */
 function serveFile(req, res, next) {
-  if (req.query.meta != null || req.query.json != null) {
-    // Preserve support for ?meta and ?json for backwards compat.
-    delete req.query.meta
-    delete req.query.json
-    const search = qs.stringify(req.query)
-    res.redirect(`/_meta${req.pathname}${search}`)
+  if (req.query.meta != null) {
+    getMetadata(req.packageDir, req.file, req.stats, MaximumDepth, function (error, metadata) {
+      if (error) {
+        console.error(error)
+        res.status(500).type('text').send(`Cannot generate metadata for ${req.packageSpec}${req.filename}`)
+      } else {
+        // Cache metadata for 1 year.
+        res.set({
+          'Cache-Control': 'public, max-age=31536000',
+          'Cache-Tag': 'meta'
+        }).send(metadata)
+      }
+    })
   } else if (req.stats.isFile()) {
     // Cache files for 1 year.
     res.set({

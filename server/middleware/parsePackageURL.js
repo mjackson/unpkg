@@ -3,7 +3,6 @@ const validateNPMPackageName = require('validate-npm-package-name')
 const PackageURL = require('../PackageURL')
 
 const KnownQueryParams = {
-  json: true, // deprecated
   main: true,
   meta: true
 }
@@ -16,23 +15,30 @@ function queryIsKnown(query) {
   return Object.keys(query).every(isKnownQueryParam)
 }
 
-function sanitizeQuery(query) {
-  const saneQuery = {}
+function createSearch(query, withMeta) {
+  let search = ''
 
-  Object.keys(query).forEach(function (param) {
-    if (isKnownQueryParam(param))
-      saneQuery[param] = query[param]
-  })
+  if (query.main)
+    search += `main=${encodeURIComponent(query.main)}`
 
-  return saneQuery
+  // Do this manually because stringify uses ?meta= for { meta: true }
+  if (query.meta != null || query.json != null || withMeta)
+    search += (search ? '&' : '') + 'meta'
+
+  return search ? `?${search}` : ''
 }
 
 /**
  * Parse and validate the URL.
  */
 function parsePackageURL(req, res, next) {
+  // Redirect /_meta/pkg to /pkg?meta.
+  if (req.path.match(/^\/_meta\//))
+    return res.redirect(req.path.substr(6) + createSearch(req.query, true))
+
   const url = PackageURL.parse(req.url)
 
+  // Do not allow invalid URLs.
   if (url == null)
     return res.status(403).type('text').send(`Invalid URL: ${req.url}`)
 
@@ -45,10 +51,8 @@ function parsePackageURL(req, res, next) {
   // Redirect requests with unknown query params to their equivalents
   // with only known params so they can be served from the cache. This
   // prevents people using random query params designed to bust the cache.
-  if (!queryIsKnown(url.query)) {
-    const search = qs.stringify(sanitizeQuery(url.query))
-    return res.redirect(url.pathname + (search ? `?${search}` : ''))
-  }
+  if (!queryIsKnown(url.query))
+    return res.redirect(url.pathname + createSearch(url.query))
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion
