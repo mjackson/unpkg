@@ -2,7 +2,7 @@ const parseURL = require('url').parse
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
 const validateNPMPackageName = require('validate-npm-package-name')
-const PackageURL = require('./PackageURL')
+const parsePackageURL = require('./utils/parsePackageURL')
 const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
 const {
@@ -66,7 +66,7 @@ function computeCounters(stream) {
         if (edgeResponse.status === 200) {
           // Q: How many requests do we serve for a package per day?
           // Q: How many bytes do we serve for a package per day?
-          const url = PackageURL.parse(parseURL(clientRequest.uri).pathname)
+          const url = parsePackageURL(parseURL(clientRequest.uri).pathname)
           const packageName = url && url.packageName
 
           if (packageName && validateNPMPackageName(packageName).errors == null) {

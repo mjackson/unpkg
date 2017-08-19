@@ -7,7 +7,7 @@ const morgan = require('morgan')
 const { fetchStats } = require('./cloudflare')
 
 const checkBlacklist = require('./middleware/checkBlacklist')
-const parsePackageURL = require('./middleware/parsePackageURL')
+const packageURL = require('./middleware/packageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
 
@@ -75,7 +75,7 @@ function createApp() {
   }))
 
   app.use('/',
-    parsePackageURL,
+    packageURL,
     checkBlacklist(PackageBlacklist),
     fetchFile,
     serveFile

@@ -1,9 +1,9 @@
 const fs = require('fs')
 const path = require('path')
 const semver = require('semver')
+const createPackageURL = require('../utils/createPackageURL')
 const getPackage = require('./utils/getPackage')
 const getPackageInfo = require('./utils/getPackageInfo')
-const PackageURL = require('../PackageURL')
 
 const FindExtensions = [ '', '.js', '.json' ]
 
@@ -137,7 +137,7 @@ function fetchFile(req, res, next) {
       res.set({
         'Cache-Control': 'public, max-age=60',
         'Cache-Tag': 'redirect'
-      }).redirect(PackageURL.create(req.packageName, tags[req.packageVersion], req.filename, req.search))
+      }).redirect(createPackageURL(req.packageName, tags[req.packageVersion], req.filename, req.search))
     } else {
       const maxVersion = semver.maxSatisfying(Object.keys(versions), req.packageVersion)
 
@@ -146,7 +146,7 @@ function fetchFile(req, res, next) {
         res.set({
           'Cache-Control': 'public, max-age=60',
           'Cache-Tag': 'redirect'
-        }).redirect(PackageURL.create(req.packageName, maxVersion, req.filename, req.search))
+        }).redirect(createPackageURL(req.packageName, maxVersion, req.filename, req.search))
       } else {
         res.status(404).type('text').send(`Cannot find package ${req.packageSpec}`)
       }

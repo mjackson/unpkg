@@ -1,5 +1,5 @@
 const validateNPMPackageName = require('validate-npm-package-name')
-const PackageURL = require('../PackageURL')
+const parsePackageURL = require('../utils/parsePackageURL')
 
 const KnownQueryParams = {
   expand: true,
@@ -45,7 +45,7 @@ function createSearch(query) {
 /**
  * Parse and validate the URL.
  */
-function parsePackageURL(req, res, next) {
+function packageURL(req, res, next) {
   // Redirect /_meta/pkg to /pkg?meta.
   if (req.path.match(/^\/_meta\//)) {
     delete req.query.json
@@ -53,7 +53,7 @@ function parsePackageURL(req, res, next) {
     return res.redirect(req.path.substr(6) + createSearch(req.query))
   }
 
-  const url = PackageURL.parse(req.url)
+  const url = parsePackageURL(req.url)
 
   // Do not allow invalid URLs.
   if (url == null)
@@ -82,4 +82,4 @@ function parsePackageURL(req, res, next) {
   next()
 }
 
-module.exports = parsePackageURL
+module.exports = packageURL
