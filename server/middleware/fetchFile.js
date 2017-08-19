@@ -1,8 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 const semver = require('semver')
-const PackageCache = require('../PackageCache')
-const PackageInfo = require('../PackageInfo')
+const getPackage = require('./utils/getPackage')
+const getPackageInfo = require('./utils/getPackageInfo')
 const PackageURL = require('../PackageURL')
 
 const FindExtensions = [ '', '.js', '.json' ]
@@ -47,7 +47,7 @@ function findFile(base, useIndex, callback) {
  * trailing slash.
  */
 function fetchFile(req, res, next) {
-  PackageInfo.get(req.packageName, function (error, packageInfo) {
+  getPackageInfo(req.packageName, function (error, packageInfo) {
     if (error) {
       console.error(error)
       return res.status(500).type('text').send(`Cannot get info for package "${req.packageName}"`)
@@ -64,7 +64,7 @@ function fetchFile(req, res, next) {
       // A valid request for a package we haven't downloaded yet.
       req.packageConfig = versions[req.packageVersion]
 
-      PackageCache.get(req.packageConfig, function (error, outputDir) {
+      getPackage(req.packageConfig, function (error, outputDir) {
         if (error) {
           console.error(error)
           res.status(500).type('text').send(`Cannot fetch package ${req.packageSpec}`)

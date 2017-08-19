@@ -63,6 +63,4 @@ function getPackageInfo(packageName, callback) {
   })
 }
 
-module.exports = {
-  get: getPackageInfo
-}
+module.exports = getPackageInfo

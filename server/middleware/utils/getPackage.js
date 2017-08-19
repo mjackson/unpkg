@@ -85,6 +85,4 @@ function getPackage(packageConfig, callback) {
   })
 }
 
-module.exports = {
-  get: getPackage
-}
+module.exports = getPackage
