@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const etag = require('etag')
+const babel = require('babel-core')
+const unpkgRewrite = require('babel-plugin-unpkg-rewrite')
 const getMetadata = require('./utils/getMetadata')
 const getFileContentType = require('./utils/getFileContentType')
 const getIndexHTML = require('./utils/getIndexHTML')
@@ -15,26 +16,16 @@ const AutoIndex = !process.env.DISABLE_INDEX
  */
 const MaximumDepth = 128
 
-function sendFile(res, file, stats) {
-  let contentType = getFileContentType(file)
+const FileTransforms = {
+  expand: function (file, callback) {
+    const options = {
+      plugins: [ unpkgRewrite ]
+    }
 
-  if (contentType === 'text/html')
-    contentType = 'text/plain' // We can't serve HTML because bad people :(
-
-  res.writeHead(200, {
-    'Content-Type': contentType,
-    'Content-Length': stats.size,
-    'ETag': etag(stats)
-  })
-
-  const stream = fs.createReadStream(file)
-
-  stream.on('error', (error) => {
-    console.error(error)
-    res.status(500).type('text').send('There was an error serving this file')
-  })
-
-  stream.pipe(res)
+    babel.transformFile(file, options, function (error, result) {
+      callback(error, result && result.code)
+    })
+  }
 }
 
 /**
@@ -55,14 +46,32 @@ function serveFile(req, res, next) {
       }
     })
   } else if (req.stats.isFile()) {
+    const file = path.join(req.packageDir, req.file)
+
+    let contentType = getFileContentType(file)
+
+    if (contentType === 'text/html')
+      contentType = 'text/plain' // We can't serve HTML because bad people :(
+
     // Cache files for 1 year.
     res.set({
+      'Content-Type': contentType,
       'Cache-Control': 'public, max-age=31536000',
       'Cache-Tag': 'file'
     })
 
-    // TODO: use res.sendFile instead of our own sendFile?
-    sendFile(res, path.join(req.packageDir, req.file), req.stats)
+    if (contentType === 'application/javascript' && req.query.expand != null) {
+      FileTransforms.expand(file, function (error, code) {
+        if (error) {
+          console.error(error)
+          res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
+        } else {
+          res.send(code)
+        }
+      })
+    } else {
+      res.sendFile(file)
+    }
   } else if (AutoIndex && req.stats.isDirectory()) {
     getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
       if (error) {

@@ -1,8 +1,8 @@
-const qs = require('querystring')
 const validateNPMPackageName = require('validate-npm-package-name')
 const PackageURL = require('../PackageURL')
 
 const KnownQueryParams = {
+  expand: true,
   main: true,
   meta: true
 }
@@ -15,15 +15,29 @@ function queryIsKnown(query) {
   return Object.keys(query).every(isKnownQueryParam)
 }
 
-function createSearch(query, withMeta) {
-  let search = ''
+function sanitizeQuery(query) {
+  const saneQuery = {}
 
-  if (query.main)
-    search += `main=${encodeURIComponent(query.main)}`
+  Object.keys(query).forEach(function (param) {
+    if (isKnownQueryParam(param))
+      saneQuery[param] = query[param]
+  })
 
-  // Do this manually because stringify uses ?meta= for { meta: true }
-  if (query.meta != null || query.json != null || withMeta)
-    search += (search ? '&' : '') + 'meta'
+  return saneQuery
+}
+
+function createSearch(query) {
+  const params = []
+
+  Object.keys(query).forEach(function (param) {
+    if (query[param] === '') {
+      params.push(param) // Omit the trailing "=" from param=
+    } else {
+      params.push(`${param}=${encodeURIComponent(query[param])}`)
+    }
+  })
+
+  const search = params.join('&')
 
   return search ? `?${search}` : ''
 }
@@ -33,8 +47,11 @@ function createSearch(query, withMeta) {
  */
 function parsePackageURL(req, res, next) {
   // Redirect /_meta/pkg to /pkg?meta.
-  if (req.path.match(/^\/_meta\//))
-    return res.redirect(req.path.substr(6) + createSearch(req.query, true))
+  if (req.path.match(/^\/_meta\//)) {
+    delete req.query.json
+    req.query.meta = ''
+    return res.redirect(req.path.substr(6) + createSearch(req.query))
+  }
 
   const url = PackageURL.parse(req.url)
 
@@ -52,7 +69,7 @@ function parsePackageURL(req, res, next) {
   // with only known params so they can be served from the cache. This
   // prevents people using random query params designed to bust the cache.
   if (!queryIsKnown(url.query))
-    return res.redirect(url.pathname + createSearch(url.query))
+    return res.redirect(url.pathname + createSearch(sanitizeQuery(url.query)))
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion

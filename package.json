@@ -13,7 +13,6 @@
     "countries-list": "^1.3.2",
     "csso": "^3.1.1",
     "date-fns": "^1.28.1",
-    "etag": "^1.8.0",
     "express": "^4.15.2",
     "gunzip-maybe": "^1.4.0",
     "http-client": "^4.3.1",
@@ -39,7 +38,7 @@
   },
   "devDependencies": {
     "autoprefixer": "6.7.2",
-    "babel-core": "6.22.1",
+    "babel-core": "^6.26.0",
     "babel-eslint": "7.1.1",
     "babel-jest": "18.0.0",
     "babel-loader": "6.2.10",
