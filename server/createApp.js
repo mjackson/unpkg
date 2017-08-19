@@ -1,6 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-const http = require('http')
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
@@ -52,17 +51,19 @@ function errorHandler(err, req, res, next) {
   next(err)
 }
 
-function createServer() {
+function createApp() {
   const app = express()
 
   app.disable('x-powered-by')
 
-  app.use(morgan(process.env.NODE_ENV === 'production'
-    // Modified version of the Heroku router's log format
-    // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
-    ? 'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
-    : 'dev'
-  ))
+  if (process.env.NODE_ENV !== 'test') {
+    app.use(morgan(process.env.NODE_ENV === 'production'
+      // Modified version of the Heroku router's log format
+      // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
+      ? 'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
+      : 'dev'
+    ))
+  }
 
   app.use(errorHandler)
   app.use(cors())
@@ -80,26 +81,7 @@ function createServer() {
     serveFile
   )
 
-  const server = http.createServer(app)
-
-  // Heroku dynos automatically timeout after 30s. Set our
-  // own timeout here to force sockets to close before that.
-  // https://devcenter.heroku.com/articles/request-timeout
-  server.setTimeout(25000, function (socket) {
-    const message = `Timeout of 25 seconds exceeded`
-
-    socket.end([
-      `HTTP/1.1 503 Service Unavailable`,
-      `Date: ${(new Date).toGMTString()}`,
-      `Content-Type: text/plain`,
-      `Content-Length: ${Buffer.byteLength(message)}`,
-      `Connection: close`,
-      ``,
-      message
-    ].join(`\r\n`))
-  })
-
-  return server
+  return app
 }
 
-module.exports = createServer
+module.exports = createApp
