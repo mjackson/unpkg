@@ -111,6 +111,12 @@ function processPerDayDashboard(dashboard) {
   return Promise.all(dashboard.timeseries.map(processPerDayTimeseries))
 }
 
+function errorCount(httpStatus) {
+  return Object.keys(httpStatus).reduce(function (memo, status) {
+    return parseInt(status, 10) >= 500 ? memo + httpStatus[status] : memo
+  }, 0)
+}
+
 function processPerDayTimeseries(ts) {
   return new Promise(function (resolve) {
     const since = new Date(ts.since)
@@ -146,14 +152,17 @@ function processPerDayTimeseries(ts) {
     db.set(`stats-cachedBandwidth-${dayKey}`, ts.bandwidth.cached)
     db.expireat(`stats-cachedBandwidth-${dayKey}`, oneYearLater)
 
-    const httpStatus = ts.requests.http_status
-    const errors = Object.keys(httpStatus).reduce(function (memo, status) {
-      return parseInt(status, 10) >= 500 ? memo + httpStatus[status] : memo
-    }, 0)
-
     // Q: How many errors do we serve per day?
-    db.set(`stats-errors-${dayKey}`, errors)
+    db.set(`stats-errors-${dayKey}`, errorCount(ts.requests.http_status))
     db.expireat(`stats-errors-${dayKey}`, oneYearLater)
+
+    // Q: How many threats do we see each day?
+    db.set(`stats-threats-${dayKey}`, ts.threats.all)
+    db.expireat(`stats-threats-${dayKey}`, oneYearLater)
+
+    // Q: How many unique visitors do we see each day?
+    db.set(`stats-uniques-${dayKey}`, ts.uniques.all)
+    db.expireat(`stats-uniques-${dayKey}`, oneYearLater)
 
     const requestsByCountry = []
     const bandwidthByCountry = []
@@ -230,6 +239,18 @@ function processPerHourTimeseries(ts) {
     db.set(`stats-cachedBandwidth-${hourKey}`, ts.bandwidth.cached)
     db.expireat(`stats-cachedBandwidth-${hourKey}`, sevenDaysLater)
 
+    // Q: How many errors do we serve per hour?
+    db.set(`stats-errors-${hourKey}`, errorCount(ts.requests.http_status))
+    db.expireat(`stats-errors-${hourKey}`, sevenDaysLater)
+
+    // Q: How many threats do we see each hour?
+    db.set(`stats-threats-${hourKey}`, ts.threats.all)
+    db.expireat(`stats-threats-${hourKey}`, sevenDaysLater)
+
+    // Q: How many unique visitors do we see each hour?
+    db.set(`stats-uniques-${hourKey}`, ts.uniques.all)
+    db.expireat(`stats-uniques-${hourKey}`, sevenDaysLater)
+
     resolve()
   })
 }
@@ -276,6 +297,18 @@ function processPerMinuteTimeseries(ts) {
     // Q: How much bandwidth do we serve per minute from the cache?
     db.set(`stats-cachedBandwidth-${minuteKey}`, ts.bandwidth.cached)
     db.expireat(`stats-cachedBandwidth-${minuteKey}`, oneDayLater)
+
+    // Q: How many errors do we serve per hour?
+    db.set(`stats-errors-${minuteKey}`, errorCount(ts.requests.http_status))
+    db.expireat(`stats-errors-${minuteKey}`, oneDayLater)
+
+    // Q: How many threats do we see each minute?
+    db.set(`stats-threats-${minuteKey}`, ts.threats.all)
+    db.expireat(`stats-threats-${minuteKey}`, oneDayLater)
+
+    // Q: How many unique visitors do we see each minute?
+    db.set(`stats-uniques-${minuteKey}`, ts.uniques.all)
+    db.expireat(`stats-uniques-${minuteKey}`, oneDayLater)
 
     resolve()
   })
