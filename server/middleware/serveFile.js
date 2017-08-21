@@ -17,9 +17,11 @@ const AutoIndex = !process.env.DISABLE_INDEX
 const MaximumDepth = 128
 
 const FileTransforms = {
-  expand: function (file, callback) {
+  expand: function (file, dependencies, callback) {
     const options = {
-      plugins: [ unpkgRewrite ]
+      plugins: [
+        unpkgRewrite(dependencies)
+      ]
     }
 
     babel.transformFile(file, options, function (error, result) {
@@ -60,8 +62,13 @@ function serveFile(req, res, next) {
       'Cache-Tag': 'file'
     })
 
-    if (contentType === 'application/javascript' && req.query.expand != null) {
-      FileTransforms.expand(file, function (error, code) {
+    if (contentType === 'application/javascript' && req.query.module != null) {
+      const dependencies = Object.assign({},
+        req.packageConfig.peerDependencies,
+        req.packageConfig.dependencies
+      )
+
+      FileTransforms.expand(file, dependencies, function (error, code) {
         if (error) {
           console.error(error)
           res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)

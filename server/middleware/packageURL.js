@@ -2,9 +2,9 @@ const validateNPMPackageName = require('validate-npm-package-name')
 const parsePackageURL = require('../utils/parsePackageURL')
 
 const KnownQueryParams = {
-  expand: true,
   main: true,
-  meta: true
+  meta: true,
+  module: true
 }
 
 function isKnownQueryParam(param) {
