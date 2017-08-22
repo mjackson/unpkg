@@ -1,60 +1,43 @@
-unpkg is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for everything on [npm](https://www.npmjs.com/). Use it to quickly and easily load files using a simple URL like:
+unpkg is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for everything on [npm](https://www.npmjs.com/). Use it to quickly and easily load any file from any package using a URL like:
 
-<div style="text-align:center">`https://unpkg.com/package@version/file`</div>
+<div class="home-example">unpkg.com/:package@:version/:file</div>
 
-A few examples:
+### Examples
 
-  * [https://unpkg.com/react@15.3.1/dist/react.min.js](/react@15.3.1/dist/react.min.js)
-  * [https://unpkg.com/react-dom@15.3.1/dist/react-dom.min.js](/react-dom@15.3.1/dist/react-dom.min.js)
-  * [https://unpkg.com/history@4.2.0/umd/history.min.js](/history@4.2.0/umd/history.min.js)
+Using a fixed version:
 
-You may also use a [tag](https://docs.npmjs.com/cli/dist-tag) or [version range](https://docs.npmjs.com/misc/semver) instead of a fixed version number, or omit the version/tag entirely to use the `latest` tag.
+  * [unpkg.com/react@15.3.1/dist/react.min.js](/react@15.3.1/dist/react.min.js)
+  * [unpkg.com/react-dom@15.3.1/dist/react-dom.min.js](/react-dom@15.3.1/dist/react-dom.min.js)
 
-  * [https://unpkg.com/react@^0.14/dist/react.min.js](/react@^0.14/dist/react.min.js)
-  * [https://unpkg.com/react/dist/react.min.js](/react/dist/react.min.js)
+You may also use a [semver range](https://docs.npmjs.com/misc/semver) or a [tag](https://docs.npmjs.com/cli/dist-tag) instead of a fixed version number, or omit the version/tag entirely to use the `latest` tag.
 
-If you omit the file path, unpkg will try to serve [the `browser` bundle](https://github.com/defunctzombie/package-browser-field-spec) if present, the [`main` module](https://docs.npmjs.com/files/package.json#main) otherwise.
+  * [unpkg.com/react@^15/dist/react.min.js](/react@^15/dist/react.min.js)
+  * [unpkg.com/react/dist/react.min.js](/react/dist/react.min.js)
 
-  * [https://unpkg.com/jquery](/jquery)
-  * [https://unpkg.com/angular-formly](/angular-formly)
-  * [https://unpkg.com/three](/three)
+If you omit the file path, unpkg will serve the package's "main" file.
+
+  * [unpkg.com/jquery](/jquery)
+  * [unpkg.com/three](/three)
 
 Append a `/` at the end of a URL to view a listing of all the files in a package.
 
-  * [https://unpkg.com/lodash/](/lodash/)
-  * [https://unpkg.com/modernizr/](/modernizr/)
-  * [https://unpkg.com/react/](/react/)
+  * [unpkg.com/react/](/react/)
+  * [unpkg.com/lodash/](/lodash/)
 
 ### Query Parameters
 
-<table cellpadding="0" cellspacing="0">
-  <thead>
-    <tr>
-      <th width="80px">Name</th>
-      <th width="120px">Default Value</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>`main`</td>
-      <td>`unpkg`, `browser`, `main`</td>
-      <td>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL</td>
-    </tr>
-    <tr>
-      <td>`meta`</td>
-      <td></td>
-      <td>Return metadata about any file in a package as JSON (e.g. `/any/file?meta`)</td>
-    </tr>
-    <tr>
-      <td>`expand`</td>
-      <td></td>
-      <td>Expands all ["bare" `import` specifiers](https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier) in JavaScript modules to unpkg URLs. This feature is *very experimental*</td>
-    </tr>
-  </tbody>
-</table>
+<dl>
+  <dt>`?main=:mainField`</dt>
+  <dd>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL. Defaults to using `unpkg`, [`browser`](https://github.com/defunctzombie/package-browser-field-spec), and then [`main`](https://docs.npmjs.com/files/package.json#main).</dd>
 
-### Suggested Workflow
+  <dt>`?meta`</dt>
+  <dd>Return metadata about any file in a package as JSON (e.g. `/any/file?meta`)</dd>
+
+  <dt>`?module`</dt>
+  <dd>Expands all ["bare" `import` specifiers](https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier) in JavaScript modules to unpkg URLs. This feature is *very experimental*</dd>
+</dl>
+
+### Workflow
 
 For npm package authors, unpkg relieves the burden of publishing your code to a CDN in addition to the npm registry. All you need to do is include your [UMD](https://github.com/umdjs/umd) build in your npm package (not your repo, that's different!).
 

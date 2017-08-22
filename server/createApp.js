@@ -4,46 +4,20 @@ const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
 
-const { fetchStats } = require('./cloudflare')
-
 const checkBlacklist = require('./middleware/checkBlacklist')
 const packageURL = require('./middleware/packageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
-
-/**
- * A list of packages we refuse to serve.
- */
-const PackageBlacklist = require('./PackageBlacklist').blacklist
+const serveStats = require('./middleware/serveStats')
 
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
 })
 
-function sendHomePage(publicDir) {
-  const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8')
-
-  return function (req, res, next) {
-    fetchStats(function (error, stats) {
-      if (error) {
-        next(error)
-      } else {
-        res.set({
-          'Cache-Control': 'public, max-age=60',
-          'Cache-Tag': 'home'
-        })
-
-        res.send(
-          // Replace the __SERVER_DATA__ token that was added to the
-          // HTML file in the build process (see scripts/build.js).
-          html.replace('__SERVER_DATA__', JSON.stringify({
-            cloudflareStats: stats
-          }))
-        )
-      }
-    })
-  }
-}
+/**
+ * A list of packages we refuse to serve.
+ */
+const PackageBlacklist = require('./PackageBlacklist').blacklist
 
 function errorHandler(err, req, res, next) {
   console.error(err.stack)
@@ -68,11 +42,11 @@ function createApp() {
   app.use(errorHandler)
   app.use(cors())
 
-  app.get('/', sendHomePage('build'))
-
   app.use(express.static('build', {
     maxAge: '365d'
   }))
+
+  app.use('/_stats', serveStats())
 
   app.use('/',
     packageURL,

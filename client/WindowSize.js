@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { addEvent, removeEvent } from './DOMUtils'
+import addEvent from './utils/addEvent'
+import removeEvent from './utils/removeEvent'
 
 const ResizeEvent = 'resize'
 

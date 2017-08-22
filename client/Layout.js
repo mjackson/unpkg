@@ -1,9 +1,11 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { Motion, spring } from 'react-motion'
-import { withRouter, Link } from 'react-router-dom'
+import { Switch, Route, Link, withRouter } from 'react-router-dom'
 import WindowSize from './WindowSize'
+import About from './About'
+import Stats from './Stats'
+import Home from './Home'
 
 class Layout extends React.Component {
   static propTypes = {
@@ -14,24 +16,25 @@ class Layout extends React.Component {
   state = {
     underlineLeft: 0,
     underlineWidth: 0,
-    useSpring: false
+    useSpring: false,
+    stats: null
   }
 
   adjustUnderline = (useSpring = false) => {
     let itemIndex
     switch (this.props.location.pathname) {
-      case '/about':
-        itemIndex = 2
-        break
       case '/stats':
         itemIndex = 1
+        break
+      case '/about':
+        itemIndex = 2
         break
       case '/':
       default:
         itemIndex = 0
     }
 
-    const itemNodes = ReactDOM.findDOMNode(this).querySelectorAll('.underlist > li')
+    const itemNodes = this.listNode.querySelectorAll('li')
     const currentNode = itemNodes[itemIndex]
 
     this.setState({
@@ -43,6 +46,10 @@ class Layout extends React.Component {
 
   componentDidMount() {
     this.adjustUnderline()
+
+    fetch('/_stats/last-month')
+      .then(res => res.json())
+      .then(stats => this.setState({ stats }))
   }
 
   componentDidUpdate(prevProps) {
@@ -63,34 +70,36 @@ class Layout extends React.Component {
         <WindowSize onChange={this.adjustUnderline}/>
         <div className="wrapper">
           <header>
-            <h1>unpkg</h1>
-            <nav>
-              <ol className="underlist">
+            <h1 className="layout-title">unpkg</h1>
+            <nav className="layout-nav">
+              <ol className="layout-nav-list" ref={node => this.listNode = node}>
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/stats">Stats</Link></li>
                 <li><Link to="/about">About</Link></li>
               </ol>
-              <Motion defaultStyle={{ left: underlineLeft, width: underlineWidth }} style={style}>
-                {s => (
+              <Motion
+                defaultStyle={{ left: underlineLeft, width: underlineWidth }}
+                style={style}
+                children={style => (
                   <div
-                    className="underlist-underline"
+                    className="layout-nav-underline"
                     style={{
-                      WebkitTransform: `translate3d(${s.left}px,0,0)`,
-                      transform: `translate3d(${s.left}px,0,0)`,
-                      width: s.width
+                      WebkitTransform: `translate3d(${style.left}px,0,0)`,
+                      transform: `translate3d(${style.left}px,0,0)`,
+                      width: style.width
                     }}
                   />
                 )}
-              </Motion>
+              />
             </nav>
           </header>
         </div>
-        {this.props.children}
-        <div className="wrapper">
-          <footer>
-            <p>&copy; 2016-{(new Date()).getFullYear()} Michael Jackson</p>
-          </footer>
-        </div>
+
+        <Switch>
+          <Route path="/stats" render={() => <Stats data={this.state.stats}/>}/>
+          <Route path="/about" component={About}/>
+          <Route path="/" component={Home}/>
+        </Switch>
       </div>
     )
   }

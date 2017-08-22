@@ -1,25 +1,16 @@
+const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
 
-function sumValues(array) {
-  return array.reduce(function (memo, n) {
-    return memo + (parseInt(n, 10) || 0)
-  }, 0)
+function createDayKey(date) {
+  return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
 }
 
-function getKeyValues(keys) {
-  return new Promise(function (resolve, reject) {
-    db.mget(keys, function (error, values) {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(values)
-      }
-    })
-  })
+function createHourKey(date) {
+  return `${createDayKey(date)}-${date.getUTCHours()}`
 }
 
-function sumKeys(keys) {
-  return getKeyValues(keys).then(sumValues)
+function createMinuteKey(date) {
+  return `${createHourKey(date)}-${date.getUTCMinutes()}`
 }
 
 function createScoresMap(array) {
@@ -31,7 +22,7 @@ function createScoresMap(array) {
   return map
 }
 
-function getScoresMap(key, n = 10) {
+function getScoresMap(key, n = 100) {
   return new Promise(function (resolve, reject) {
     db.zrevrange(key, 0, n, 'withscores', function (error, value) {
       if (error) {
@@ -43,16 +34,31 @@ function getScoresMap(key, n = 10) {
   })
 }
 
-function createTopScores(map) {
-  return Object.keys(map).reduce(function (memo, key) {
-    return memo.concat([ [ key, map[key] ] ])
-  }, []).sort(function (a, b) {
-    return b[1] - a[1]
-  })
+function getPackageRequests(date, n = 100) {
+  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n)
 }
 
-function getTopScores(key, n) {
-  return getScoresMap(key, n).then(createTopScores)
+function getPackageBandwidth(date, n = 100) {
+  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n)
+}
+
+function getProtocolRequests(date) {
+  return getScoresMap(`stats-protocolRequests-${createDayKey(date)}`)
+}
+
+function addDailyMetricsToTimeseries(timeseries) {
+  const since = new Date(timeseries.since)
+
+  return Promise.all([
+    getPackageRequests(since),
+    getPackageBandwidth(since),
+    getProtocolRequests(since)
+  ]).then(function (results) {
+    timeseries.requests.package = results[0]
+    timeseries.bandwidth.package = results[1]
+    timeseries.requests.protocol = results[2]
+    return timeseries
+  })
 }
 
 function sumMaps(maps) {
@@ -65,36 +71,95 @@ function sumMaps(maps) {
   }, {})
 }
 
-function sumTopScores(keys, n) {
+function addDailyMetrics(result) {
   return Promise.all(
-    keys.map(function (key) {
-      return getScoresMap(key, n)
+    result.timeseries.map(addDailyMetricsToTimeseries)
+  ).then(function () {
+    result.totals.requests.package = sumMaps(
+      result.timeseries.map(function (timeseries) {
+        return timeseries.requests.package
+      })
+    )
+
+    result.totals.bandwidth.package = sumMaps(
+      result.timeseries.map(function (timeseries) {
+        return timeseries.bandwidth.package
+      })
+    )
+
+    result.totals.requests.protocol = sumMaps(
+      result.timeseries.map(function (timeseries) {
+        return timeseries.requests.protocol
+      })
+    )
+
+    return result
+  })
+}
+
+function extractPublicInfo(data) {
+  return {
+    since: data.since,
+    until: data.until,
+
+    requests: {
+      all: data.requests.all,
+      cached: data.requests.cached,
+      country: data.requests.country,
+      status: data.requests.http_status
+    },
+
+    bandwidth: {
+      all: data.bandwidth.all,
+      cached: data.bandwidth.cached,
+      country: data.bandwidth.country
+    },
+
+    threats: {
+      all: data.threats.all,
+      country: data.threats.country
+    },
+
+    uniques: {
+      all: data.uniques.all
+    }
+  }
+}
+
+const DomainNames = [
+  'unpkg.com',
+  'npmcdn.com'
+]
+
+function fetchStats(since, until) {
+  return cf.getZones(DomainNames).then(function (zones) {
+    return cf.getZoneAnalyticsDashboard(zones, since, until).then(function (dashboard) {
+      return {
+        timeseries: dashboard.timeseries.map(extractPublicInfo),
+        totals: extractPublicInfo(dashboard.totals)
+      }
     })
-  ).then(sumMaps).then(createTopScores)
+  })
 }
 
-function createKey(...args) {
-  return args.join('-')
-}
+const oneMinute = 1000 * 60
+const oneHour = oneMinute * 60
+const oneDay = oneHour * 24
 
-function createDayKey(date) {
-  return createKey(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-}
+function getStats(since, until, callback) {
+  let promise = fetchStats(since, until)
 
-function createHourKey(date) {
-  return createKey(createDayKey(date), date.getUTCHours())
-}
+  if ((until - since) > oneDay)
+    promise = promise.then(addDailyMetrics)
 
-function createMinuteKey(date) {
-  return createKey(createHourKey(date), date.getUTCMinutes())
+  promise.then(function (value) {
+    callback(null, value)
+  }, callback)
 }
 
 module.exports = {
-  getKeyValues,
-  sumKeys,
-  getTopScores,
-  sumTopScores,
   createDayKey,
   createHourKey,
-  createMinuteKey
+  createMinuteKey,
+  getStats
 }

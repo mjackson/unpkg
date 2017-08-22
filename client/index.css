@@ -11,9 +11,9 @@ body {
   padding: 5px 20px;
 }
 
-@media all and (min-width: 660px) {
+@media (min-width: 800px) {
   body {
-    padding: 50px 20px;
+    padding: 40px 20px 120px;
   }
 }
 
@@ -24,92 +24,101 @@ a:visited {
   color: rebeccapurple;
 }
 
-code {
-  background: #eee;
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.8em;
+}
+h3 {
+  font-size: 1.6em;
+}
+
+ul {
+  padding-left: 25px;
+}
+
+dd {
+  margin-left: 25px;
 }
 
 table {
-  border-color: black;
-  border-style: solid;
-  border-width: 0 0 1px 1px;
+  border: 1px solid black;
+  border: 0;
 }
-table th, table td {
+th {
   text-align: left;
+  background-color: #eee;
+}
+th, td {
+  padding: 5px;
+}
+th {
+  vertical-align: bottom;
+}
+td {
   vertical-align: top;
-  padding: 5px 7px;
-  border-color: black;
-  border-style: solid;
-  border-width: 1px 1px 0 0;
-}
-
-.continent-row {
-  font-weight: bold;
-}
-.country-name {
-  padding-left: 2em;
-}
-
-.table-filter {
-  display: block;
-  text-align: right;
-  color: #666;
-  margin-bottom: 1em;
-}
-.table-filter input {
-  font-size: 1em;
-  text-align: right;
-  max-width: 100px;
-  color: #999;
 }
 
 .wrapper {
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
 }
-h1, h2, h3, header nav {
-  font-family: Futura, Helvetica, sans-serif;
-  text-transform: uppercase;
-}
-h3 {
-  margin-top: 2em;
-}
 
-header h1 {
-  font-size: 4em;
-  line-height: 1;
-  text-align: center;
-  letter-spacing: 0.1em;
-}
-header nav {
-  margin-bottom: 4em;
-}
-header nav a:link,
-header nav a:visited {
-  color: black;
-}
-
-.underlist {
-  list-style-type: none;
-  padding: 0;
+.layout-title {
   margin: 0;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 5em;
+}
 
+.layout-nav {
+  margin: 0 0 3em;
+}
+.layout-nav-list {
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
 }
-.underlist li {
-  margin: 0 5px;
-  padding: 0 5px;
-
+.layout-nav-list li {
   flex-basis: auto;
+  list-style-type: none;
+  display: inline-block;
+  font-size: 1.1em;
+  margin: 0 10px;
 }
-.underlist a:link {
+.layout-nav-list li a:link {
   text-decoration: none;
 }
-.underlist-underline {
+.layout-nav-list li a:link,
+.layout-nav-list li a:visited {
+  color: black;
+}
+.layout-nav-underline {
   height: 4px;
   background-color: black;
   position: absolute;
   left: 0;
+}
+
+.home-example {
+  text-align: center;
+  background-color: #eee;
+  margin: 2em 0;
+  padding: 5px 0;
+}
+
+.table-filter {
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.regions-table .continent-row {
+  font-weight: bold;
+}
+.regions-table .country-row td.country-name {
+  padding-left: 20px;
 }
 
 .about-logos {
@@ -124,11 +133,4 @@ header nav a:visited {
 }
 .about-logo img {
   max-width: 60%;
-}
-
-footer {
-  margin-top: 40px;
-  border-top: 1px solid black;
-  font-size: 0.8em;
-  text-align: right;
 }

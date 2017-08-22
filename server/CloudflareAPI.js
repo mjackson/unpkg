@@ -1,5 +1,5 @@
 require('isomorphic-fetch')
-const invariant = require('invariant')
+const warning = require('warning')
 const gunzip = require('gunzip-maybe')
 const ndjson = require('ndjson')
 
@@ -7,12 +7,12 @@ const CloudflareAPIURL = 'https://api.cloudflare.com'
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
 
-invariant(
+warning(
   CloudflareEmail,
   'Missing the $CLOUDFLARE_EMAIL environment variable'
 )
 
-invariant(
+warning(
   CloudflareKey,
   'Missing the $CLOUDFLARE_KEY environment variable'
 )
@@ -30,16 +30,50 @@ function getJSON(path, headers) {
   return get(path, headers).then(function (res) {
     return res.json()
   }).then(function (data) {
+    if (!data.success) {
+      console.error(`CloudflareAPI.getJSON failed at ${path}`)
+      console.error(data)
+      throw new Error('Failed to getJSON from Cloudflare')
+    }
+
     return data.result
   })
 }
 
-function getZones(domain) {
-  return getJSON(`/zones?name=${domain}`)
+function getZones(domains) {
+  return Promise.all(
+    (Array.isArray(domains) ? domains : [ domains ]).map(function (domain) {
+      return getJSON(`/zones?name=${domain}`)
+    })
+  ).then(function (results) {
+    return results.reduce(function (memo, zones) {
+      return memo.concat(zones)
+    })
+  })
 }
 
-function getZoneAnalyticsDashboard(zoneId, since) {
-  return getJSON(`/zones/${zoneId}/analytics/dashboard?since=${since}&continuous=true`)
+function reduceResults(target, values) {
+  Object.keys(values).forEach(key => {
+    const value = values[key]
+
+    if (typeof value === 'object' && value) {
+      target[key] = reduceResults(target[key] || {}, value)
+    } else if (typeof value === 'number') {
+      target[key] = (target[key] || 0) + values[key]
+    }
+  })
+
+  return target
+}
+
+function getZoneAnalyticsDashboard(zones, since, until) {
+  return Promise.all(
+    (Array.isArray(zones) ? zones : [ zones ]).map(function (zone) {
+      return getJSON(`/zones/${zone.id}/analytics/dashboard?since=${since.toISOString()}&until=${until.toISOString()}`)
+    })
+  ).then(function (results) {
+    return results.reduce(reduceResults)
+  })
 }
 
 function getJSONStream(path, headers) {

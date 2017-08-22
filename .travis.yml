@@ -1,10 +1,12 @@
 language: node_js
 node_js:
-- stable
+  - stable
 cache: yarn
 branches:
   only:
-  - master
+    - master
+services:
+  - redis-server
 before_deploy: yarn build
 deploy:
   provider: heroku
