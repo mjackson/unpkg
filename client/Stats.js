@@ -39,20 +39,6 @@ class Stats extends React.Component {
     const since = parseDate(totals.since)
     const until = parseDate(totals.until)
 
-    // Protocols
-    const protocolRows = Object.keys(totals.requests.protocol).sort((a, b) => {
-      return totals.requests.protocol[b] - totals.requests.protocol[a]
-    }).map(protocol => {
-      const requests = totals.requests.protocol[protocol]
-
-      return (
-        <tr key={protocol}>
-          <td>{protocol}</td>
-          <td>{formatNumber(requests)} ({formatPercent(requests / sumValues(totals.requests.protocol))}%)</td>
-        </tr>
-      )
-    })
-
     // Packages
     const packageRows = []
 
@@ -129,25 +115,23 @@ class Stats extends React.Component {
       }
     })
 
+    // Protocols
+    const protocolRows = Object.keys(totals.requests.protocol).sort((a, b) => {
+      return totals.requests.protocol[b] - totals.requests.protocol[a]
+    }).map(protocol => {
+      const requests = totals.requests.protocol[protocol]
+
+      return (
+        <tr key={protocol}>
+          <td>{protocol}</td>
+          <td>{formatNumber(requests)} ({formatPercent(requests / sumValues(totals.requests.protocol))}%)</td>
+        </tr>
+      )
+    })
+
     return (
       <div className="wrapper">
         <p>From <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong> unpkg served <strong>{formatNumber(totals.requests.all)}</strong> requests and a total of <strong>{formatBytes(totals.bandwidth.all)}</strong> of data to <strong>{formatNumber(totals.uniques.all)}</strong> unique visitors, <strong>{formatPercent(totals.requests.cached / totals.requests.all, 0)}%</strong> of which were served from the cache.</p>
-
-        <h3>Protocols</h3>
-
-        <p>The table below breaks down requests to unpkg from <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong> by HTTP protocol.</p>
-
-        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Protocol</th>
-              <th>Requests (% of total)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {protocolRows}
-          </tbody>
-        </table>
 
         <h3>Packages</h3>
 
@@ -207,6 +191,23 @@ class Stats extends React.Component {
             {regionRows}
           </tbody>
         </table>
+
+        <h3>Protocols</h3>
+
+        <p>The table below breaks down requests to unpkg from <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong> by HTTP protocol.</p>
+
+        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th>Protocol</th>
+              <th>Requests (% of total)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {protocolRows}
+          </tbody>
+        </table>
+
       </div>
     )
   }
