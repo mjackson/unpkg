@@ -44,7 +44,7 @@ function servePastDaysStats(days, req, res) {
       res.status(500).send({ error: 'Unable to fetch stats' })
     } else {
       res.set({
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': 'public, max-age=60',
         'Cache-Tag': 'stats'
       }).send(stats)
     }
