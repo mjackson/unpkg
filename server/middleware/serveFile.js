@@ -58,8 +58,7 @@ function serveFile(req, res, next) {
     // Cache files for 1 year.
     res.set({
       'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=31536000',
-      'Cache-Tag': 'file'
+      'Cache-Control': 'public, max-age=31536000'
     })
 
     if (contentType === 'application/javascript' && req.query.module != null) {
@@ -73,11 +72,15 @@ function serveFile(req, res, next) {
           console.error(error)
           res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
         } else {
-          res.send(code)
+          res.set({
+            'Cache-Tag': 'file,module'
+          }).send(code)
         }
       })
     } else {
-      res.sendFile(file)
+      res.set({
+        'Cache-Tag': 'file'
+      }).sendFile(file)
     }
   } else if (AutoIndex && req.stats.isDirectory()) {
     getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
