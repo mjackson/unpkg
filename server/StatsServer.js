@@ -1,6 +1,16 @@
 const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
 
+const PackageBlacklist = require('./PackageBlacklist').blacklist
+
+function prunePackages(packagesMap) {
+  PackageBlacklist.forEach(function (packageName) {
+    delete packagesMap[packageName]
+  })
+
+  return packagesMap
+}
+
 function createDayKey(date) {
   return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
 }
@@ -35,11 +45,11 @@ function getScoresMap(key, n = 100) {
 }
 
 function getPackageRequests(date, n = 100) {
-  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n)
+  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n).then(prunePackages)
 }
 
 function getPackageBandwidth(date, n = 100) {
-  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n)
+  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n).then(prunePackages)
 }
 
 function getProtocolRequests(date) {

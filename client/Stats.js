@@ -23,7 +23,7 @@ class Stats extends React.Component {
   }
 
   state = {
-    minPackageRequests: 100000,
+    minPackageRequests: 1000000,
     minCountryRequests: 1000000
   }
 
@@ -133,7 +133,25 @@ class Stats extends React.Component {
       <div className="wrapper">
         <p>From <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong> unpkg served <strong>{formatNumber(totals.requests.all)}</strong> requests and a total of <strong>{formatBytes(totals.bandwidth.all)}</strong> of data to <strong>{formatNumber(totals.uniques.all)}</strong> unique visitors, <strong>{formatPercent(totals.requests.cached / totals.requests.all, 0)}%</strong> of which were served from the cache.</p>
 
+        <h3>Protocols</h3>
+
+        <p>The table below breaks down requests to unpkg from <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong> by HTTP protocol.</p>
+
+        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th>Protocol</th>
+              <th>Requests (% of total)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {protocolRows}
+          </tbody>
+        </table>
+
         <h3>Packages</h3>
+
+        <p>The table below shows the most popular packages served by unpkg from <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong>. Only the top {Object.keys(totals.requests.package).length} packages are shown.</p>
 
         <p className="table-filter">Include only packages that received at least <select
             value={this.state.minPackageRequests}
@@ -144,6 +162,7 @@ class Stats extends React.Component {
             <option value="10000">10,000</option>
             <option value="100000">100,000</option>
             <option value="1000000">1,000,000</option>
+            <option value="1000000">10,000,000</option>
           </select> requests.
         </p>
 
@@ -160,21 +179,9 @@ class Stats extends React.Component {
           </tbody>
         </table>
 
-        <h3>Protocols</h3>
-
-        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Protocol</th>
-              <th>Requests (% of total)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {protocolRows}
-          </tbody>
-        </table>
-
         <h3>Regions</h3>
+
+        <p>The table below breaks down requests to unpkg from <strong>{formatDate(since, 'MMM D')}</strong> to <strong>{formatDate(until, 'MMM D')}</strong> by geographic region.</p>
 
         <p className="table-filter">Include only countries that made at least <select
             value={this.state.minCountryRequests}
