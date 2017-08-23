@@ -75,15 +75,12 @@ function fetchFile(req, res, next) {
             // Based on the URL, figure out which file they want.
             const base = path.join(req.packageDir, req.filename)
 
-            findFile(base, false, function (error, file, stats) {
+            findFile(base, req.filename[req.filename.length - 1] !== '/', function (error, file, stats) {
               if (error)
                 console.error(error)
 
               if (file == null) {
                 res.status(404).type('text').send(`Cannot find file "${req.filename}" in package ${req.packageSpec}`)
-              } else if (stats.isDirectory() && req.pathname[req.pathname.length - 1] !== '/') {
-                // Append / to directory URLs.
-                res.status(301).redirect(`${req.pathname}/${req.search}`)
               } else {
                 req.file = file.replace(req.packageDir, '')
                 req.stats = stats
