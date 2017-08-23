@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "server": "heroku local -f Procfile.local -p 3001",
+    "serve": "heroku local -f Procfile.local -p 3001",
     "test": "node scripts/test.js --env=jsdom"
   },
   "dependencies": {
