@@ -739,9 +739,9 @@ babel-plugin-transform-strict-mode@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
-babel-plugin-unpkg-rewrite@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-unpkg-rewrite/-/babel-plugin-unpkg-rewrite-2.0.0.tgz#ab5debacb5667eadd95ff9a6f84422c5ef07227b"
+babel-plugin-unpkg-rewrite@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-unpkg-rewrite/-/babel-plugin-unpkg-rewrite-3.0.0.tgz#3485621d79da04cd910ca21cdc6b3cacc1a3d1d1"
   dependencies:
     warning "^3.0.0"
     whatwg-url "^4.3.0"
