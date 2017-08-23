@@ -5,6 +5,9 @@ const createPackageURL = require('../utils/createPackageURL')
 const getPackage = require('./utils/getPackage')
 const getPackageInfo = require('./utils/getPackageInfo')
 
+/**
+ * File extensions to look for when automatically resolving.
+ */
 const FindExtensions = [ '', '.js', '.json' ]
 
 /**
@@ -109,8 +112,8 @@ function fetchFile(req, res, next) {
                 // Fall back to the "browser" field if declared (only support strings).
                 mainFilename = packageConfig.browser
               } else {
-                // If there is no main, use "index" (same as npm).
-                mainFilename = packageConfig.main || 'index'
+                // If there is no main, use "/" (same as npm).
+                mainFilename = packageConfig.main || '/'
               }
             }
 
