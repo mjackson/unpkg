@@ -61,11 +61,9 @@ function fetchFile(req, res, next) {
 
     req.packageInfo = packageInfo
 
-    const { versions, 'dist-tags': tags } = req.packageInfo
-
-    if (req.packageVersion in versions) {
+    if (req.packageVersion in req.packageInfo.versions) {
       // A valid request for a package we haven't downloaded yet.
-      req.packageConfig = versions[req.packageVersion]
+      req.packageConfig = req.packageInfo.versions[req.packageVersion]
 
       getPackage(req.packageConfig, function (error, outputDir) {
         if (error) {
@@ -76,9 +74,9 @@ function fetchFile(req, res, next) {
 
           if (req.filename) {
             // Based on the URL, figure out which file they want.
-            const base = path.join(req.packageDir, req.filename)
+            const useIndex = req.filename[req.filename.length - 1] !== '/'
 
-            findFile(base, req.filename[req.filename.length - 1] !== '/', function (error, file, stats) {
+            findFile(path.join(req.packageDir, req.filename), useIndex, function (error, file, stats) {
               if (error)
                 console.error(error)
 
@@ -90,39 +88,53 @@ function fetchFile(req, res, next) {
                 next()
               }
             })
-          } else {
-            // No filename in the URL. Try to figure out which file they want by
-            // checking package.json's "unpkg", "browser", and "main" fields.
-            let mainFilename
+          } else if (req.query.module != null) {
+            // They want an ES module. Try "module", "jsnext:main", and "/"
+            // https://github.com/rollup/rollup/wiki/pkg.module
+            const filename = req.packageConfig.module || req.packageConfig['jsnext:main'] || '/'
 
-            const packageConfig = req.packageConfig
-            const queryMain = req.query.main
-
-            if (queryMain) {
-              if (!(queryMain in packageConfig))
-                return res.status(404).type('text').send(`Cannot find field "${queryMain}" in ${req.packageSpec} package config`)
-
-              mainFilename = packageConfig[queryMain]
-            } else {
-              if (typeof packageConfig.unpkg === 'string') {
-                // The "unpkg" field allows packages to explicitly declare the
-                // file to serve at the bare URL (see #59).
-                mainFilename = packageConfig.unpkg
-              } else if (typeof packageConfig.browser === 'string') {
-                // Fall back to the "browser" field if declared (only support strings).
-                mainFilename = packageConfig.browser
-              } else {
-                // If there is no main, use "/" (same as npm).
-                mainFilename = packageConfig.main || '/'
-              }
-            }
-
-            findFile(path.join(req.packageDir, mainFilename), true, function (error, file, stats) {
+            findFile(path.join(req.packageDir, filename), true, function (error, file, stats) {
               if (error)
                 console.error(error)
 
               if (file == null) {
-                res.status(404).type('text').send(`Cannot find main file "${mainFilename}" in package ${req.packageSpec}`)
+                res.status(404).type('text').send(`Cannot find module "${filename}" in package ${req.packageSpec}`)
+              } else {
+                // Need to redirect to the module file so relative imports resolve
+                // correctly. Cache module redirects for 1 minute.
+                res.set({
+                  'Cache-Control': 'public, max-age=60',
+                  'Cache-Tag': 'redirect,module-redirect'
+                }).redirect(302, createPackageURL(req.packageName, req.packageVersion, file.replace(req.packageDir, ''), req.search))
+              }
+            })
+          } else {
+            // No filename in the URL. Try to figure out which file they want.
+            let filename
+
+            if (req.query.main) {
+              if (!(req.query.main in req.packageConfig))
+                return res.status(404).type('text').send(`Cannot find field "${req.query.main}" in ${req.packageSpec} package config`)
+
+              filename = req.packageConfig[req.query.main]
+            } else if (typeof req.packageConfig.unpkg === 'string') {
+              // The "unpkg" field allows packages to explicitly declare the
+              // file to serve at the bare URL (see #59).
+              filename = req.packageConfig.unpkg
+            } else if (typeof req.packageConfig.browser === 'string') {
+              // Fall back to the "browser" field if declared (only support strings).
+              filename = req.packageConfig.browser
+            } else {
+              // Use "main" or fallback to "/" (same as npm).
+              filename = req.packageConfig.main || '/'
+            }
+
+            findFile(path.join(req.packageDir, filename), true, function (error, file, stats) {
+              if (error)
+                console.error(error)
+
+              if (file == null) {
+                res.status(404).type('text').send(`Cannot find main file "${filename}" in package ${req.packageSpec}`)
               } else {
                 req.file = file.replace(req.packageDir, '')
                 req.stats = stats
@@ -132,20 +144,20 @@ function fetchFile(req, res, next) {
           }
         }
       })
-    } else if (req.packageVersion in tags) {
+    } else if (req.packageVersion in req.packageInfo['dist-tags']) {
       // Cache tag redirects for 1 minute.
       res.set({
         'Cache-Control': 'public, max-age=60',
-        'Cache-Tag': 'redirect'
-      }).redirect(302, createPackageURL(req.packageName, tags[req.packageVersion], req.filename, req.search))
+        'Cache-Tag': 'redirect,tag-redirect'
+      }).redirect(302, createPackageURL(req.packageName, req.packageInfo['dist-tags'][req.packageVersion], req.filename, req.search))
     } else {
-      const maxVersion = semver.maxSatisfying(Object.keys(versions), req.packageVersion)
+      const maxVersion = semver.maxSatisfying(Object.keys(req.packageInfo.versions), req.packageVersion)
 
       if (maxVersion) {
         // Cache semver redirects for 1 minute.
         res.set({
           'Cache-Control': 'public, max-age=60',
-          'Cache-Tag': 'redirect'
+          'Cache-Tag': 'redirect,semver-redirect'
         }).redirect(302, createPackageURL(req.packageName, maxVersion, req.filename, req.search))
       } else {
         res.status(404).type('text').send(`Cannot find package ${req.packageSpec}`)
