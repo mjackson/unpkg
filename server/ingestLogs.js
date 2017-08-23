@@ -5,10 +5,7 @@ const validateNPMPackageName = require('validate-npm-package-name')
 const parsePackageURL = require('./utils/parsePackageURL')
 const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
-const {
-  createDayKey,
-  createHourKey
-} = require('./StatsServer')
+const { createDayKey } = require('./StatsServer')
 
 /**
  * Domains we want to analyze.
