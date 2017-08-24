@@ -5,6 +5,10 @@ const createPackageURL = require('../utils/createPackageURL')
 const getPackage = require('./utils/getPackage')
 const getPackageInfo = require('./utils/getPackageInfo')
 
+function getBasename(file) {
+  return path.basename(file, path.extname(file))
+}
+
 /**
  * File extensions to look for when automatically resolving.
  */
@@ -111,10 +115,7 @@ function fetchFile(req, res, next) {
 
             filename = file.replace(req.packageDir, '')
 
-            // TODO: We are able to serve files w/out the ".js" extension so
-            // don't bother redirecting when req.filename is "/area" and filename
-            // is "/area.js"
-            if (req.query.module != null && req.filename !== filename) {
+            if (req.query.module != null && getBasename(req.filename) !== getBasename(filename)) {
               // Need to redirect to the module file so relative imports resolve
               // correctly. Cache module redirects for 1 minute.
               res.set({
