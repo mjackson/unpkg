@@ -72,76 +72,61 @@ function fetchFile(req, res, next) {
         } else {
           req.packageDir = outputDir
 
-          if (req.filename) {
-            // Based on the URL, figure out which file they want.
-            const useIndex = req.filename[req.filename.length - 1] !== '/'
+          let filename = req.filename
+          let useIndex = true
 
-            findFile(path.join(req.packageDir, req.filename), useIndex, function (error, file, stats) {
-              if (error)
-                console.error(error)
-
-              if (file == null) {
-                res.status(404).type('text').send(`Cannot find file "${req.filename}" in package ${req.packageSpec}`)
-              } else {
-                req.file = file.replace(req.packageDir, '')
-                req.stats = stats
-                next()
-              }
-            })
-          } else if (req.query.module != null) {
+          if (req.query.module != null) {
             // They want an ES module. Try "module", "jsnext:main", and "/"
             // https://github.com/rollup/rollup/wiki/pkg.module
-            const filename = req.packageConfig.module || req.packageConfig['jsnext:main'] || '/'
+            if (filename == null)
+              filename = req.packageConfig.module || req.packageConfig['jsnext:main'] || '/'
+          } else if (filename) {
+            // They are requesting an explicit filename. Only try to find an
+            // index file if they are NOT requesting an HTML directory listing.
+            useIndex = filename[filename.length - 1] !== '/'
+          } else if (req.query.main) {
+            if (!(req.query.main in req.packageConfig))
+              return res.status(404).type('text').send(`Cannot find field "${req.query.main}" in ${req.packageSpec} package config`)
 
-            findFile(path.join(req.packageDir, filename), true, function (error, file, stats) {
-              if (error)
-                console.error(error)
-
-              if (file == null) {
-                res.status(404).type('text').send(`Cannot find module "${filename}" in package ${req.packageSpec}`)
-              } else {
-                // Need to redirect to the module file so relative imports resolve
-                // correctly. Cache module redirects for 1 minute.
-                res.set({
-                  'Cache-Control': 'public, max-age=60',
-                  'Cache-Tag': 'redirect,module-redirect'
-                }).redirect(302, createPackageURL(req.packageName, req.packageVersion, file.replace(req.packageDir, ''), req.search))
-              }
-            })
+            // They specified a custom ?main field.
+            filename = req.packageConfig[req.query.main]
+          } else if (typeof req.packageConfig.unpkg === 'string') {
+            // The "unpkg" field allows packages to explicitly declare the
+            // file to serve at the bare URL (see #59).
+            filename = req.packageConfig.unpkg
+          } else if (typeof req.packageConfig.browser === 'string') {
+            // Fall back to the "browser" field if declared (only support strings).
+            filename = req.packageConfig.browser
           } else {
-            // No filename in the URL. Try to figure out which file they want.
-            let filename
-
-            if (req.query.main) {
-              if (!(req.query.main in req.packageConfig))
-                return res.status(404).type('text').send(`Cannot find field "${req.query.main}" in ${req.packageSpec} package config`)
-
-              filename = req.packageConfig[req.query.main]
-            } else if (typeof req.packageConfig.unpkg === 'string') {
-              // The "unpkg" field allows packages to explicitly declare the
-              // file to serve at the bare URL (see #59).
-              filename = req.packageConfig.unpkg
-            } else if (typeof req.packageConfig.browser === 'string') {
-              // Fall back to the "browser" field if declared (only support strings).
-              filename = req.packageConfig.browser
-            } else {
-              // Use "main" or fallback to "/" (same as npm).
-              filename = req.packageConfig.main || '/'
-            }
-
-            findFile(path.join(req.packageDir, filename), true, function (error, file, stats) {
-              if (error)
-                console.error(error)
-
-              if (file == null) {
-                res.status(404).type('text').send(`Cannot find main file "${filename}" in package ${req.packageSpec}`)
-              } else {
-                req.file = file.replace(req.packageDir, '')
-                req.stats = stats
-                next()
-              }
-            })
+            // Fall back to "main" or / (same as npm).
+            filename = req.packageConfig.main || '/'
           }
+
+          findFile(path.join(req.packageDir, filename), useIndex, function (error, file, stats) {
+            if (error)
+              console.error(error)
+
+            if (file == null)
+              return res.status(404).type('text').send(`Cannot find module "${filename}" in package ${req.packageSpec}`)
+
+            filename = file.replace(req.packageDir, '')
+
+            // TODO: We are able to serve files w/out the ".js" extension so
+            // don't bother redirecting when req.filename is "/area" and filename
+            // is "/area.js"
+            if (req.query.module != null && req.filename !== filename) {
+              // Need to redirect to the module file so relative imports resolve
+              // correctly. Cache module redirects for 1 minute.
+              res.set({
+                'Cache-Control': 'public, max-age=60',
+                'Cache-Tag': 'redirect,module-redirect'
+              }).redirect(302, createPackageURL(req.packageName, req.packageVersion, filename, req.search))
+            } else {
+              req.file = filename
+              req.stats = stats
+              next()
+            }
+          })
         }
       })
     } else if (req.packageVersion in req.packageInfo['dist-tags']) {
