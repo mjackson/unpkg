@@ -80,7 +80,14 @@ function serveFile(req, res, next) {
     } else {
       res.set({
         'Cache-Tag': 'file'
-      }).sendFile(file)
+      }).sendFile(file, function (error) {
+        if (error) {
+          console.error(`Cannot send file ${req.packageSpec}${req.filename}`)
+          console.error(error)
+          // res.status(500).type('text').send(`Cannot send file ${req.packageSpec}${req.filename}`)
+          res.sendStatus(500)
+        }
+      })
     }
   } else if (AutoIndex && req.stats.isDirectory()) {
     getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
