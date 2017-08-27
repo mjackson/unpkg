@@ -123,7 +123,7 @@ function fetchFile(req, res, next) {
                 'Cache-Tag': 'redirect,module-redirect'
               }).redirect(302, createPackageURL(req.packageName, req.packageVersion, filename, req.search))
             } else {
-              req.file = filename
+              req.filename = filename
               req.stats = stats
               next()
             }

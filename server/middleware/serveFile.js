@@ -35,7 +35,7 @@ const FileTransforms = {
  */
 function serveFile(req, res, next) {
   if (req.query.meta != null) {
-    getMetadata(req.packageDir, req.file, req.stats, MaximumDepth, function (error, metadata) {
+    getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, function (error, metadata) {
       if (error) {
         console.error(error)
         res.status(500).type('text').send(`Cannot generate metadata for ${req.packageSpec}${req.filename}`)
@@ -48,7 +48,7 @@ function serveFile(req, res, next) {
       }
     })
   } else if (req.stats.isFile()) {
-    const file = path.join(req.packageDir, req.file)
+    const file = path.join(req.packageDir, req.filename)
 
     let contentType = getFileContentType(file)
 
@@ -90,7 +90,7 @@ function serveFile(req, res, next) {
       })
     }
   } else if (AutoIndex && req.stats.isDirectory()) {
-    getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.file, function (error, html) {
+    getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.filename, function (error, html) {
       if (error) {
         console.error(error)
         res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
