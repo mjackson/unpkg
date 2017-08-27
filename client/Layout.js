@@ -50,6 +50,17 @@ class Layout extends React.Component {
     fetch('/_stats/last-month')
       .then(res => res.json())
       .then(stats => this.setState({ stats }))
+
+    if (window.localStorage) {
+      const savedStats = window.localStorage.savedStats
+
+      if (savedStats)
+        this.setState({ stats: JSON.parse(savedStats) })
+
+      window.onbeforeunload = () => {
+        localStorage.savedStats = JSON.stringify(this.state.stats)
+      }
+    }
   }
 
   componentDidUpdate(prevProps) {
