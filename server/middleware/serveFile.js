@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const etag = require('etag')
 const babel = require('babel-core')
 const unpkgRewrite = require('babel-plugin-unpkg-rewrite')
 const getMetadata = require('./utils/getMetadata')
@@ -35,6 +36,7 @@ const FileTransforms = {
  */
 function serveFile(req, res, next) {
   if (req.query.meta != null) {
+    // Serve JSON metadata.
     getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, function (error, metadata) {
       if (error) {
         console.error(error)
@@ -48,6 +50,7 @@ function serveFile(req, res, next) {
       }
     })
   } else if (req.stats.isFile()) {
+    // Serve a file.
     const file = path.join(req.packageDir, req.filename)
 
     let contentType = getFileContentType(file)
@@ -55,13 +58,8 @@ function serveFile(req, res, next) {
     if (contentType === 'text/html')
       contentType = 'text/plain' // We can't serve HTML because bad people :(
 
-    // Cache files for 1 year.
-    res.set({
-      'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=31536000'
-    })
-
     if (contentType === 'application/javascript' && req.query.module != null) {
+      // Serve a JavaScript module.
       const dependencies = Object.assign({},
         req.packageConfig.peerDependencies,
         req.packageConfig.dependencies
@@ -72,28 +70,46 @@ function serveFile(req, res, next) {
           console.error(error)
           res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
         } else {
+          // Cache modules for 1 year.
           res.set({
-            'Cache-Tag': 'file,module'
+            'Content-Type': contentType,
+            'Content-Length': Buffer.byteLength(code),
+            'Cache-Control': 'public, max-age=31536000',
+            'Cache-Tag': 'file,js-file,js-module'
           }).send(code)
         }
       })
     } else {
-      const options = {
-        dotfiles: 'allow'
-      }
+      // Serve some other static file.
+      const tags = [ 'file' ]
 
+      const ext = path.extname(req.filename).substr(1)
+
+      if (ext)
+        tags.push(`${ext}-file`)
+
+      // Cache files for 1 year.
       res.set({
-        'Cache-Tag': 'file'
-      }).sendFile(file, options, function (error) {
-        if (error) {
-          console.error(`Cannot send file ${req.packageSpec}${req.filename}`)
-          console.error(error)
-          // res.status(500).type('text').send(`Cannot send file ${req.packageSpec}${req.filename}`)
-          res.sendStatus(500)
-        }
+        'Content-Type': contentType,
+        'Content-Length': req.stats.size,
+        'Cache-Control': 'public, max-age=31536000',
+        'Last-Modified': req.stats.mtime.toUTCString(),
+        'ETag': etag(req.stats),
+        'Cache-Tag': tags.join(',')
       })
+
+      const stream = fs.createReadStream(file)
+
+      stream.on('error', function (error) {
+        console.error(`Cannot send file ${req.packageSpec}${req.filename}`)
+        console.error(error)
+        res.sendStatus(500)
+      })
+
+      stream.pipe(res)
     }
   } else if (AutoIndex && req.stats.isDirectory()) {
+    // Serve an HTML directory listing.
     getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.filename, function (error, html) {
       if (error) {
         console.error(error)
