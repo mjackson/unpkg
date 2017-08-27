@@ -82,7 +82,7 @@ function fetchFile(req, res, next) {
           if (req.query.module != null) {
             // They want an ES module. Try "module", "jsnext:main", and "/"
             // https://github.com/rollup/rollup/wiki/pkg.module
-            if (filename == null)
+            if (!filename)
               filename = req.packageConfig.module || req.packageConfig['jsnext:main'] || '/'
           } else if (filename) {
             // They are requesting an explicit filename. Only try to find an
