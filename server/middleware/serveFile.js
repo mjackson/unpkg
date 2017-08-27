@@ -78,9 +78,13 @@ function serveFile(req, res, next) {
         }
       })
     } else {
+      const options = {
+        dotfiles: 'allow'
+      }
+
       res.set({
         'Cache-Tag': 'file'
-      }).sendFile(file, function (error) {
+      }).sendFile(file, options, function (error) {
         if (error) {
           console.error(`Cannot send file ${req.packageSpec}${req.filename}`)
           console.error(error)
