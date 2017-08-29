@@ -46,12 +46,24 @@ function createSearch(query) {
  * Parse and validate the URL.
  */
 function packageURL(req, res, next) {
-  // Redirect /_meta/pkg to /pkg?meta.
+  // Redirect /_meta/path to /path?meta.
   if (req.path.match(/^\/_meta\//)) {
-    delete req.query.json
     req.query.meta = ''
     return res.redirect(req.path.substr(6) + createSearch(req.query))
   }
+
+  // Redirect /path?json => /path?meta
+  if (req.query.json != null) {
+    delete req.query.json
+    req.query.meta = ''
+    return res.redirect(req.path + createSearch(req.query))
+  }
+
+  // Redirect requests with unknown query params to their equivalents
+  // with only known params so they can be served from the cache. This
+  // prevents people using random query params designed to bust the cache.
+  if (!queryIsKnown(req.query))
+    return res.redirect(req.path + createSearch(sanitizeQuery(req.query)))
 
   const url = parsePackageURL(req.url)
 
@@ -64,12 +76,6 @@ function packageURL(req, res, next) {
   // Do not allow invalid package names.
   if (nameErrors)
     return res.status(403).type('text').send(`Invalid package name: ${url.packageName} (${nameErrors.join(', ')})`)
-
-  // Redirect requests with unknown query params to their equivalents
-  // with only known params so they can be served from the cache. This
-  // prevents people using random query params designed to bust the cache.
-  if (!queryIsKnown(url.query))
-    return res.redirect(url.pathname + createSearch(sanitizeQuery(url.query)))
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion
