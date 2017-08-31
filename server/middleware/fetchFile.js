@@ -115,7 +115,7 @@ function fetchFile(req, res, next) {
 
             filename = file.replace(req.packageDir, '')
 
-            if (req.query.module != null && getBasename(req.filename) !== getBasename(filename)) {
+            if (getBasename(req.filename) !== getBasename(filename)) {
               // Need to redirect to the module file so relative imports resolve
               // correctly. Cache module redirects for 1 minute.
               res.set({
