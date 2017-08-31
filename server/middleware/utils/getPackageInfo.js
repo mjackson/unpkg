@@ -19,7 +19,9 @@ function fetchPackageInfo(packageName) {
   const url = `${RegistryURL}/${encodedPackageName}`
 
   return fetch(url, {
-    headers: { 'Accept': 'application/json' }
+    headers: {
+      'Accept': 'application/json'
+    }
   }).then(function (res) {
     return res.status === 404 ? null : res.json()
   })
