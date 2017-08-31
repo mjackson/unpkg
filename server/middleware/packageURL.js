@@ -49,21 +49,21 @@ function packageURL(req, res, next) {
   // Redirect /_meta/path to /path?meta.
   if (req.path.match(/^\/_meta\//)) {
     req.query.meta = ''
-    return res.redirect(req.path.substr(6) + createSearch(req.query))
+    return res.redirect(302, req.path.substr(6) + createSearch(req.query))
   }
 
   // Redirect /path?json => /path?meta
   if (req.query.json != null) {
     delete req.query.json
     req.query.meta = ''
-    return res.redirect(req.path + createSearch(req.query))
+    return res.redirect(302, req.path + createSearch(req.query))
   }
 
   // Redirect requests with unknown query params to their equivalents
   // with only known params so they can be served from the cache. This
   // prevents people using random query params designed to bust the cache.
   if (!queryIsKnown(req.query))
-    return res.redirect(req.path + createSearch(sanitizeQuery(req.query)))
+    return res.redirect(302, req.path + createSearch(sanitizeQuery(req.query)))
 
   const url = parsePackageURL(req.url)
 
