@@ -1,5 +1,6 @@
 const validateNPMPackageName = require('validate-npm-package-name')
 const parsePackageURL = require('../utils/parsePackageURL')
+const createSearch = require('./utils/createSearch')
 
 const KnownQueryParams = {
   main: true,
@@ -24,22 +25,6 @@ function sanitizeQuery(query) {
   })
 
   return saneQuery
-}
-
-function createSearch(query) {
-  const params = []
-
-  Object.keys(query).forEach(function (param) {
-    if (query[param] === '') {
-      params.push(param) // Omit the trailing "=" from param=
-    } else {
-      params.push(`${param}=${encodeURIComponent(query[param])}`)
-    }
-  })
-
-  const search = params.join('&')
-
-  return search ? `?${search}` : ''
 }
 
 /**

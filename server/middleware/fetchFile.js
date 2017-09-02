@@ -2,8 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const semver = require('semver')
 const createPackageURL = require('../utils/createPackageURL')
-const getPackage = require('./utils/getPackage')
+const createSearch = require('./utils/createSearch')
 const getPackageInfo = require('./utils/getPackageInfo')
+const getPackage = require('./utils/getPackage')
 
 function getBasename(file) {
   return path.basename(file, path.extname(file))
@@ -112,13 +113,14 @@ function fetchFile(req, res, next) {
 
             filename = file.replace(req.packageDir, '')
 
-            if (getBasename(req.filename) !== getBasename(filename)) {
+            if (req.query.main != null || getBasename(req.filename) !== getBasename(filename)) {
               // Need to redirect to the module file so relative imports resolve
               // correctly. Cache module redirects for 1 minute.
+              delete req.query.main
               res.set({
                 'Cache-Control': 'public, max-age=60',
                 'Cache-Tag': 'redirect,module-redirect'
-              }).redirect(302, createPackageURL(req.packageName, req.packageVersion, filename, req.search))
+              }).redirect(302, createPackageURL(req.packageName, req.packageVersion, filename, createSearch(req.query)))
             } else {
               req.filename = filename
               req.stats = stats
