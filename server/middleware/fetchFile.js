@@ -88,10 +88,7 @@ function fetchFile(req, res, next) {
             // They are requesting an explicit filename. Only try to find an
             // index file if they are NOT requesting an HTML directory listing.
             useIndex = filename[filename.length - 1] !== '/'
-          } else if (req.query.main) {
-            if (!(req.query.main in req.packageConfig))
-              return res.status(404).type('text').send(`Cannot find field "${req.query.main}" in ${req.packageSpec} package config`)
-
+          } else if (req.query.main && typeof req.packageConfig[req.query.main] === 'string') {
             // They specified a custom ?main field.
             filename = req.packageConfig[req.query.main]
           } else if (typeof req.packageConfig.unpkg === 'string') {
