@@ -1,5 +1,5 @@
 require('isomorphic-fetch')
-const warning = require('warning')
+const invariant = require('invariant')
 const gunzip = require('gunzip-maybe')
 const ndjson = require('ndjson')
 
@@ -7,12 +7,12 @@ const CloudflareAPIURL = 'https://api.cloudflare.com'
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
 
-warning(
+invariant(
   CloudflareEmail,
   'Missing the $CLOUDFLARE_EMAIL environment variable'
 )
 
-warning(
+invariant(
   CloudflareKey,
   'Missing the $CLOUDFLARE_KEY environment variable'
 )
