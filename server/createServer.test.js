@@ -1,10 +1,10 @@
 const request = require('supertest')
-const createApp = require('./createApp')
+const createServer = require('./createServer')
 
 describe('The server app', function () {
   let app
   beforeEach(function () {
-    app = createApp()
+    app = createServer()
   })
 
   it('rejects invalid package names', function (done) {

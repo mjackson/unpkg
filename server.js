@@ -1,11 +1,11 @@
 const http = require('http')
 const throng = require('throng')
-const createApp = require('./server/createApp')
+const createServer = require('./server/createServer')
 
 const port = parseInt(process.env.PORT, 10) || 5000
 
 function startServer(id) {
-  const server = http.createServer(createApp())
+  const server = http.createServer(createServer())
 
   // Heroku dynos automatically timeout after 30s. Set our
   // own timeout here to force sockets to close before that.

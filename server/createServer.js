@@ -8,9 +8,9 @@ const checkBlacklist = require('./middleware/checkBlacklist')
 const packageURL = require('./middleware/packageURL')
 const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
-const serveStats = require('./middleware/serveStats')
 
 const createSearchServer = require('./createSearchServer')
+const createStatsServer = require('./createStatsServer')
 
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
@@ -48,9 +48,8 @@ function createApp() {
     maxAge: '365d'
   }))
 
-  app.use('/_stats', serveStats())
-
   app.use('/_search', createSearchServer())
+  app.use('/_stats', createStatsServer())
 
   app.use('/',
     packageURL,

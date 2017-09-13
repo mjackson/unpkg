@@ -2,7 +2,7 @@ const express = require('express')
 const subDays = require('date-fns/sub_days')
 const startOfDay = require('date-fns/start_of_day')
 const startOfSecond = require('date-fns/start_of_second')
-const StatsServer = require('../StatsServer')
+const StatsServer = require('./StatsServer')
 
 function serveArbitraryStats(req, res) {
   const now = startOfSecond(new Date)
@@ -63,7 +63,7 @@ function serveLastDayStats(req, res) {
   servePastDaysStats(1, req, res)
 }
 
-function serveStats() {
+function createStatsServer() {
   const app = express.Router()
 
   app.get('/', serveArbitraryStats)
@@ -74,4 +74,4 @@ function serveStats() {
   return app
 }
 
-module.exports = serveStats
+module.exports = createStatsServer
