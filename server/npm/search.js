@@ -37,7 +37,7 @@ function search(query, page) {
 
     const params = {
       // typoTolerance: 'min',
-      optionalFacetFilters: `concatenatedName:${concat(query)}`,
+      // optionalFacetFilters: `concatenatedName:${concat(query)}`,
       facets: [ 'keywords' ],
       attributesToHighlight: null,
       attributesToRetrieve: [
