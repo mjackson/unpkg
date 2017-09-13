@@ -14,14 +14,15 @@ function enhanceHit(hit) {
 
       resolve(hit)
     } else {
+      // We don't have any global paths for this package yet. Try
+      // using the "bare" URL.
+      hit.assets = [
+        `https://unpkg.com/${hit.name}@${hit.version}`
+      ]
+
       resolve(hit)
     }
   })
-}
-
-function byRelevanceDescending(a, b) {
-  // Hits that have assets are more relevant.
-  return a.assets ? (b.assets ? 0 : -1) : (b.assets ? 1 : 0)
 }
 
 // add concatenated name for more relevance for people spelling without spaces
@@ -65,8 +66,6 @@ function search(query, page) {
           Promise.all(
             value.hits.map(enhanceHit)
           ).then(function (hits) {
-            hits.sort(byRelevanceDescending)
-
             const totalHits = value.nbHits
             const totalPages = value.nbPages
 
