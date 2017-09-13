@@ -10,6 +10,8 @@ const fetchFile = require('./middleware/fetchFile')
 const serveFile = require('./middleware/serveFile')
 const serveStats = require('./middleware/serveStats')
 
+const createSearchServer = require('./createSearchServer')
+
 morgan.token('fwd', function (req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
 })
@@ -47,6 +49,8 @@ function createApp() {
   }))
 
   app.use('/_stats', serveStats())
+
+  app.use('/_search', createSearchServer())
 
   app.use('/',
     packageURL,

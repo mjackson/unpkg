@@ -9,6 +9,7 @@
     "test": "node scripts/test.js --env=jsdom"
   },
   "dependencies": {
+    "algoliasearch": "^3.24.3",
     "babel-plugin-unpkg-rewrite": "^3.1.0",
     "cors": "^2.8.1",
     "countries-list": "^1.3.2",
