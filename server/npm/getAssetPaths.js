@@ -1,3 +1,4 @@
+const semver = require('semver')
 const assetPathsIndex = require('./assetPathsIndex')
 
 function getAssetPaths(packageName, version) {
