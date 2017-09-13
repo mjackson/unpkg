@@ -10,10 +10,29 @@
  * The range `null` is a catch-all.
  */
 module.exports = {
-
   'angular': [
     [ '>=1.2.27', '/angular.min.js' ],
     [ null, '/lib/angular.min.js' ]
+  ],
+
+  'angular-animate': [
+    [ null, '/angular-animate.min.js' ]
+  ],
+
+  'angular-cookies': [
+    [ null, '/angular-cookies.min.js' ]
+  ],
+
+  'angular-resource': [
+    [ null, '/angular-resource.min.js' ]
+  ],
+
+  'angular-sanitize': [
+    [ null, '/angular-sanitize.min.js' ]
+  ],
+
+  'angular-ui-bootstrap': [
+    [ null, '/dist/ui-bootstrap.js' ]
   ],
 
   'animate.css': [
@@ -32,12 +51,20 @@ module.exports = {
     [ null, '/dist/css/bootstrap.min.css', '/dist/js/bootstrap.min.js' ]
   ],
 
+  'bootstrap-sass': [
+    [ null, '/assets/javascripts/bootstrap.min.js' ]
+  ],
+
   'bulma': [
     [ null, '/css/bulma.css' ]
   ],
 
   'core.js': [
     [ null, '/dist/core.min.js' ]
+  ],
+
+  'create-react-class': [
+    [ null, '/create-react-class.min.js' ]
   ],
 
   'd3': [
@@ -81,9 +108,17 @@ module.exports = {
     [ null, '/dist/css/materialize.min.css' ]
   ],
 
+  'ngx-bootstrap': [
+    [ null, '/bundles/ngx-bootstrap.umd.js' ]
+  ],
+
   'react': [
     [ '>=16.0.0-alpha.7', '/umd/react.production.min.js' ],
     [ null, '/dist/react.min.js' ]
+  ],
+
+  'react-bootstrap': [
+    [ null, '/dist/react-bootstrap.min.js' ]
   ],
 
   'react-dom': [
@@ -140,5 +175,4 @@ module.exports = {
   'zone.js': [
     [ null, '/dist/zone.js' ]
   ]
-
 }
