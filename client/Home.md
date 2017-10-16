@@ -6,13 +6,13 @@ unpkg is a fast, global [content delivery network](https://en.wikipedia.org/wiki
 
 Using a fixed version:
 
-  * [unpkg.com/react@15.3.1/dist/react.min.js](/react@15.3.1/dist/react.min.js)
-  * [unpkg.com/react-dom@15.3.1/dist/react-dom.min.js](/react-dom@15.3.1/dist/react-dom.min.js)
+  * [unpkg.com/react@16.0.0/umd/react.production.min.js](/react@16.0.0/umd/react.production.min.js)
+  * [unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js](/react-dom@16.0.0/umd/react-dom.production.min.js)
 
 You may also use a [semver range](https://docs.npmjs.com/misc/semver) or a [tag](https://docs.npmjs.com/cli/dist-tag) instead of a fixed version number, or omit the version/tag entirely to use the `latest` tag.
 
-  * [unpkg.com/react@^15/dist/react.min.js](/react@^15/dist/react.min.js)
-  * [unpkg.com/react/dist/react.min.js](/react/dist/react.min.js)
+  * [unpkg.com/react@^16/umd/react.production.min.js](/react@^16/umd/react.production.min.js)
+  * [unpkg.com/react/umd/react.production.min.js](/react/umd/react.production.min.js)
 
 If you omit the file path, unpkg will serve the package's "main" file.
 
