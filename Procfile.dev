@@ -1,1 +1,2 @@
 web: NODE_ENV=development node server.js
+db: redis-server --port 6379
