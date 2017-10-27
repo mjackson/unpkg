@@ -31,6 +31,7 @@ const FileTransforms = {
   }
 }
 
+
 /**
  * Send the file, JSON metadata, or HTML directory listing.
  */
@@ -68,7 +69,8 @@ function serveFile(req, res, next) {
       FileTransforms.expand(file, dependencies, function (error, code) {
         if (error) {
           console.error(error)
-          res.status(500).type('text').send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
+          const debugInfo = error.constructor.name + ': ' + error.message.replace(/^.*?\/unpkg-.+?\//, `/${req.packageSpec}/`) + '\n\n' + error.codeFrame
+          res.status(500).type('text').send(`Cannot generate module for ${req.packageSpec}${req.filename}\n\n${debugInfo}`)
         } else {
           // Cache modules for 1 year.
           res.set({
