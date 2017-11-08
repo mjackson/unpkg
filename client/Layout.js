@@ -54,8 +54,7 @@ class Layout extends React.Component {
     if (window.localStorage) {
       const savedStats = window.localStorage.savedStats
 
-      if (savedStats)
-        this.setState({ stats: JSON.parse(savedStats) })
+      if (savedStats) this.setState({ stats: JSON.parse(savedStats) })
 
       window.onbeforeunload = () => {
         localStorage.savedStats = JSON.stringify(this.state.stats)
@@ -72,21 +71,32 @@ class Layout extends React.Component {
     const { underlineLeft, underlineWidth, useSpring } = this.state
 
     const style = {
-      left: useSpring ? spring(underlineLeft, { stiffness: 220 }) : underlineLeft,
+      left: useSpring
+        ? spring(underlineLeft, { stiffness: 220 })
+        : underlineLeft,
       width: useSpring ? spring(underlineWidth) : underlineWidth
     }
 
     return (
       <div>
-        <WindowSize onChange={this.adjustUnderline}/>
+        <WindowSize onChange={this.adjustUnderline} />
         <div className="wrapper">
           <header>
             <h1 className="layout-title">unpkg</h1>
             <nav className="layout-nav">
-              <ol className="layout-nav-list" ref={node => this.listNode = node}>
-                <li><Link to="/">Home</Link></li>
-                <li><Link to="/stats">Stats</Link></li>
-                <li><Link to="/about">About</Link></li>
+              <ol
+                className="layout-nav-list"
+                ref={node => (this.listNode = node)}
+              >
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/stats">Stats</Link>
+                </li>
+                <li>
+                  <Link to="/about">About</Link>
+                </li>
               </ol>
               <Motion
                 defaultStyle={{ left: underlineLeft, width: underlineWidth }}
@@ -107,9 +117,12 @@ class Layout extends React.Component {
         </div>
 
         <Switch>
-          <Route path="/stats" render={() => <Stats data={this.state.stats}/>}/>
-          <Route path="/about" component={About}/>
-          <Route path="/" component={Home}/>
+          <Route
+            path="/stats"
+            render={() => <Stats data={this.state.stats} />}
+          />
+          <Route path="/about" component={About} />
+          <Route path="/" component={Home} />
         </Switch>
       </div>
     )

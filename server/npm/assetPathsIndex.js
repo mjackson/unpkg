@@ -10,169 +10,96 @@
  * The range `null` is a catch-all.
  */
 module.exports = {
-  'angular': [
-    [ '>=1.2.27', '/angular.min.js' ],
-    [ null, '/lib/angular.min.js' ]
+  angular: [['>=1.2.27', '/angular.min.js'], [null, '/lib/angular.min.js']],
+
+  'angular-animate': [[null, '/angular-animate.min.js']],
+
+  'angular-cookies': [[null, '/angular-cookies.min.js']],
+
+  'angular-resource': [[null, '/angular-resource.min.js']],
+
+  'angular-sanitize': [[null, '/angular-sanitize.min.js']],
+
+  'angular-ui-bootstrap': [[null, '/dist/ui-bootstrap.js']],
+
+  'animate.css': [[null, '/animate.min.css']],
+
+  'babel-standalone': [[null, '/babel.min.js']],
+
+  backbone: [[null, '/backbone-min.js']],
+
+  bootstrap: [
+    [null, '/dist/css/bootstrap.min.css', '/dist/js/bootstrap.min.js']
   ],
 
-  'angular-animate': [
-    [ null, '/angular-animate.min.js' ]
-  ],
+  'bootstrap-sass': [[null, '/assets/javascripts/bootstrap.min.js']],
 
-  'angular-cookies': [
-    [ null, '/angular-cookies.min.js' ]
-  ],
+  bulma: [[null, '/css/bulma.css']],
 
-  'angular-resource': [
-    [ null, '/angular-resource.min.js' ]
-  ],
+  'core.js': [[null, '/dist/core.min.js']],
 
-  'angular-sanitize': [
-    [ null, '/angular-sanitize.min.js' ]
-  ],
+  'create-react-class': [[null, '/create-react-class.min.js']],
 
-  'angular-ui-bootstrap': [
-    [ null, '/dist/ui-bootstrap.js' ]
-  ],
+  d3: [[null, '/build/d3.min.js']],
 
-  'animate.css': [
-    [ null, '/animate.min.css' ]
-  ],
-
-  'babel-standalone': [
-    [ null, '/babel.min.js' ]
-  ],
-
-  'backbone': [
-    [ null, '/backbone-min.js' ]
-  ],
-
-  'bootstrap': [
-    [ null, '/dist/css/bootstrap.min.css', '/dist/js/bootstrap.min.js' ]
-  ],
-
-  'bootstrap-sass': [
-    [ null, '/assets/javascripts/bootstrap.min.js' ]
-  ],
-
-  'bulma': [
-    [ null, '/css/bulma.css' ]
-  ],
-
-  'core.js': [
-    [ null, '/dist/core.min.js' ]
-  ],
-
-  'create-react-class': [
-    [ null, '/create-react-class.min.js' ]
-  ],
-
-  'd3': [
-    [ null, '/build/d3.min.js' ]
-  ],
-
-  'ember-source': [
-    [ null, '/dist/ember.min.js' ]
-  ],
+  'ember-source': [[null, '/dist/ember.min.js']],
 
   'foundation-sites': [
-    [ null, '/dist/css/foundation.min.css', '/dist/js/foundation.min.js' ]
+    [null, '/dist/css/foundation.min.css', '/dist/js/foundation.min.js']
   ],
 
-  'gsap': [
-    [ null, '/TweenMax.js' ]
+  gsap: [[null, '/TweenMax.js']],
+
+  handlebars: [[null, '/dist/handlebars.min.js']],
+
+  jquery: [[null, '/dist/jquery.min.js']],
+
+  fastclick: [[null, '/lib/fastclick.js']],
+
+  lodash: [['<3', '/dist/lodash.min.js'], [null, '/lodash.min.js']],
+
+  'masonry-layout': [[null, '/dist/masonry.pkgd.min.js']],
+
+  'materialize-css': [[null, '/dist/css/materialize.min.css']],
+
+  'ngx-bootstrap': [[null, '/bundles/ngx-bootstrap.umd.js']],
+
+  react: [
+    ['>=16.0.0-alpha.7', '/umd/react.production.min.js'],
+    [null, '/dist/react.min.js']
   ],
 
-  'handlebars': [
-    [ null, '/dist/handlebars.min.js' ]
-  ],
-
-  'jquery': [
-    [ null, '/dist/jquery.min.js' ]
-  ],
-
-  'fastclick': [
-    [ null, '/lib/fastclick.js' ]
-  ],
-
-  'lodash': [
-    [ '<3', '/dist/lodash.min.js' ],
-    [ null, '/lodash.min.js' ]
-  ],
-
-  'masonry-layout': [
-    [ null, '/dist/masonry.pkgd.min.js' ]
-  ],
-
-  'materialize-css': [
-    [ null, '/dist/css/materialize.min.css' ]
-  ],
-
-  'ngx-bootstrap': [
-    [ null, '/bundles/ngx-bootstrap.umd.js' ]
-  ],
-
-  'react': [
-    [ '>=16.0.0-alpha.7', '/umd/react.production.min.js' ],
-    [ null, '/dist/react.min.js' ]
-  ],
-
-  'react-bootstrap': [
-    [ null, '/dist/react-bootstrap.min.js' ]
-  ],
+  'react-bootstrap': [[null, '/dist/react-bootstrap.min.js']],
 
   'react-dom': [
-    [ '>=16.0.0-alpha.7', '/umd/react-dom.production.min.js' ],
-    [ null, '/dist/react-dom.min.js' ]
+    ['>=16.0.0-alpha.7', '/umd/react-dom.production.min.js'],
+    [null, '/dist/react-dom.min.js']
   ],
 
   'react-router': [
-    [ '>=4.0.0', '/umd/react-router.min.js' ],
-    [ null, '/umd/ReactRouter.min.js' ]
+    ['>=4.0.0', '/umd/react-router.min.js'],
+    [null, '/umd/ReactRouter.min.js']
   ],
 
-  'redux': [
-    [ null, '/dist/redux.min.js' ]
-  ],
+  redux: [[null, '/dist/redux.min.js']],
 
-  'redux-saga': [
-    [ null, '/dist/redux-saga.min.js' ]
-  ],
+  'redux-saga': [[null, '/dist/redux-saga.min.js']],
 
-  'redux-thunk': [
-    [ null, '/dist/redux-thunk.min.js' ]
-  ],
+  'redux-thunk': [[null, '/dist/redux-thunk.min.js']],
 
-  'snapsvg': [
-    [ null, '/snap.svg-min.js' ]
-  ],
+  snapsvg: [[null, '/snap.svg-min.js']],
 
-  'systemjs': [
-    [ null, '/dist/system.js' ]
-  ],
+  systemjs: [[null, '/dist/system.js']],
 
-  'three': [
-    [ '<=0.77.0', '/three.min.js' ],
-    [ null, '/build/three.min.js' ]
-  ],
+  three: [['<=0.77.0', '/three.min.js'], [null, '/build/three.min.js']],
 
-  'underscore': [
-    [ null, '/underscore-min.js' ]
-  ],
+  underscore: [[null, '/underscore-min.js']],
 
-  'vue': [
-    [ null, '/dist/vue.min.js' ]
-  ],
+  vue: [[null, '/dist/vue.min.js']],
 
-  'zepto': [
-    [ null, '/dist/zepto.min.js' ]
-  ],
+  zepto: [[null, '/dist/zepto.min.js']],
 
-  'zingchart': [
-    [ null, '/client/zingchart.min.js' ]
-  ],
+  zingchart: [[null, '/client/zingchart.min.js']],
 
-  'zone.js': [
-    [ null, '/dist/zone.js' ]
-  ]
+  'zone.js': [[null, '/dist/zone.js']]
 }

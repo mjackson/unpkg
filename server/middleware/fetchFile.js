@@ -13,18 +13,18 @@ function getBasename(file) {
 /**
  * File extensions to look for when automatically resolving.
  */
-const FindExtensions = [ '', '.js', '.json' ]
+const FindExtensions = ['', '.js', '.json']
 
 /**
  * Resolves a path like "lib/file" into "lib/file.js" or "lib/file.json"
  * depending on which one is available, similar to require('lib/file').
  */
 function findFile(base, useIndex, callback) {
-  FindExtensions.reduceRight(function (next, ext) {
+  FindExtensions.reduceRight(function(next, ext) {
     const file = base + ext
 
-    return function () {
-      fs.stat(file, function (error, stats) {
+    return function() {
+      fs.stat(file, function(error, stats) {
         if (error) {
           if (error.code === 'ENOENT' || error.code === 'ENOTDIR') {
             next()
@@ -32,7 +32,11 @@ function findFile(base, useIndex, callback) {
             callback(error)
           }
         } else if (useIndex && stats.isDirectory()) {
-          findFile(path.join(file, 'index'), false, function (error, indexFile, indexStats) {
+          findFile(path.join(file, 'index'), false, function(
+            error,
+            indexFile,
+            indexStats
+          ) {
             if (error) {
               callback(error)
             } else if (indexFile) {
@@ -55,14 +59,20 @@ function findFile(base, useIndex, callback) {
  * trailing slash.
  */
 function fetchFile(req, res, next) {
-  getPackageInfo(req.packageName, function (error, packageInfo) {
+  getPackageInfo(req.packageName, function(error, packageInfo) {
     if (error) {
       console.error(error)
-      return res.status(500).type('text').send(`Cannot get info for package "${req.packageName}"`)
+      return res
+        .status(500)
+        .type('text')
+        .send(`Cannot get info for package "${req.packageName}"`)
     }
 
     if (packageInfo == null || packageInfo.versions == null)
-      return res.status(404).type('text').send(`Cannot find package "${req.packageName}"`)
+      return res
+        .status(404)
+        .type('text')
+        .send(`Cannot find package "${req.packageName}"`)
 
     req.packageInfo = packageInfo
 
@@ -70,10 +80,13 @@ function fetchFile(req, res, next) {
       // A valid request for a package we haven't downloaded yet.
       req.packageConfig = req.packageInfo.versions[req.packageVersion]
 
-      getPackage(req.packageConfig, function (error, outputDir) {
+      getPackage(req.packageConfig, function(error, outputDir) {
         if (error) {
           console.error(error)
-          res.status(500).type('text').send(`Cannot fetch package ${req.packageSpec}`)
+          res
+            .status(500)
+            .type('text')
+            .send(`Cannot fetch package ${req.packageSpec}`)
         } else {
           req.packageDir = outputDir
 
@@ -84,12 +97,18 @@ function fetchFile(req, res, next) {
             // They want an ES module. Try "module", "jsnext:main", and "/"
             // https://github.com/rollup/rollup/wiki/pkg.module
             if (!filename)
-              filename = req.packageConfig.module || req.packageConfig['jsnext:main'] || '/'
+              filename =
+                req.packageConfig.module ||
+                req.packageConfig['jsnext:main'] ||
+                '/'
           } else if (filename) {
             // They are requesting an explicit filename. Only try to find an
             // index file if they are NOT requesting an HTML directory listing.
             useIndex = filename[filename.length - 1] !== '/'
-          } else if (req.query.main && typeof req.packageConfig[req.query.main] === 'string') {
+          } else if (
+            req.query.main &&
+            typeof req.packageConfig[req.query.main] === 'string'
+          ) {
             // They specified a custom ?main field.
             filename = req.packageConfig[req.query.main]
           } else if (typeof req.packageConfig.unpkg === 'string') {
@@ -104,23 +123,46 @@ function fetchFile(req, res, next) {
             filename = req.packageConfig.main || '/'
           }
 
-          findFile(path.join(req.packageDir, filename), useIndex, function (error, file, stats) {
-            if (error)
-              console.error(error)
+          findFile(path.join(req.packageDir, filename), useIndex, function(
+            error,
+            file,
+            stats
+          ) {
+            if (error) console.error(error)
 
             if (file == null)
-              return res.status(404).type('text').send(`Cannot find module "${filename}" in package ${req.packageSpec}`)
+              return res
+                .status(404)
+                .type('text')
+                .send(
+                  `Cannot find module "${filename}" in package ${
+                    req.packageSpec
+                  }`
+                )
 
             filename = file.replace(req.packageDir, '')
 
-            if (req.query.main != null || getBasename(req.filename) !== getBasename(filename)) {
+            if (
+              req.query.main != null ||
+              getBasename(req.filename) !== getBasename(filename)
+            ) {
               // Need to redirect to the module file so relative imports resolve
               // correctly. Cache module redirects for 1 minute.
               delete req.query.main
-              res.set({
-                'Cache-Control': 'public, max-age=60',
-                'Cache-Tag': 'redirect,module-redirect'
-              }).redirect(302, createPackageURL(req.packageName, req.packageVersion, filename, createSearch(req.query)))
+              res
+                .set({
+                  'Cache-Control': 'public, max-age=60',
+                  'Cache-Tag': 'redirect,module-redirect'
+                })
+                .redirect(
+                  302,
+                  createPackageURL(
+                    req.packageName,
+                    req.packageVersion,
+                    filename,
+                    createSearch(req.query)
+                  )
+                )
             } else {
               req.filename = filename
               req.stats = stats
@@ -131,21 +173,47 @@ function fetchFile(req, res, next) {
       })
     } else if (req.packageVersion in req.packageInfo['dist-tags']) {
       // Cache tag redirects for 1 minute.
-      res.set({
-        'Cache-Control': 'public, max-age=60',
-        'Cache-Tag': 'redirect,tag-redirect'
-      }).redirect(302, createPackageURL(req.packageName, req.packageInfo['dist-tags'][req.packageVersion], req.filename, req.search))
+      res
+        .set({
+          'Cache-Control': 'public, max-age=60',
+          'Cache-Tag': 'redirect,tag-redirect'
+        })
+        .redirect(
+          302,
+          createPackageURL(
+            req.packageName,
+            req.packageInfo['dist-tags'][req.packageVersion],
+            req.filename,
+            req.search
+          )
+        )
     } else {
-      const maxVersion = semver.maxSatisfying(Object.keys(req.packageInfo.versions), req.packageVersion)
+      const maxVersion = semver.maxSatisfying(
+        Object.keys(req.packageInfo.versions),
+        req.packageVersion
+      )
 
       if (maxVersion) {
         // Cache semver redirects for 1 minute.
-        res.set({
-          'Cache-Control': 'public, max-age=60',
-          'Cache-Tag': 'redirect,semver-redirect'
-        }).redirect(302, createPackageURL(req.packageName, maxVersion, req.filename, req.search))
+        res
+          .set({
+            'Cache-Control': 'public, max-age=60',
+            'Cache-Tag': 'redirect,semver-redirect'
+          })
+          .redirect(
+            302,
+            createPackageURL(
+              req.packageName,
+              maxVersion,
+              req.filename,
+              req.search
+            )
+          )
       } else {
-        res.status(404).type('text').send(`Cannot find package ${req.packageSpec}`)
+        res
+          .status(404)
+          .type('text')
+          .send(`Cannot find package ${req.packageSpec}`)
       }
     }
   })

@@ -19,9 +19,8 @@ function queryIsKnown(query) {
 function sanitizeQuery(query) {
   const saneQuery = {}
 
-  Object.keys(query).forEach(function (param) {
-    if (isKnownQueryParam(param))
-      saneQuery[param] = query[param]
+  Object.keys(query).forEach(function(param) {
+    if (isKnownQueryParam(param)) saneQuery[param] = query[param]
   })
 
   return saneQuery
@@ -54,13 +53,21 @@ function packageURL(req, res, next) {
 
   // Do not allow invalid URLs.
   if (url == null)
-    return res.status(403).type('text').send(`Invalid URL: ${req.url}`)
+    return res
+      .status(403)
+      .type('text')
+      .send(`Invalid URL: ${req.url}`)
 
   const nameErrors = validateNPMPackageName(url.packageName).errors
 
   // Do not allow invalid package names.
   if (nameErrors)
-    return res.status(403).type('text').send(`Invalid package name: ${url.packageName} (${nameErrors.join(', ')})`)
+    return res
+      .status(403)
+      .type('text')
+      .send(
+        `Invalid package name: ${url.packageName} (${nameErrors.join(', ')})`
+      )
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion

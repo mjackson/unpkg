@@ -26,7 +26,7 @@ function ignoreSymlinks(file, headers) {
 }
 
 function extractResponse(response, outputDir) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const extract = tar.extract(outputDir, {
       readable: true, // All dirs/files should be readable.
       map: stripNamePrefix,
@@ -44,24 +44,24 @@ function extractResponse(response, outputDir) {
 function fetchAndExtract(tarballURL, outputDir) {
   console.log(`info: Fetching ${tarballURL} and extracting to ${outputDir}`)
 
-  return fetch(tarballURL).then(function (response) {
+  return fetch(tarballURL).then(function(response) {
     return extractResponse(response, outputDir)
   })
 }
 
-const fetchMutex = createMutex(function (payload, callback) {
+const fetchMutex = createMutex(function(payload, callback) {
   const { tarballURL, outputDir } = payload
 
-  fs.access(outputDir, function (error) {
+  fs.access(outputDir, function(error) {
     if (error) {
       if (error.code === 'ENOENT' || error.code === 'ENOTDIR') {
         // ENOENT or ENOTDIR are to be expected when we haven't yet
         // fetched a package for the first time. Carry on!
-        mkdirp(outputDir, function (error) {
+        mkdirp(outputDir, function(error) {
           if (error) {
             callback(error)
           } else {
-            fetchAndExtract(tarballURL, outputDir).then(function () {
+            fetchAndExtract(tarballURL, outputDir).then(function() {
               callback()
             }, callback)
           }
@@ -80,7 +80,7 @@ function getPackage(packageConfig, callback) {
   const tarballURL = packageConfig.dist.tarball
   const outputDir = createTempPath(packageConfig.name, packageConfig.version)
 
-  fetchMutex(tarballURL, { tarballURL, outputDir }, function (error) {
+  fetchMutex(tarballURL, { tarballURL, outputDir }, function(error) {
     callback(error, outputDir)
   })
 }

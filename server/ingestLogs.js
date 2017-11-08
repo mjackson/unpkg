@@ -37,7 +37,7 @@ const oneMinute = oneSecond * 60
 const oneHour = oneMinute * 60
 
 function computeCounters(stream) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const counters = {}
     const expireat = {}
 
@@ -49,7 +49,7 @@ function computeCounters(stream) {
 
     stream
       .on('error', reject)
-      .on('data', function (entry) {
+      .on('data', function(entry) {
         const date = new Date(Math.round(entry.timestamp / 1000000))
 
         const nextDay = startOfDay(addDays(date, 1))
@@ -66,9 +66,22 @@ function computeCounters(stream) {
           const url = parsePackageURL(parseURL(clientRequest.uri).pathname)
           const packageName = url && url.packageName
 
-          if (packageName && validateNPMPackageName(packageName).errors == null) {
-            incr(`stats-packageRequests-${dayKey}`, packageName, 1, thirtyDaysLater)
-            incr(`stats-packageBytes-${dayKey}`, packageName, edgeResponse.bytes, thirtyDaysLater)
+          if (
+            packageName &&
+            validateNPMPackageName(packageName).errors == null
+          ) {
+            incr(
+              `stats-packageRequests-${dayKey}`,
+              packageName,
+              1,
+              thirtyDaysLater
+            )
+            incr(
+              `stats-packageBytes-${dayKey}`,
+              packageName,
+              edgeResponse.bytes,
+              thirtyDaysLater
+            )
           }
         }
 
@@ -85,32 +98,36 @@ function computeCounters(stream) {
 
         if (hostname) {
           incr(`stats-hostnameRequests-${dayKey}`, hostname, 1, sevenDaysLater)
-          incr(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes, sevenDaysLater)
+          incr(
+            `stats-hostnameBytes-${dayKey}`,
+            hostname,
+            edgeResponse.bytes,
+            sevenDaysLater
+          )
         }
       })
-      .on('end', function () {
+      .on('end', function() {
         resolve({ counters, expireat })
       })
   })
 }
 
 function processLogs(stream) {
-  return computeCounters(stream).then(function ({ counters, expireat }) {
-    Object.keys(counters).forEach(function (key) {
+  return computeCounters(stream).then(function({ counters, expireat }) {
+    Object.keys(counters).forEach(function(key) {
       const values = counters[key]
 
-      Object.keys(values).forEach(function (member) {
+      Object.keys(values).forEach(function(member) {
         db.zincrby(key, values[member], member)
       })
 
-      if (expireat[key])
-        db.expireat(key, expireat[key])
+      if (expireat[key]) db.expireat(key, expireat[key])
     })
   })
 }
 
 function ingestLogs(zone, startSeconds, endSeconds) {
-  return new Promise(function (resolve) {
+  return new Promise(function(resolve) {
     console.log(
       'info: Started ingesting logs for %s from %s to %s',
       zone.name,
@@ -121,7 +138,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
     const startFetchTime = Date.now()
 
     resolve(
-      cf.getLogs(zone.id, startSeconds, endSeconds).then(function (stream) {
+      cf.getLogs(zone.id, startSeconds, endSeconds).then(function(stream) {
         const endFetchTime = Date.now()
 
         console.log(
@@ -133,7 +150,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
 
         const startProcessTime = Date.now()
 
-        return processLogs(stream).then(function () {
+        return processLogs(stream).then(function() {
           const endProcessTime = Date.now()
 
           console.log(
@@ -149,10 +166,13 @@ function ingestLogs(zone, startSeconds, endSeconds) {
 }
 
 function startZone(zone) {
-  const startSecondsKey = `ingestLogsWorker-nextStartSeconds-${zone.name.replace('.', '-')}`
+  const startSecondsKey = `ingestLogsWorker-nextStartSeconds-${zone.name.replace(
+    '.',
+    '-'
+  )}`
 
   function takeATurn() {
-    db.get(startSecondsKey, function (error, value) {
+    db.get(startSecondsKey, function(error, value) {
       let startSeconds = value && parseInt(value, 10)
 
       const now = Date.now()
@@ -182,18 +202,21 @@ function startZone(zone) {
       // set of logs. This will help ensure that any congestion in the log
       // pipeline has passed and a full set of logs can be ingested.
       // https://support.cloudflare.com/hc/en-us/articles/216672448-Enterprise-Log-Share-REST-API
-      const maxSeconds = toSeconds(now - (oneMinute * 30))
+      const maxSeconds = toSeconds(now - oneMinute * 30)
 
       if (startSeconds < maxSeconds) {
         const endSeconds = startSeconds + LogWindowSeconds
 
-        ingestLogs(zone, startSeconds, endSeconds).then(function () {
-          db.set(startSecondsKey, endSeconds)
-          setTimeout(takeATurn)
-        }, function (error) {
-          console.error(error.stack)
-          process.exit(1)
-        })
+        ingestLogs(zone, startSeconds, endSeconds).then(
+          function() {
+            db.set(startSecondsKey, endSeconds)
+            setTimeout(takeATurn)
+          },
+          function(error) {
+            console.error(error.stack)
+            process.exit(1)
+          }
+        )
       } else {
         setTimeout(takeATurn, (startSeconds - maxSeconds) * 1000)
       }
@@ -203,8 +226,8 @@ function startZone(zone) {
   takeATurn()
 }
 
-Promise.all(DomainNames.map(cf.getZones)).then(function (results) {
-  const zones = results.reduce(function (memo, zones) {
+Promise.all(DomainNames.map(cf.getZones)).then(function(results) {
+  const zones = results.reduce(function(memo, zones) {
     return memo.concat(zones)
   })
 

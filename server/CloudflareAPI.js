@@ -7,15 +7,9 @@ const CloudflareAPIURL = 'https://api.cloudflare.com'
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
 
-invariant(
-  CloudflareEmail,
-  'Missing the $CLOUDFLARE_EMAIL environment variable'
-)
+invariant(CloudflareEmail, 'Missing the $CLOUDFLARE_EMAIL environment variable')
 
-invariant(
-  CloudflareKey,
-  'Missing the $CLOUDFLARE_KEY environment variable'
-)
+invariant(CloudflareKey, 'Missing the $CLOUDFLARE_KEY environment variable')
 
 function get(path, headers) {
   return fetch(`${CloudflareAPIURL}/client/v4${path}`, {
@@ -27,26 +21,28 @@ function get(path, headers) {
 }
 
 function getJSON(path, headers) {
-  return get(path, headers).then(function (res) {
-    return res.json()
-  }).then(function (data) {
-    if (!data.success) {
-      console.error(`CloudflareAPI.getJSON failed at ${path}`)
-      console.error(data)
-      throw new Error('Failed to getJSON from Cloudflare')
-    }
+  return get(path, headers)
+    .then(function(res) {
+      return res.json()
+    })
+    .then(function(data) {
+      if (!data.success) {
+        console.error(`CloudflareAPI.getJSON failed at ${path}`)
+        console.error(data)
+        throw new Error('Failed to getJSON from Cloudflare')
+      }
 
-    return data.result
-  })
+      return data.result
+    })
 }
 
 function getZones(domains) {
   return Promise.all(
-    (Array.isArray(domains) ? domains : [ domains ]).map(function (domain) {
+    (Array.isArray(domains) ? domains : [domains]).map(function(domain) {
       return getJSON(`/zones?name=${domain}`)
     })
-  ).then(function (results) {
-    return results.reduce(function (memo, zones) {
+  ).then(function(results) {
+    return results.reduce(function(memo, zones) {
       return memo.concat(zones)
     })
   })
@@ -68,26 +64,36 @@ function reduceResults(target, values) {
 
 function getZoneAnalyticsDashboard(zones, since, until) {
   return Promise.all(
-    (Array.isArray(zones) ? zones : [ zones ]).map(function (zone) {
-      return getJSON(`/zones/${zone.id}/analytics/dashboard?since=${since.toISOString()}&until=${until.toISOString()}`)
+    (Array.isArray(zones) ? zones : [zones]).map(function(zone) {
+      return getJSON(
+        `/zones/${
+          zone.id
+        }/analytics/dashboard?since=${since.toISOString()}&until=${until.toISOString()}`
+      )
     })
-  ).then(function (results) {
+  ).then(function(results) {
     return results.reduce(reduceResults)
   })
 }
 
 function getJSONStream(path, headers) {
-  const acceptGzipHeaders = Object.assign({}, headers, { 'Accept-Encoding': 'gzip' })
-
-  return get(path, acceptGzipHeaders).then(function (res) {
-    return res.body.pipe(gunzip())
-  }).then(function (stream) {
-    return stream.pipe(ndjson.parse())
+  const acceptGzipHeaders = Object.assign({}, headers, {
+    'Accept-Encoding': 'gzip'
   })
+
+  return get(path, acceptGzipHeaders)
+    .then(function(res) {
+      return res.body.pipe(gunzip())
+    })
+    .then(function(stream) {
+      return stream.pipe(ndjson.parse())
+    })
 }
 
 function getLogs(zoneId, startTime, endTime) {
-  return getJSONStream(`/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`)
+  return getJSONStream(
+    `/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`
+  )
 }
 
 module.exports = {

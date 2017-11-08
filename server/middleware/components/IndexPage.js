@@ -13,34 +13,41 @@ s.onchange = function () {
 }
 `
 
-const byVersion = (a, b) =>
-  semver.lt(a, b) ? -1 : (semver.gt(a, b) ? 1 : 0)
+const byVersion = (a, b) => (semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0)
 
 const IndexPage = ({ packageInfo, version, dir, entries }) => {
   const versions = Object.keys(packageInfo.versions).sort(byVersion)
-  const options = versions.map(v => (
+  const options = versions.map(v =>
     e('option', { key: v, value: v }, `${packageInfo.name}@${v}`)
-  ))
+  )
 
-  return (
-    e('html', null,
-      e('head', null,
-        e('meta', { charSet: 'utf-8' }),
-        e('title', null, `Index of ${dir}`),
-        e('style', { dangerouslySetInnerHTML: { __html: IndexPageStyle } })
-      ),
-      e('body', null,
-        e('div', { className: 'content-wrapper' },
-          e('div', { className: 'version-wrapper' },
-            e('select', { id: 'version', defaultValue: version }, options)
-          ),
-          e('h1', null, `Index of ${dir}`),
-          e('script', { dangerouslySetInnerHTML: { __html: IndexPageScript } }),
-          e('hr'),
-          e(DirectoryListing, { dir, entries }),
-          e('hr'),
-          e('address', null, `${packageInfo.name}@${version}`)
-        )
+  return e(
+    'html',
+    null,
+    e(
+      'head',
+      null,
+      e('meta', { charSet: 'utf-8' }),
+      e('title', null, `Index of ${dir}`),
+      e('style', { dangerouslySetInnerHTML: { __html: IndexPageStyle } })
+    ),
+    e(
+      'body',
+      null,
+      e(
+        'div',
+        { className: 'content-wrapper' },
+        e(
+          'div',
+          { className: 'version-wrapper' },
+          e('select', { id: 'version', defaultValue: version }, options)
+        ),
+        e('h1', null, `Index of ${dir}`),
+        e('script', { dangerouslySetInnerHTML: { __html: IndexPageScript } }),
+        e('hr'),
+        e(DirectoryListing, { dir, entries }),
+        e('hr'),
+        e('address', null, `${packageInfo.name}@${version}`)
       )
     )
   )

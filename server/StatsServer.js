@@ -4,7 +4,7 @@ const db = require('./RedisClient')
 const PackageBlacklist = require('./PackageBlacklist').blacklist
 
 function prunePackages(packagesMap) {
-  PackageBlacklist.forEach(function (packageName) {
+  PackageBlacklist.forEach(function(packageName) {
     delete packagesMap[packageName]
   })
 
@@ -33,8 +33,8 @@ function createScoresMap(array) {
 }
 
 function getScoresMap(key, n = 100) {
-  return new Promise(function (resolve, reject) {
-    db.zrevrange(key, 0, n, 'withscores', function (error, value) {
+  return new Promise(function(resolve, reject) {
+    db.zrevrange(key, 0, n, 'withscores', function(error, value) {
       if (error) {
         reject(error)
       } else {
@@ -45,11 +45,15 @@ function getScoresMap(key, n = 100) {
 }
 
 function getPackageRequests(date, n = 100) {
-  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n).then(prunePackages)
+  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n).then(
+    prunePackages
+  )
 }
 
 function getPackageBandwidth(date, n = 100) {
-  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n).then(prunePackages)
+  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n).then(
+    prunePackages
+  )
 }
 
 function getProtocolRequests(date) {
@@ -63,7 +67,7 @@ function addDailyMetricsToTimeseries(timeseries) {
     getPackageRequests(since),
     getPackageBandwidth(since),
     getProtocolRequests(since)
-  ]).then(function (results) {
+  ]).then(function(results) {
     timeseries.requests.package = results[0]
     timeseries.bandwidth.package = results[1]
     timeseries.requests.protocol = results[2]
@@ -72,8 +76,8 @@ function addDailyMetricsToTimeseries(timeseries) {
 }
 
 function sumMaps(maps) {
-  return maps.reduce(function (memo, map) {
-    Object.keys(map).forEach(function (key) {
+  return maps.reduce(function(memo, map) {
+    Object.keys(map).forEach(function(key) {
       memo[key] = (memo[key] || 0) + map[key]
     })
 
@@ -82,29 +86,29 @@ function sumMaps(maps) {
 }
 
 function addDailyMetrics(result) {
-  return Promise.all(
-    result.timeseries.map(addDailyMetricsToTimeseries)
-  ).then(function () {
-    result.totals.requests.package = sumMaps(
-      result.timeseries.map(function (timeseries) {
-        return timeseries.requests.package
-      })
-    )
+  return Promise.all(result.timeseries.map(addDailyMetricsToTimeseries)).then(
+    function() {
+      result.totals.requests.package = sumMaps(
+        result.timeseries.map(function(timeseries) {
+          return timeseries.requests.package
+        })
+      )
 
-    result.totals.bandwidth.package = sumMaps(
-      result.timeseries.map(function (timeseries) {
-        return timeseries.bandwidth.package
-      })
-    )
+      result.totals.bandwidth.package = sumMaps(
+        result.timeseries.map(function(timeseries) {
+          return timeseries.bandwidth.package
+        })
+      )
 
-    result.totals.requests.protocol = sumMaps(
-      result.timeseries.map(function (timeseries) {
-        return timeseries.requests.protocol
-      })
-    )
+      result.totals.requests.protocol = sumMaps(
+        result.timeseries.map(function(timeseries) {
+          return timeseries.requests.protocol
+        })
+      )
 
-    return result
-  })
+      return result
+    }
+  )
 }
 
 function extractPublicInfo(data) {
@@ -136,19 +140,18 @@ function extractPublicInfo(data) {
   }
 }
 
-const DomainNames = [
-  'unpkg.com',
-  'npmcdn.com'
-]
+const DomainNames = ['unpkg.com', 'npmcdn.com']
 
 function fetchStats(since, until) {
-  return cf.getZones(DomainNames).then(function (zones) {
-    return cf.getZoneAnalyticsDashboard(zones, since, until).then(function (dashboard) {
-      return {
-        timeseries: dashboard.timeseries.map(extractPublicInfo),
-        totals: extractPublicInfo(dashboard.totals)
-      }
-    })
+  return cf.getZones(DomainNames).then(function(zones) {
+    return cf
+      .getZoneAnalyticsDashboard(zones, since, until)
+      .then(function(dashboard) {
+        return {
+          timeseries: dashboard.timeseries.map(extractPublicInfo),
+          totals: extractPublicInfo(dashboard.totals)
+        }
+      })
   })
 }
 
@@ -159,10 +162,9 @@ const oneDay = oneHour * 24
 function getStats(since, until, callback) {
   let promise = fetchStats(since, until)
 
-  if ((until - since) > oneDay)
-    promise = promise.then(addDailyMetrics)
+  if (until - since > oneDay) promise = promise.then(addDailyMetrics)
 
-  promise.then(function (value) {
+  promise.then(function(value) {
     callback(null, value)
   }, callback)
 }

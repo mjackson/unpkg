@@ -14,9 +14,8 @@ invariant(
   'Missing $ALGOLIA_NPM_SEARCH_API_KEY environment variable'
 )
 
-const index = algolia(
-  AlgoliaNpmSearchAppId,
-  AlgoliaNpmSearchApiKey
-).initIndex('npm-search')
+const index = algolia(AlgoliaNpmSearchAppId, AlgoliaNpmSearchApiKey).initIndex(
+  'npm-search'
+)
 
 module.exports = index

@@ -2,13 +2,13 @@ const searchIndex = require('./searchIndex')
 const getAssetPaths = require('./getAssetPaths')
 
 function enhanceHit(hit) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const assetPaths = getAssetPaths(hit.name, hit.version)
 
     if (assetPaths) {
       // TODO: Double check the package metadata to ensure the files
       // haven't moved from the paths in the index?
-      hit.assets = assetPaths.map(function (path) {
+      hit.assets = assetPaths.map(function(path) {
         return `https://unpkg.com/${hit.name}@${hit.version}${path}`
       })
 
@@ -16,9 +16,7 @@ function enhanceHit(hit) {
     } else {
       // We don't have any global paths for this package yet. Try
       // using the "bare" URL.
-      hit.assets = [
-        `https://unpkg.com/${hit.name}@${hit.version}`
-      ]
+      hit.assets = [`https://unpkg.com/${hit.name}@${hit.version}`]
 
       resolve(hit)
     }
@@ -32,13 +30,13 @@ function concat(string) {
 }
 
 function search(query, page) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const hitsPerPage = 10
 
     const params = {
       // typoTolerance: 'min',
       // optionalFacetFilters: `concatenatedName:${concat(query)}`,
-      facets: [ 'keywords' ],
+      facets: ['keywords'],
       attributesToHighlight: null,
       attributesToRetrieve: [
         'description',
@@ -58,14 +56,12 @@ function search(query, page) {
       page
     }
 
-    searchIndex.search(query, params, function (error, value) {
+    searchIndex.search(query, params, function(error, value) {
       if (error) {
         reject(error)
       } else {
         resolve(
-          Promise.all(
-            value.hits.map(enhanceHit)
-          ).then(function (hits) {
+          Promise.all(value.hits.map(enhanceHit)).then(function(hits) {
             const totalHits = value.nbHits
             const totalPages = value.nbPages
 

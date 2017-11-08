@@ -114,5 +114,9 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "prettier": {
+    "semi": false,
+    "single-quote": true
   }
 }

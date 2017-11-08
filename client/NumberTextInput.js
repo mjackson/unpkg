@@ -24,12 +24,11 @@ class NumberTextInput extends React.Component {
     this.setState({ value: this.props.value })
   }
 
-  handleChange = (event) => {
+  handleChange = event => {
     const value = this.props.parseNumber(event.target.value)
 
     this.setState({ value }, () => {
-      if (this.props.onChange)
-        this.props.onChange(value)
+      if (this.props.onChange) this.props.onChange(value)
     })
   }
 
@@ -39,7 +38,12 @@ class NumberTextInput extends React.Component {
     const displayValue = formatNumber(value)
 
     return (
-      <input {...props} type="text" value={displayValue} onChange={this.handleChange}/>
+      <input
+        {...props}
+        type="text"
+        value={displayValue}
+        onChange={this.handleChange}
+      />
     )
   }
 }

@@ -10,7 +10,7 @@ function createCache(keyPrefix) {
   }
 
   function get(key, callback) {
-    db.get(createKey(key), function (error, value) {
+    db.get(createKey(key), function(error, value) {
       callback(error, value && JSON.parse(value))
     })
   }
