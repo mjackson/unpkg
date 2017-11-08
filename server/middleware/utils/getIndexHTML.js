@@ -8,7 +8,7 @@ const IndexPage = require('../components/IndexPage')
 const e = React.createElement
 
 function getEntries(dir) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     fs.readdir(dir, function(error, files) {
       if (error) {
         reject(error)
@@ -16,8 +16,8 @@ function getEntries(dir) {
         resolve(
           Promise.all(
             files.map(file => getFileStats(path.join(dir, file)))
-          ).then(function(statsArray) {
-            return statsArray.map(function(stats, index) {
+          ).then(statsArray => {
+            return statsArray.map((stats, index) => {
               return { file: files[index], stats }
             })
           })

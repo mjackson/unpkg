@@ -2,15 +2,15 @@ const searchIndex = require('./searchIndex')
 const getAssetPaths = require('./getAssetPaths')
 
 function enhanceHit(hit) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const assetPaths = getAssetPaths(hit.name, hit.version)
 
     if (assetPaths) {
       // TODO: Double check the package metadata to ensure the files
       // haven't moved from the paths in the index?
-      hit.assets = assetPaths.map(function(path) {
-        return `https://unpkg.com/${hit.name}@${hit.version}${path}`
-      })
+      hit.assets = assetPaths.map(
+        path => `https://unpkg.com/${hit.name}@${hit.version}${path}`
+      )
 
       resolve(hit)
     } else {
@@ -30,7 +30,7 @@ function concat(string) {
 }
 
 function search(query, page) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const hitsPerPage = 10
 
     const params = {
@@ -61,7 +61,7 @@ function search(query, page) {
         reject(error)
       } else {
         resolve(
-          Promise.all(value.hits.map(enhanceHit)).then(function(hits) {
+          Promise.all(value.hits.map(enhanceHit)).then(hits => {
             const totalHits = value.nbHits
             const totalPages = value.nbPages
 

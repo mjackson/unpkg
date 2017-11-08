@@ -37,7 +37,7 @@ const oneMinute = oneSecond * 60
 const oneHour = oneMinute * 60
 
 function computeCounters(stream) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const counters = {}
     const expireat = {}
 
@@ -113,11 +113,11 @@ function computeCounters(stream) {
 }
 
 function processLogs(stream) {
-  return computeCounters(stream).then(function({ counters, expireat }) {
-    Object.keys(counters).forEach(function(key) {
+  return computeCounters(stream).then(({ counters, expireat }) => {
+    Object.keys(counters).forEach(key => {
       const values = counters[key]
 
-      Object.keys(values).forEach(function(member) {
+      Object.keys(values).forEach(member => {
         db.zincrby(key, values[member], member)
       })
 
@@ -127,7 +127,7 @@ function processLogs(stream) {
 }
 
 function ingestLogs(zone, startSeconds, endSeconds) {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     console.log(
       'info: Started ingesting logs for %s from %s to %s',
       zone.name,
@@ -138,7 +138,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
     const startFetchTime = Date.now()
 
     resolve(
-      cf.getLogs(zone.id, startSeconds, endSeconds).then(function(stream) {
+      cf.getLogs(zone.id, startSeconds, endSeconds).then(stream => {
         const endFetchTime = Date.now()
 
         console.log(
@@ -150,7 +150,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
 
         const startProcessTime = Date.now()
 
-        return processLogs(stream).then(function() {
+        return processLogs(stream).then(() => {
           const endProcessTime = Date.now()
 
           console.log(
@@ -226,8 +226,8 @@ function startZone(zone) {
   takeATurn()
 }
 
-Promise.all(DomainNames.map(cf.getZones)).then(function(results) {
-  const zones = results.reduce(function(memo, zones) {
+Promise.all(DomainNames.map(cf.getZones)).then(results => {
+  const zones = results.reduce((memo, zones) => {
     return memo.concat(zones)
   })
 

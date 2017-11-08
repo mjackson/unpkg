@@ -26,7 +26,7 @@ function ignoreSymlinks(file, headers) {
 }
 
 function extractResponse(response, outputDir) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const extract = tar.extract(outputDir, {
       readable: true, // All dirs/files should be readable.
       map: stripNamePrefix,
@@ -44,12 +44,12 @@ function extractResponse(response, outputDir) {
 function fetchAndExtract(tarballURL, outputDir) {
   console.log(`info: Fetching ${tarballURL} and extracting to ${outputDir}`)
 
-  return fetch(tarballURL).then(function(response) {
+  return fetch(tarballURL).then(response => {
     return extractResponse(response, outputDir)
   })
 }
 
-const fetchMutex = createMutex(function(payload, callback) {
+const fetchMutex = createMutex((payload, callback) => {
   const { tarballURL, outputDir } = payload
 
   fs.access(outputDir, function(error) {
@@ -61,7 +61,7 @@ const fetchMutex = createMutex(function(payload, callback) {
           if (error) {
             callback(error)
           } else {
-            fetchAndExtract(tarballURL, outputDir).then(function() {
+            fetchAndExtract(tarballURL, outputDir).then(() => {
               callback()
             }, callback)
           }

@@ -19,7 +19,7 @@ function queryIsKnown(query) {
 function sanitizeQuery(query) {
   const saneQuery = {}
 
-  Object.keys(query).forEach(function(param) {
+  Object.keys(query).forEach(param => {
     if (isKnownQueryParam(param)) saneQuery[param] = query[param]
   })
 

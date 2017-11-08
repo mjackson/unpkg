@@ -13,7 +13,7 @@ function createMutex(doWork) {
       ]
 
       doWork(payload, function(error, value) {
-        mutex[key].forEach(function(callback) {
+        mutex[key].forEach(callback => {
           callback(error, value)
         })
       })

@@ -22,7 +22,7 @@ function fetchPackageInfo(packageName) {
     headers: {
       Accept: 'application/json'
     }
-  }).then(function(res) {
+  }).then(res => {
     return res.status === 404 ? null : res.json()
   })
 }
@@ -31,7 +31,7 @@ const PackageNotFound = 'PackageNotFound'
 
 // This mutex prevents multiple concurrent requests to
 // the registry for the same package info.
-const fetchMutex = createMutex(function(packageName, callback) {
+const fetchMutex = createMutex((packageName, callback) => {
   fetchPackageInfo(packageName).then(
     function(value) {
       if (value == null) {

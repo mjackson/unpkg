@@ -1,7 +1,7 @@
 function createSearch(query) {
   const params = []
 
-  Object.keys(query).forEach(function(param) {
+  Object.keys(query).forEach(param => {
     if (query[param] === '') {
       params.push(param) // Omit the trailing "=" from param=
     } else {

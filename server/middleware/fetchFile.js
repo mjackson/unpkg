@@ -20,7 +20,7 @@ const FindExtensions = ['', '.js', '.json']
  * depending on which one is available, similar to require('lib/file').
  */
 function findFile(base, useIndex, callback) {
-  FindExtensions.reduceRight(function(next, ext) {
+  FindExtensions.reduceRight((next, ext) => {
     const file = base + ext
 
     return function() {

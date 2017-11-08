@@ -3,14 +3,14 @@ const createServer = require('./createServer')
 
 describe('The server app', function() {
   let app
-  beforeEach(function() {
+  beforeEach(() => {
     app = createServer()
   })
 
   it('rejects invalid package names', function(done) {
     request(app)
       .get('/_invalid/index.js')
-      .then(function(res) {
+      .then(res => {
         expect(res.statusCode).toBe(403)
         done()
       })
@@ -19,7 +19,7 @@ describe('The server app', function() {
   it('redirects invalid query params', function(done) {
     request(app)
       .get('/react?main=index&invalid')
-      .then(function(res) {
+      .then(res => {
         expect(res.statusCode).toBe(302)
         expect(res.headers.location).toBe('/react?main=index')
         done()
@@ -29,7 +29,7 @@ describe('The server app', function() {
   it('redirects /_meta to ?meta', function(done) {
     request(app)
       .get('/_meta/react?main=index')
-      .then(function(res) {
+      .then(res => {
         expect(res.statusCode).toBe(302)
         expect(res.headers.location).toBe('/react?main=index&meta')
         done()

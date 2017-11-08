@@ -22,10 +22,10 @@ function get(path, headers) {
 
 function getJSON(path, headers) {
   return get(path, headers)
-    .then(function(res) {
+    .then(res => {
       return res.json()
     })
-    .then(function(data) {
+    .then(data => {
       if (!data.success) {
         console.error(`CloudflareAPI.getJSON failed at ${path}`)
         console.error(data)
@@ -38,11 +38,11 @@ function getJSON(path, headers) {
 
 function getZones(domains) {
   return Promise.all(
-    (Array.isArray(domains) ? domains : [domains]).map(function(domain) {
+    (Array.isArray(domains) ? domains : [domains]).map(domain => {
       return getJSON(`/zones?name=${domain}`)
     })
-  ).then(function(results) {
-    return results.reduce(function(memo, zones) {
+  ).then(results => {
+    return results.reduce((memo, zones) => {
       return memo.concat(zones)
     })
   })
@@ -64,14 +64,14 @@ function reduceResults(target, values) {
 
 function getZoneAnalyticsDashboard(zones, since, until) {
   return Promise.all(
-    (Array.isArray(zones) ? zones : [zones]).map(function(zone) {
+    (Array.isArray(zones) ? zones : [zones]).map(zone => {
       return getJSON(
         `/zones/${
           zone.id
         }/analytics/dashboard?since=${since.toISOString()}&until=${until.toISOString()}`
       )
     })
-  ).then(function(results) {
+  ).then(results => {
     return results.reduce(reduceResults)
   })
 }
@@ -82,10 +82,10 @@ function getJSONStream(path, headers) {
   })
 
   return get(path, acceptGzipHeaders)
-    .then(function(res) {
+    .then(res => {
       return res.body.pipe(gunzip())
     })
-    .then(function(stream) {
+    .then(stream => {
       return stream.pipe(ndjson.parse())
     })
 }
