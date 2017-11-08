@@ -2,28 +2,32 @@ const express = require('express')
 const subDays = require('date-fns/sub_days')
 const startOfDay = require('date-fns/start_of_day')
 const startOfSecond = require('date-fns/start_of_second')
-const StatsServer = require('./StatsServer')
+const StatsAPI = require('./StatsAPI')
 
 function serveArbitraryStats(req, res) {
   const now = startOfSecond(new Date())
   const since = req.query.since ? new Date(req.query.since) : subDays(now, 30)
   const until = req.query.until ? new Date(req.query.until) : now
 
-  if (isNaN(since.getTime()))
+  if (isNaN(since.getTime())) {
     return res.status(403).send({ error: '?since is not a valid date' })
+  }
 
-  if (isNaN(until.getTime()))
+  if (isNaN(until.getTime())) {
     return res.status(403).send({ error: '?until is not a valid date' })
+  }
 
-  if (until <= since)
+  if (until <= since) {
     return res
       .status(403)
       .send({ error: '?until date must come after ?since date' })
+  }
 
-  if (until > now)
+  if (until > now) {
     return res.status(403).send({ error: '?until must be a date in the past' })
+  }
 
-  StatsServer.getStats(since, until, function(error, stats) {
+  StatsAPI.getStats(since, until, (error, stats) => {
     if (error) {
       console.error(error)
       res.status(500).send({ error: 'Unable to fetch stats' })
@@ -42,7 +46,7 @@ function servePastDaysStats(days, req, res) {
   const until = startOfDay(new Date())
   const since = subDays(until, days)
 
-  StatsServer.getStats(since, until, function(error, stats) {
+  StatsAPI.getStats(since, until, (error, stats) => {
     if (error) {
       console.error(error)
       res.status(500).send({ error: 'Unable to fetch stats' })

@@ -3,9 +3,10 @@ const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
 const validateNPMPackageName = require('validate-npm-package-name')
 const parsePackageURL = require('./utils/parsePackageURL')
-const cf = require('./CloudflareAPI')
+const CloudflareAPI = require('./CloudflareAPI')
+const StatsAPI = require('./StatsAPI')
+
 const db = require('./RedisClient')
-const { createDayKey } = require('./StatsServer')
 
 /**
  * Domains we want to analyze.
@@ -55,7 +56,7 @@ function computeCounters(stream) {
         const nextDay = startOfDay(addDays(date, 1))
         const sevenDaysLater = getSeconds(addDays(nextDay, 7))
         const thirtyDaysLater = getSeconds(addDays(nextDay, 30))
-        const dayKey = createDayKey(date)
+        const dayKey = StatsAPI.createDayKey(date)
 
         const clientRequest = entry.clientRequest
         const edgeResponse = entry.edgeResponse
@@ -138,7 +139,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
     const startFetchTime = Date.now()
 
     resolve(
-      cf.getLogs(zone.id, startSeconds, endSeconds).then(stream => {
+      CloudflareAPI.getLogs(zone.id, startSeconds, endSeconds).then(stream => {
         const endFetchTime = Date.now()
 
         console.log(
@@ -226,7 +227,7 @@ function startZone(zone) {
   takeATurn()
 }
 
-Promise.all(DomainNames.map(cf.getZones)).then(results => {
+Promise.all(DomainNames.map(CloudflareAPI.getZones)).then(results => {
   const zones = results.reduce((memo, zones) => {
     return memo.concat(zones)
   })
