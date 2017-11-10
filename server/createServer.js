@@ -20,10 +20,12 @@ const PackageBlacklist = require('./PackageBlacklist').blacklist
 
 function errorHandler(err, req, res, next) {
   console.error(err.stack)
+
   res
     .status(500)
     .type('text')
     .send('Internal Server Error')
+
   next(err)
 }
 
@@ -54,8 +56,6 @@ function createServer() {
   )
 
   if (process.env.NODE_ENV !== 'test') {
-    const createSearchServer = require('./createSearchServer')
-    app.use('/_search', createSearchServer())
 
     const createStatsServer = require('./createStatsServer')
     app.use('/_stats', createStatsServer())
