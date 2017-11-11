@@ -1,4 +1,4 @@
-const validateNPMPackageName = require('validate-npm-package-name')
+const validateNpmPackageName = require('validate-npm-package-name')
 const parsePackageURL = require('../utils/parsePackageURL')
 const createSearch = require('./utils/createSearch')
 
@@ -29,7 +29,7 @@ function sanitizeQuery(query) {
 /**
  * Parse and validate the URL.
  */
-function packageURL(req, res, next) {
+function parseURL(req, res, next) {
   // Redirect /_meta/path to /path?meta.
   if (req.path.match(/^\/_meta\//)) {
     req.query.meta = ''
@@ -46,28 +46,30 @@ function packageURL(req, res, next) {
   // Redirect requests with unknown query params to their equivalents
   // with only known params so they can be served from the cache. This
   // prevents people using random query params designed to bust the cache.
-  if (!queryIsKnown(req.query))
+  if (!queryIsKnown(req.query)) {
     return res.redirect(302, req.path + createSearch(sanitizeQuery(req.query)))
+  }
 
   const url = parsePackageURL(req.url)
 
-  // Do not allow invalid URLs.
-  if (url == null)
+  // Disallow invalid URLs.
+  if (url == null) {
     return res
       .status(403)
       .type('text')
       .send(`Invalid URL: ${req.url}`)
+  }
 
-  const nameErrors = validateNPMPackageName(url.packageName).errors
+  const nameErrors = validateNpmPackageName(url.packageName).errors
 
-  // Do not allow invalid package names.
-  if (nameErrors)
+  // Disallow invalid package names.
+  if (nameErrors) {
+    const reason = nameErrors.join(', ')
     return res
       .status(403)
       .type('text')
-      .send(
-        `Invalid package name: ${url.packageName} (${nameErrors.join(', ')})`
-      )
+      .send(`Invalid package name "${url.packageName}" (${reason})`)
+  }
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion
@@ -80,4 +82,4 @@ function packageURL(req, res, next) {
   next()
 }
 
-module.exports = packageURL
+module.exports = parseURL

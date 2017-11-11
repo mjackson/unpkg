@@ -1,4 +1,4 @@
-const getFileContentType = require('./getFileContentType')
+const getFileContentType = require('../getFileContentType')
 
 it('gets a content type of text/plain for LICENSE|README|CHANGES|AUTHORS|Makefile', () => {
   expect(getFileContentType('AUTHORS')).toBe('text/plain')

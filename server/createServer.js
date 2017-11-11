@@ -1,22 +1,20 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
+const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 
 const checkBlacklist = require('./middleware/checkBlacklist')
-const packageURL = require('./middleware/packageURL')
 const fetchFile = require('./middleware/fetchFile')
+const parseURL = require('./middleware/parseURL')
+const requireAuth = require('./middleware/requireAuth')
 const serveFile = require('./middleware/serveFile')
+const userToken = require('./middleware/userToken')
 
 morgan.token('fwd', function(req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
 })
-
-/**
- * A list of packages we refuse to serve.
- */
-const PackageBlacklist = require('./PackageBlacklist').blacklist
 
 function errorHandler(err, req, res, next) {
   console.error(err.stack)
@@ -47,7 +45,6 @@ function createServer() {
   }
 
   app.use(errorHandler)
-  app.use(cors())
 
   app.use(
     express.static('build', {
@@ -55,19 +52,36 @@ function createServer() {
     })
   )
 
-  if (process.env.NODE_ENV !== 'test') {
+  app.use(cors())
+  app.use(bodyParser.json())
+  app.use(userToken)
 
-    const createStatsServer = require('./createStatsServer')
-    app.use('/_stats', createStatsServer())
+  app.get('/_publicKey', require('./actions/showPublicKey'))
+
+  app.post('/_auth', require('./actions/createAuth'))
+  app.get('/_auth', require('./actions/showAuth'))
+
+  app.post(
+    '/_blacklist',
+    requireAuth('blacklist.add'),
+    require('./actions/addToBlacklist')
+  )
+  app.get(
+    '/_blacklist',
+    requireAuth('blacklist.read'),
+    require('./actions/showBlacklist')
+  )
+  app.delete(
+    '/_blacklist/:packageName',
+    requireAuth('blacklist.remove'),
+    require('./actions/removeFromBlacklist')
+  )
+
+  if (process.env.NODE_ENV !== 'test') {
+    app.get('/_stats', require('./actions/showStats'))
   }
 
-  app.use(
-    '/',
-    packageURL,
-    checkBlacklist(PackageBlacklist),
-    fetchFile,
-    serveFile
-  )
+  app.use('/', parseURL, checkBlacklist, fetchFile, serveFile)
 
   return app
 }

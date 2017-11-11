@@ -1,14 +1,17 @@
-const cf = require('./CloudflareAPI')
 const db = require('./RedisClient')
-
-const PackageBlacklist = require('./PackageBlacklist').blacklist
+const CloudflareAPI = require('./CloudflareAPI')
+const BlacklistAPI = require('./BlacklistAPI')
 
 function prunePackages(packagesMap) {
-  PackageBlacklist.forEach(packageName => {
-    delete packagesMap[packageName]
-  })
-
-  return packagesMap
+  return Promise.all(
+    Object.keys(packagesMap).map(packageName =>
+      BlacklistAPI.isBlacklisted(packageName).then(blacklisted => {
+        if (blacklisted) {
+          delete packagesMap[packageName]
+        }
+      })
+    )
+  ).then(() => packagesMap)
 }
 
 function createDayKey(date) {
@@ -87,25 +90,25 @@ function sumMaps(maps) {
 }
 
 function addDailyMetrics(result) {
-  return Promise.all(result.timeseries.map(addDailyMetricsToTimeseries)).then(
-    () => {
-      result.totals.requests.package = sumMaps(
-        result.timeseries.map(timeseries => {
-          return timeseries.requests.package
-        })
-      )
+  return Promise.all(
+    result.timeseries.map(addDailyMetricsToTimeseries)
+  ).then(() => {
+    result.totals.requests.package = sumMaps(
+      result.timeseries.map(timeseries => {
+        return timeseries.requests.package
+      })
+    )
 
-      result.totals.bandwidth.package = sumMaps(
-        result.timeseries.map(timeseries => timeseries.bandwidth.package)
-      )
+    result.totals.bandwidth.package = sumMaps(
+      result.timeseries.map(timeseries => timeseries.bandwidth.package)
+    )
 
-      result.totals.requests.protocol = sumMaps(
-        result.timeseries.map(timeseries => timeseries.requests.protocol)
-      )
+    result.totals.requests.protocol = sumMaps(
+      result.timeseries.map(timeseries => timeseries.requests.protocol)
+    )
 
-      return result
-    }
-  )
+    return result
+  })
 }
 
 function extractPublicInfo(data) {
@@ -140,8 +143,12 @@ function extractPublicInfo(data) {
 const DomainNames = ['unpkg.com', 'npmcdn.com']
 
 function fetchStats(since, until) {
-  return cf.getZones(DomainNames).then(zones => {
-    return cf.getZoneAnalyticsDashboard(zones, since, until).then(dashboard => {
+  return CloudflareAPI.getZones(DomainNames).then(zones => {
+    return CloudflareAPI.getZoneAnalyticsDashboard(
+      zones,
+      since,
+      until
+    ).then(dashboard => {
       return {
         timeseries: dashboard.timeseries.map(extractPublicInfo),
         totals: extractPublicInfo(dashboard.totals)
@@ -154,14 +161,9 @@ const oneMinute = 1000 * 60
 const oneHour = oneMinute * 60
 const oneDay = oneHour * 24
 
-function getStats(since, until, callback) {
-  let promise = fetchStats(since, until)
-
-  if (until - since > oneDay) promise = promise.then(addDailyMetrics)
-
-  promise.then(value => {
-    callback(null, value)
-  }, callback)
+function getStats(since, until) {
+  const promise = fetchStats(since, until)
+  return until - since > oneDay ? promise.then(addDailyMetrics) : promise
 }
 
 module.exports = {
