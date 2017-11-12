@@ -5,7 +5,7 @@ const BlacklistAPI = require('./BlacklistAPI')
 function prunePackages(packagesMap) {
   return Promise.all(
     Object.keys(packagesMap).map(packageName =>
-      BlacklistAPI.isBlacklisted(packageName).then(blacklisted => {
+      BlacklistAPI.includesPackage(packageName).then(blacklisted => {
         if (blacklisted) {
           delete packagesMap[packageName]
         }

@@ -50,7 +50,7 @@ function getPackages() {
   })
 }
 
-function containsPackage(packageName) {
+function includesPackage(packageName) {
   return new Promise((resolve, reject) => {
     db.sismember(BlacklistSet, packageName, (error, value) => {
       if (error) {
@@ -67,5 +67,5 @@ module.exports = {
   removePackage,
   removeAllPackages,
   getPackages,
-  containsPackage
+  includesPackage
 }

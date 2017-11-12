@@ -1,7 +1,7 @@
 const BlacklistAPI = require('../BlacklistAPI')
 
 function checkBlacklist(req, res, next) {
-  BlacklistAPI.containsPackage(req.packageName).then(
+  BlacklistAPI.includesPackage(req.packageName).then(
     blacklisted => {
       // Disallow packages that have been blacklisted.
       if (blacklisted) {
