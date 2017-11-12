@@ -1,13 +1,13 @@
 const AuthAPI = require('../AuthAPI')
 
-const DefaultScopes = {
+const defaultScopes = {
   blacklist: {
     read: true
   }
 }
 
 function createAuth(req, res) {
-  AuthAPI.createToken(DefaultScopes).then(
+  AuthAPI.createToken(defaultScopes).then(
     token => {
       res.send({ token })
     },

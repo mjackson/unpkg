@@ -1,6 +1,10 @@
 const AuthAPI = require('../server/AuthAPI')
 
-const scopes = {}
+const scopes = {
+  blacklist: {
+    read: true
+  }
+}
 
 AuthAPI.createToken(scopes).then(
   token => {
