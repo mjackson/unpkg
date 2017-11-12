@@ -1,6 +1,4 @@
 language: node_js
-node_js:
-  - stable
 cache: yarn
 branches:
   only:
