@@ -73,7 +73,7 @@ function parseURL(req, res, next) {
 
   req.packageName = url.packageName
   req.packageVersion = url.packageVersion
-  req.packageSpec = `${req.packageName}@${req.packageVersion}`
+  req.packageSpec = `${url.packageName}@${url.packageVersion}`
   req.pathname = url.pathname
   req.filename = url.filename
   req.search = url.search
