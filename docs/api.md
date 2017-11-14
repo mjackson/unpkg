@@ -56,13 +56,22 @@ Example:
 
 ### GET /\_publicKey
 
-The [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) unpkg uses to encrypt authentication tokens, in plain text. You can also find the key [on GitHub](https://github.com/unpkg/unpkg/blob/master/public.key).
+The [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) unpkg uses to encrypt authentication tokens, as JSON. You can also find the key as plain text [on GitHub](https://github.com/unpkg/unpkg/blob/master/public.key).
 
 This can be useful to verify a token was issued by unpkg.
 
 Required scope: none
 
 Query parameters: none
+
+Example:
+
+```log
+> curl "https://unpkg.com/_publicKey"
+{
+  "publicKey": "..."
+}
+```
 
 # Blacklist
 
