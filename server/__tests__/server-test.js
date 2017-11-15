@@ -199,6 +199,19 @@ describe('The server', () => {
             })
         })
       })
+
+      it('can remove a scoped package from the blacklist', done => {
+        withToken({ blacklist: { remove: true } }, token => {
+          request(server)
+            .delete('/_blacklist/@scope/bad-package')
+            .send({ token })
+            .end((err, res) => {
+              expect(res.statusCode).toBe(200)
+              expect(res.body.ok).toBe(true)
+              done()
+            })
+        })
+      })
     })
   })
 })

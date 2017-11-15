@@ -2,17 +2,7 @@ const validateNpmPackageName = require('validate-npm-package-name')
 const BlacklistAPI = require('../BlacklistAPI')
 
 function removeFromBlacklist(req, res) {
-  const packageName = req.params.packageName
-
-  const nameErrors = validateNpmPackageName(packageName).errors
-
-  // Disallow invalid package names.
-  if (nameErrors) {
-    const reason = nameErrors.join(', ')
-    return res.status(403).send({
-      error: `Invalid package name "${packageName}" (${reason})`
-    })
-  }
+  const packageName = req.packageName
 
   BlacklistAPI.removePackage(packageName).then(
     removed => {
@@ -25,13 +15,14 @@ function removeFromBlacklist(req, res) {
 
       res.send({
         ok: true,
-        message: `Package "${packageName}" was ${removed
-          ? 'removed from'
-          : 'not in'} the blacklist`
+        message: `Package "${packageName}" was ${
+          removed ? 'removed from' : 'not in'
+        } the blacklist`
       })
     },
     error => {
       console.error(error)
+
       res.status(500).send({
         error: `Unable to remove "${packageName}" from the blacklist`
       })

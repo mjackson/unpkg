@@ -11,6 +11,7 @@ const parseURL = require('./middleware/parseURL')
 const requireAuth = require('./middleware/requireAuth')
 const serveFile = require('./middleware/serveFile')
 const userToken = require('./middleware/userToken')
+const validatePackageURL = require('./middleware/validatePackageURL')
 
 morgan.token('fwd', function(req) {
   return req.get('x-forwarded-for').replace(/\s/g, '')
@@ -25,6 +26,12 @@ function errorHandler(err, req, res, next) {
     .send('Internal Server Error')
 
   next(err)
+}
+
+function createRouter(setup) {
+  const app = express.Router()
+  setup(app)
+  return app
 }
 
 function createServer() {
@@ -61,20 +68,26 @@ function createServer() {
   app.post('/_auth', require('./actions/createAuth'))
   app.get('/_auth', require('./actions/showAuth'))
 
-  app.post(
+  app.use(
     '/_blacklist',
-    requireAuth('blacklist.add'),
-    require('./actions/addToBlacklist')
-  )
-  app.get(
-    '/_blacklist',
-    requireAuth('blacklist.read'),
-    require('./actions/showBlacklist')
-  )
-  app.delete(
-    '/_blacklist/:packageName',
-    requireAuth('blacklist.remove'),
-    require('./actions/removeFromBlacklist')
+    createRouter(app => {
+      app.post(
+        '/',
+        requireAuth('blacklist.add'),
+        require('./actions/addToBlacklist')
+      )
+      app.get(
+        '/',
+        requireAuth('blacklist.read'),
+        require('./actions/showBlacklist')
+      )
+      app.delete(
+        /.*/,
+        requireAuth('blacklist.remove'),
+        validatePackageURL,
+        require('./actions/removeFromBlacklist')
+      )
+    })
   )
 
   if (process.env.NODE_ENV !== 'test') {
