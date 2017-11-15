@@ -1,7 +1,6 @@
 const parseURL = require('url').parse
 const startOfDay = require('date-fns/start_of_day')
 const addDays = require('date-fns/add_days')
-const validateNPMPackageName = require('validate-npm-package-name')
 const parsePackageURL = require('./utils/parsePackageURL')
 const CloudflareAPI = require('./CloudflareAPI')
 const StatsAPI = require('./StatsAPI')
@@ -67,10 +66,7 @@ function computeCounters(stream) {
           const url = parsePackageURL(parseURL(clientRequest.uri).pathname)
           const packageName = url && url.packageName
 
-          if (
-            packageName &&
-            validateNPMPackageName(packageName).errors == null
-          ) {
+          if (packageName) {
             incr(
               `stats-packageRequests-${dayKey}`,
               packageName,

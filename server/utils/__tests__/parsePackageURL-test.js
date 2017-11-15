@@ -80,5 +80,6 @@ describe('parsePackageURL', () => {
 
   it('returns null for invalid pathnames', () => {
     expect(parsePackageURL('history')).toBe(null)
+    expect(parsePackageURL('/.invalid')).toBe(null)
   })
 })

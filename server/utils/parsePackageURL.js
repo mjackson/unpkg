@@ -1,4 +1,5 @@
 const url = require('url')
+const validatePackageName = require('./validatePackageName')
 
 const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
 
@@ -19,9 +20,14 @@ function parsePackageURL(packageURL) {
 
   const match = URLFormat.exec(pathname)
 
+  // Disallow invalid URL formats.
   if (match == null) return null
 
   const packageName = match[1]
+
+  // Disallow invalid npm package names.
+  if (!validatePackageName(packageName)) return null
+
   const packageVersion = decodeParam(match[2]) || 'latest'
   const filename = decodeParam(match[3])
 
