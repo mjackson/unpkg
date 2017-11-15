@@ -65,8 +65,13 @@ function createServer() {
 
   app.get('/_publicKey', require('./actions/showPublicKey'))
 
-  app.post('/_auth', require('./actions/createAuth'))
-  app.get('/_auth', require('./actions/showAuth'))
+  app.use(
+    '/_auth',
+    createRouter(app => {
+      app.post('/', require('./actions/createAuth'))
+      app.get('/', require('./actions/showAuth'))
+    })
+  )
 
   app.use(
     '/_blacklist',
