@@ -1,5 +1,6 @@
 const request = require('supertest')
 const createServer = require('../createServer')
+const clearBlacklist = require('./utils/clearBlacklist')
 const withBlacklist = require('./utils/withBlacklist')
 const withRevokedToken = require('./utils/withRevokedToken')
 const withToken = require('./utils/withToken')
@@ -115,6 +116,8 @@ describe('The server', () => {
   })
 
   describe('POST /_blacklist', () => {
+    afterEach(clearBlacklist)
+
     describe('with no auth', () => {
       it('is forbidden', done => {
         request(server)
