@@ -5,6 +5,7 @@ const createPackageURL = require('../utils/createPackageURL')
 const createSearch = require('./utils/createSearch')
 const getPackageInfo = require('./utils/getPackageInfo')
 const getPackage = require('./utils/getPackage')
+const incrementCounter = require('./utils/incrementCounter')
 
 function getBasename(file) {
   return path.basename(file, path.extname(file))
@@ -118,6 +119,15 @@ function fetchFile(req, res, next) {
           } else if (typeof req.packageConfig.browser === 'string') {
             // Fall back to the "browser" field if declared (only support strings).
             filename = req.packageConfig.browser
+
+            // Count which packages + versions are actually using this fallback
+            // so we can warn them when we deprecate this functionality.
+            // See https://github.com/unpkg/unpkg/issues/63
+            incrementCounter(
+              'package-json-browser-fallback',
+              req.packageSpec,
+              1
+            )
           } else {
             // Fall back to "main" or / (same as npm).
             filename = req.packageConfig.main || '/'
