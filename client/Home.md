@@ -14,8 +14,9 @@ You may also use a [semver range](https://docs.npmjs.com/misc/semver) or a [tag]
   * [unpkg.com/react@^16/umd/react.production.min.js](/react@^16/umd/react.production.min.js)
   * [unpkg.com/react/umd/react.production.min.js](/react/umd/react.production.min.js)
 
-If you omit the file path, unpkg will serve the package's "main" file.
+If you omit the file path (i.e. use a "bare" URL), unpkg will serve the file specified by the `unpkg` field in `package.json`, or fall back to `main`.
 
+  * [unpkg.com/d3](/d3)
   * [unpkg.com/jquery](/jquery)
   * [unpkg.com/three](/three)
 
@@ -27,9 +28,6 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
 ### Query Parameters
 
 <dl>
-  <dt>`?main=:mainField`</dt>
-  <dd>The name of the field in [package.json](https://docs.npmjs.com/files/package.json) to use as the main entry point when there is no file path in the URL. Defaults to using `unpkg`, [`browser`](https://github.com/defunctzombie/package-browser-field-spec), and then [`main`](https://docs.npmjs.com/files/package.json#main).</dd>
-
   <dt>`?meta`</dt>
   <dd>Return metadata about any file in a package as JSON (e.g. `/any/file?meta`)</dd>
 
