@@ -112,6 +112,12 @@ function fetchFile(req, res, next) {
           ) {
             // They specified a custom ?main field.
             filename = req.packageConfig[req.query.main]
+
+            incrementCounter(
+              'package-json-custom-main',
+              req.packageSpec + '?main=' + req.query.main,
+              1
+            )
           } else if (typeof req.packageConfig.unpkg === 'string') {
             // The "unpkg" field allows packages to explicitly declare the
             // file to serve at the bare URL (see #59).
