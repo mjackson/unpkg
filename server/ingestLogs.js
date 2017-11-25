@@ -1,17 +1,17 @@
-const parseURL = require('url').parse
-const startOfDay = require('date-fns/start_of_day')
-const addDays = require('date-fns/add_days')
-const parsePackageURL = require('./utils/parsePackageURL')
-const CloudflareAPI = require('./CloudflareAPI')
-const StatsAPI = require('./StatsAPI')
+const parseURL = require("url").parse
+const startOfDay = require("date-fns/start_of_day")
+const addDays = require("date-fns/add_days")
+const parsePackageURL = require("./utils/parsePackageURL")
+const CloudflareAPI = require("./CloudflareAPI")
+const StatsAPI = require("./StatsAPI")
 
-const db = require('./RedisClient')
+const db = require("./RedisClient")
 
 /**
  * Domains we want to analyze.
  */
 const DomainNames = [
-  'unpkg.com'
+  "unpkg.com"
   //'npmcdn.com' // We don't have log data on npmcdn.com yet :/
 ]
 
@@ -48,8 +48,8 @@ function computeCounters(stream) {
     }
 
     stream
-      .on('error', reject)
-      .on('data', function(entry) {
+      .on("error", reject)
+      .on("data", function(entry) {
         const date = new Date(Math.round(entry.timestamp / 1000000))
 
         const nextDay = startOfDay(addDays(date, 1))
@@ -67,26 +67,15 @@ function computeCounters(stream) {
           const packageName = url && url.packageName
 
           if (packageName) {
-            incr(
-              `stats-packageRequests-${dayKey}`,
-              packageName,
-              1,
-              thirtyDaysLater
-            )
-            incr(
-              `stats-packageBytes-${dayKey}`,
-              packageName,
-              edgeResponse.bytes,
-              thirtyDaysLater
-            )
+            incr(`stats-packageRequests-${dayKey}`, packageName, 1, thirtyDaysLater)
+            incr(`stats-packageBytes-${dayKey}`, packageName, edgeResponse.bytes, thirtyDaysLater)
           }
         }
 
         // Q: How many requests per day do we receive via a protocol?
         const protocol = clientRequest.httpProtocol
 
-        if (protocol)
-          incr(`stats-protocolRequests-${dayKey}`, protocol, 1, thirtyDaysLater)
+        if (protocol) incr(`stats-protocolRequests-${dayKey}`, protocol, 1, thirtyDaysLater)
 
         // Q: How many requests do we receive from a hostname per day?
         // Q: How many bytes do we serve to a hostname per day?
@@ -95,15 +84,10 @@ function computeCounters(stream) {
 
         if (hostname) {
           incr(`stats-hostnameRequests-${dayKey}`, hostname, 1, sevenDaysLater)
-          incr(
-            `stats-hostnameBytes-${dayKey}`,
-            hostname,
-            edgeResponse.bytes,
-            sevenDaysLater
-          )
+          incr(`stats-hostnameBytes-${dayKey}`, hostname, edgeResponse.bytes, sevenDaysLater)
         }
       })
-      .on('end', function() {
+      .on("end", function() {
         resolve({ counters, expireat })
       })
   })
@@ -126,7 +110,7 @@ function processLogs(stream) {
 function ingestLogs(zone, startSeconds, endSeconds) {
   return new Promise(resolve => {
     console.log(
-      'info: Started ingesting logs for %s from %s to %s',
+      "info: Started ingesting logs for %s from %s to %s",
       zone.name,
       stringifySeconds(startSeconds),
       stringifySeconds(endSeconds)
@@ -139,7 +123,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
         const endFetchTime = Date.now()
 
         console.log(
-          'info: Fetched %ds worth of logs for %s in %dms',
+          "info: Fetched %ds worth of logs for %s in %dms",
           endSeconds - startSeconds,
           zone.name,
           endFetchTime - startFetchTime
@@ -151,7 +135,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
           const endProcessTime = Date.now()
 
           console.log(
-            'info: Processed %ds worth of logs for %s in %dms',
+            "info: Processed %ds worth of logs for %s in %dms",
             endSeconds - startSeconds,
             zone.name,
             endProcessTime - startProcessTime
@@ -163,10 +147,7 @@ function ingestLogs(zone, startSeconds, endSeconds) {
 }
 
 function startZone(zone) {
-  const startSecondsKey = `ingestLogsWorker-nextStartSeconds-${zone.name.replace(
-    '.',
-    '-'
-  )}`
+  const startSecondsKey = `ingestLogsWorker-nextStartSeconds-${zone.name.replace(".", "-")}`
 
   function takeATurn() {
     db.get(startSecondsKey, function(error, value) {
@@ -182,7 +163,7 @@ function startZone(zone) {
         startSeconds = minSeconds
       } else if (startSeconds < minSeconds) {
         console.warn(
-          'warning: Dropped logs for %s from %s to %s!',
+          "warning: Dropped logs for %s from %s to %s!",
           zone.name,
           stringifySeconds(startSeconds),
           stringifySeconds(minSeconds)

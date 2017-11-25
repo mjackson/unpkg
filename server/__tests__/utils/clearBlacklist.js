@@ -1,4 +1,4 @@
-const BlacklistAPI = require('../../BlacklistAPI')
+const BlacklistAPI = require("../../BlacklistAPI")
 
 function clearBlacklist(done) {
   BlacklistAPI.removeAllPackages().then(done, done)

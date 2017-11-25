@@ -1,8 +1,8 @@
-const db = require('../../RedisClient')
+const db = require("../../RedisClient")
 
 function createCache(keyPrefix) {
   function createKey(key) {
-    return keyPrefix + '-' + key
+    return keyPrefix + "-" + key
   }
 
   function set(key, value, expiry, callback) {

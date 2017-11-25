@@ -1,11 +1,11 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Motion, spring } from 'react-motion'
-import { Switch, Route, Link, withRouter } from 'react-router-dom'
-import WindowSize from './WindowSize'
-import About from './About'
-import Stats from './Stats'
-import Home from './Home'
+import React from "react"
+import PropTypes from "prop-types"
+import { Motion, spring } from "react-motion"
+import { Switch, Route, Link, withRouter } from "react-router-dom"
+import WindowSize from "./WindowSize"
+import About from "./About"
+import Stats from "./Stats"
+import Home from "./Home"
 
 class Layout extends React.Component {
   static propTypes = {
@@ -23,18 +23,18 @@ class Layout extends React.Component {
   adjustUnderline = (useSpring = false) => {
     let itemIndex
     switch (this.props.location.pathname) {
-      case '/stats':
+      case "/stats":
         itemIndex = 1
         break
-      case '/about':
+      case "/about":
         itemIndex = 2
         break
-      case '/':
+      case "/":
       default:
         itemIndex = 0
     }
 
-    const itemNodes = this.listNode.querySelectorAll('li')
+    const itemNodes = this.listNode.querySelectorAll("li")
     const currentNode = itemNodes[itemIndex]
 
     this.setState({
@@ -47,7 +47,7 @@ class Layout extends React.Component {
   componentDidMount() {
     this.adjustUnderline()
 
-    fetch('/_stats?period=last-month')
+    fetch("/_stats?period=last-month")
       .then(res => res.json())
       .then(stats => this.setState({ stats }))
 
@@ -63,17 +63,14 @@ class Layout extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.location.pathname !== this.props.location.pathname)
-      this.adjustUnderline(true)
+    if (prevProps.location.pathname !== this.props.location.pathname) this.adjustUnderline(true)
   }
 
   render() {
     const { underlineLeft, underlineWidth, useSpring } = this.state
 
     const style = {
-      left: useSpring
-        ? spring(underlineLeft, { stiffness: 220 })
-        : underlineLeft,
+      left: useSpring ? spring(underlineLeft, { stiffness: 220 }) : underlineLeft,
       width: useSpring ? spring(underlineWidth) : underlineWidth
     }
 
@@ -84,10 +81,7 @@ class Layout extends React.Component {
           <header>
             <h1 className="layout-title">unpkg</h1>
             <nav className="layout-nav">
-              <ol
-                className="layout-nav-list"
-                ref={node => (this.listNode = node)}
-              >
+              <ol className="layout-nav-list" ref={node => (this.listNode = node)}>
                 <li>
                   <Link to="/">Home</Link>
                 </li>
@@ -117,10 +111,7 @@ class Layout extends React.Component {
         </div>
 
         <Switch>
-          <Route
-            path="/stats"
-            render={() => <Stats data={this.state.stats} />}
-          />
+          <Route path="/stats" render={() => <Stats data={this.state.stats} />} />
           <Route path="/about" component={About} />
           <Route path="/" component={Home} />
         </Switch>

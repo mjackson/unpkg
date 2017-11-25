@@ -1,23 +1,19 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import formatBytes from 'pretty-bytes'
-import formatDate from 'date-fns/format'
-import parseDate from 'date-fns/parse'
-import formatNumber from './utils/formatNumber'
-import formatPercent from './utils/formatPercent'
+import React from "react"
+import PropTypes from "prop-types"
+import formatBytes from "pretty-bytes"
+import formatDate from "date-fns/format"
+import parseDate from "date-fns/parse"
+import formatNumber from "./utils/formatNumber"
+import formatPercent from "./utils/formatPercent"
 
-import { continents, countries } from 'countries-list'
+import { continents, countries } from "countries-list"
 
 const getCountriesByContinent = continent =>
-  Object.keys(countries).filter(
-    country => countries[country].continent === continent
-  )
+  Object.keys(countries).filter(country => countries[country].continent === continent)
 
-const sumKeyValues = (hash, keys) =>
-  keys.reduce((n, key) => n + (hash[key] || 0), 0)
+const sumKeyValues = (hash, keys) => keys.reduce((n, key) => n + (hash[key] || 0), 0)
 
-const sumValues = hash =>
-  Object.keys(hash).reduce((memo, key) => memo + hash[key], 0)
+const sumValues = hash => Object.keys(hash).reduce((memo, key) => memo + hash[key], 0)
 
 class Stats extends React.Component {
   static propTypes = {
@@ -63,15 +59,11 @@ class Stats extends React.Component {
                 </a>
               </td>
               <td>
-                {formatNumber(requests)} ({formatPercent(
-                  requests / totals.requests.all
-                )}%)
+                {formatNumber(requests)} ({formatPercent(requests / totals.requests.all)}%)
               </td>
               {bandwidth ? (
                 <td>
-                  {formatBytes(bandwidth)} ({formatPercent(
-                    bandwidth / totals.bandwidth.all
-                  )}%)
+                  {formatBytes(bandwidth)} ({formatPercent(bandwidth / totals.bandwidth.all)}%)
                 </td>
               ) : (
                 <td>-</td>
@@ -104,10 +96,7 @@ class Stats extends React.Component {
       const continentName = continents[continent]
       const continentData = continentsData[continent]
 
-      if (
-        continentData.requests > this.state.minCountryRequests &&
-        continentData.bandwidth !== 0
-      ) {
+      if (continentData.requests > this.state.minCountryRequests && continentData.bandwidth !== 0) {
         regionRows.push(
           <tr key={continent} className="continent-row">
             <td>{continentName}</td>
@@ -176,29 +165,26 @@ class Stats extends React.Component {
     return (
       <div className="wrapper">
         <p>
-          From <strong>{formatDate(since, 'MMM D')}</strong> to{' '}
-          <strong>{formatDate(until, 'MMM D')}</strong> unpkg served{' '}
-          <strong>{formatNumber(totals.requests.all)}</strong> requests and a
-          total of <strong>{formatBytes(totals.bandwidth.all)}</strong> of data
-          to <strong>{formatNumber(totals.uniques.all)}</strong> unique
-          visitors,{' '}
-          <strong>
-            {formatPercent(totals.requests.cached / totals.requests.all, 0)}%
-          </strong>{' '}
-          of which were served from the cache.
+          From <strong>{formatDate(since, "MMM D")}</strong> to{" "}
+          <strong>{formatDate(until, "MMM D")}</strong> unpkg served{" "}
+          <strong>{formatNumber(totals.requests.all)}</strong> requests and a total of{" "}
+          <strong>{formatBytes(totals.bandwidth.all)}</strong> of data to{" "}
+          <strong>{formatNumber(totals.uniques.all)}</strong> unique visitors,{" "}
+          <strong>{formatPercent(totals.requests.cached / totals.requests.all, 0)}%</strong> of
+          which were served from the cache.
         </p>
 
         <h3>Packages</h3>
 
         <p>
-          The table below shows the most popular packages served by unpkg from{' '}
-          <strong>{formatDate(since, 'MMM D')}</strong> to{' '}
-          <strong>{formatDate(until, 'MMM D')}</strong>. Only the top{' '}
+          The table below shows the most popular packages served by unpkg from{" "}
+          <strong>{formatDate(since, "MMM D")}</strong> to{" "}
+          <strong>{formatDate(until, "MMM D")}</strong>. Only the top{" "}
           {Object.keys(totals.requests.package).length} packages are shown.
         </p>
 
         <p className="table-filter">
-          Include only packages that received at least{' '}
+          Include only packages that received at least{" "}
           <select
             value={this.state.minPackageRequests}
             onChange={event =>
@@ -213,11 +199,11 @@ class Stats extends React.Component {
             <option value="100000">100,000</option>
             <option value="1000000">1,000,000</option>
             <option value="10000000">10,000,000</option>
-          </select>{' '}
+          </select>{" "}
           requests.
         </p>
 
-        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
+        <table cellSpacing="0" cellPadding="0" style={{ width: "100%" }}>
           <thead>
             <tr>
               <th>Package</th>
@@ -231,13 +217,13 @@ class Stats extends React.Component {
         <h3>Regions</h3>
 
         <p>
-          The table below breaks down requests to unpkg from{' '}
-          <strong>{formatDate(since, 'MMM D')}</strong> to{' '}
-          <strong>{formatDate(until, 'MMM D')}</strong> by geographic region.
+          The table below breaks down requests to unpkg from{" "}
+          <strong>{formatDate(since, "MMM D")}</strong> to{" "}
+          <strong>{formatDate(until, "MMM D")}</strong> by geographic region.
         </p>
 
         <p className="table-filter">
-          Include only countries that made at least{' '}
+          Include only countries that made at least{" "}
           <select
             value={this.state.minCountryRequests}
             onChange={event =>
@@ -251,16 +237,11 @@ class Stats extends React.Component {
             <option value="1000000">1,000,000</option>
             <option value="10000000">10,000,000</option>
             <option value="100000000">100,000,000</option>
-          </select>{' '}
+          </select>{" "}
           requests.
         </p>
 
-        <table
-          cellSpacing="0"
-          cellPadding="0"
-          style={{ width: '100%' }}
-          className="regions-table"
-        >
+        <table cellSpacing="0" cellPadding="0" style={{ width: "100%" }} className="regions-table">
           <thead>
             <tr>
               <th>Region</th>
@@ -274,12 +255,12 @@ class Stats extends React.Component {
         <h3>Protocols</h3>
 
         <p>
-          The table below breaks down requests to unpkg from{' '}
-          <strong>{formatDate(since, 'MMM D')}</strong> to{' '}
-          <strong>{formatDate(until, 'MMM D')}</strong> by HTTP protocol.
+          The table below breaks down requests to unpkg from{" "}
+          <strong>{formatDate(since, "MMM D")}</strong> to{" "}
+          <strong>{formatDate(until, "MMM D")}</strong> by HTTP protocol.
         </p>
 
-        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
+        <table cellSpacing="0" cellPadding="0" style={{ width: "100%" }}>
           <thead>
             <tr>
               <th>Protocol</th>

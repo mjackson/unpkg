@@ -1,16 +1,16 @@
-require('isomorphic-fetch')
-const createCache = require('./createCache')
-const createMutex = require('./createMutex')
+require("isomorphic-fetch")
+const createCache = require("./createCache")
+const createMutex = require("./createMutex")
 
-const RegistryURL = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org'
+const RegistryURL = process.env.NPM_REGISTRY_URL || "https://registry.npmjs.org"
 
-const PackageInfoCache = createCache('packageInfo')
+const PackageInfoCache = createCache("packageInfo")
 
 function fetchPackageInfo(packageName) {
   console.log(`info: Fetching package info for ${packageName}`)
 
   let encodedPackageName
-  if (packageName.charAt(0) === '@') {
+  if (packageName.charAt(0) === "@") {
     encodedPackageName = `@${encodeURIComponent(packageName.substring(1))}`
   } else {
     encodedPackageName = encodeURIComponent(packageName)
@@ -20,14 +20,14 @@ function fetchPackageInfo(packageName) {
 
   return fetch(url, {
     headers: {
-      Accept: 'application/json'
+      Accept: "application/json"
     }
   }).then(res => {
     return res.status === 404 ? null : res.json()
   })
 }
 
-const PackageNotFound = 'PackageNotFound'
+const PackageNotFound = "PackageNotFound"
 
 // This mutex prevents multiple concurrent requests to
 // the registry for the same package info.

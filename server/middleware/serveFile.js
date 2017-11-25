@@ -1,11 +1,11 @@
-const fs = require('fs')
-const path = require('path')
-const etag = require('etag')
-const babel = require('babel-core')
-const unpkgRewrite = require('babel-plugin-unpkg-rewrite')
-const getMetadata = require('./utils/getMetadata')
-const getFileContentType = require('./utils/getFileContentType')
-const getIndexHTML = require('./utils/getIndexHTML')
+const fs = require("fs")
+const path = require("path")
+const etag = require("etag")
+const babel = require("babel-core")
+const unpkgRewrite = require("babel-plugin-unpkg-rewrite")
+const getMetadata = require("./utils/getMetadata")
+const getFileContentType = require("./utils/getFileContentType")
+const getIndexHTML = require("./utils/getIndexHTML")
 
 /**
  * Automatically generate HTML pages that show package contents.
@@ -35,24 +35,19 @@ const FileTransforms = {
 function serveFile(req, res, next) {
   if (req.query.meta != null) {
     // Serve JSON metadata.
-    getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, function(
-      error,
-      metadata
-    ) {
+    getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, function(error, metadata) {
       if (error) {
         console.error(error)
         res
           .status(500)
-          .type('text')
-          .send(
-            `Cannot generate metadata for ${req.packageSpec}${req.filename}`
-          )
+          .type("text")
+          .send(`Cannot generate metadata for ${req.packageSpec}${req.filename}`)
       } else {
         // Cache metadata for 1 year.
         res
           .set({
-            'Cache-Control': 'public, max-age=31536000',
-            'Cache-Tag': 'meta'
+            "Cache-Control": "public, max-age=31536000",
+            "Cache-Tag": "meta"
           })
           .send(metadata)
       }
@@ -63,9 +58,9 @@ function serveFile(req, res, next) {
 
     let contentType = getFileContentType(file)
 
-    if (contentType === 'text/html') contentType = 'text/plain' // We can't serve HTML because bad people :(
+    if (contentType === "text/html") contentType = "text/plain" // We can't serve HTML because bad people :(
 
-    if (contentType === 'application/javascript' && req.query.module != null) {
+    if (contentType === "application/javascript" && req.query.module != null) {
       // Serve a JavaScript module.
       const dependencies = Object.assign(
         {},
@@ -78,33 +73,29 @@ function serveFile(req, res, next) {
           console.error(error)
           const debugInfo =
             error.constructor.name +
-            ': ' +
+            ": " +
             error.message.replace(/^.*?\/unpkg-.+?\//, `/${req.packageSpec}/`) +
-            '\n\n' +
+            "\n\n" +
             error.codeFrame
           res
             .status(500)
-            .type('text')
-            .send(
-              `Cannot generate module for ${req.packageSpec}${
-                req.filename
-              }\n\n${debugInfo}`
-            )
+            .type("text")
+            .send(`Cannot generate module for ${req.packageSpec}${req.filename}\n\n${debugInfo}`)
         } else {
           // Cache modules for 1 year.
           res
             .set({
-              'Content-Type': contentType,
-              'Content-Length': Buffer.byteLength(code),
-              'Cache-Control': 'public, max-age=31536000',
-              'Cache-Tag': 'file,js-file,js-module'
+              "Content-Type": contentType,
+              "Content-Length": Buffer.byteLength(code),
+              "Cache-Control": "public, max-age=31536000",
+              "Cache-Tag": "file,js-file,js-module"
             })
             .send(code)
         }
       })
     } else {
       // Serve some other static file.
-      const tags = ['file']
+      const tags = ["file"]
 
       const ext = path.extname(req.filename).substr(1)
 
@@ -112,17 +103,17 @@ function serveFile(req, res, next) {
 
       // Cache files for 1 year.
       res.set({
-        'Content-Type': contentType,
-        'Content-Length': req.stats.size,
-        'Cache-Control': 'public, max-age=31536000',
-        'Last-Modified': req.stats.mtime.toUTCString(),
+        "Content-Type": contentType,
+        "Content-Length": req.stats.size,
+        "Cache-Control": "public, max-age=31536000",
+        "Last-Modified": req.stats.mtime.toUTCString(),
         ETag: etag(req.stats),
-        'Cache-Tag': tags.join(',')
+        "Cache-Tag": tags.join(",")
       })
 
       const stream = fs.createReadStream(file)
 
-      stream.on('error', function(error) {
+      stream.on("error", function(error) {
         console.error(`Cannot send file ${req.packageSpec}${req.filename}`)
         console.error(error)
         res.sendStatus(500)
@@ -132,35 +123,30 @@ function serveFile(req, res, next) {
     }
   } else if (AutoIndex && req.stats.isDirectory()) {
     // Serve an HTML directory listing.
-    getIndexHTML(
-      req.packageInfo,
-      req.packageVersion,
-      req.packageDir,
-      req.filename,
-      function(error, html) {
-        if (error) {
-          console.error(error)
-          res
-            .status(500)
-            .type('text')
-            .send(
-              `Cannot generate index page for ${req.packageSpec}${req.filename}`
-            )
-        } else {
-          // Cache HTML directory listings for 1 minute.
-          res
-            .set({
-              'Cache-Control': 'public, max-age=60',
-              'Cache-Tag': 'index'
-            })
-            .send(html)
-        }
+    getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.filename, function(
+      error,
+      html
+    ) {
+      if (error) {
+        console.error(error)
+        res
+          .status(500)
+          .type("text")
+          .send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
+      } else {
+        // Cache HTML directory listings for 1 minute.
+        res
+          .set({
+            "Cache-Control": "public, max-age=60",
+            "Cache-Tag": "index"
+          })
+          .send(html)
       }
-    )
+    })
   } else {
     res
       .status(403)
-      .type('text')
+      .type("text")
       .send(`Cannot serve ${req.packageSpec}${req.filename}; it's not a file`)
   }
 }

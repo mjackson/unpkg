@@ -1,9 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-const React = require('react')
-const ReactDOMServer = require('react-dom/server')
-const getFileStats = require('./getFileStats')
-const IndexPage = require('../components/IndexPage')
+const fs = require("fs")
+const path = require("path")
+const React = require("react")
+const ReactDOMServer = require("react-dom/server")
+const getFileStats = require("./getFileStats")
+const IndexPage = require("../components/IndexPage")
 
 const e = React.createElement
 
@@ -14,9 +14,7 @@ function getEntries(dir) {
         reject(error)
       } else {
         resolve(
-          Promise.all(
-            files.map(file => getFileStats(path.join(dir, file)))
-          ).then(statsArray => {
+          Promise.all(files.map(file => getFileStats(path.join(dir, file)))).then(statsArray => {
             return statsArray.map((stats, index) => {
               return { file: files[index], stats }
             })
@@ -27,7 +25,7 @@ function getEntries(dir) {
   })
 }
 
-const DOCTYPE = '<!DOCTYPE html>'
+const DOCTYPE = "<!DOCTYPE html>"
 
 function createHTML(props) {
   return DOCTYPE + ReactDOMServer.renderToStaticMarkup(e(IndexPage, props))

@@ -122,7 +122,7 @@
     "extends": "react-app"
   },
   "prettier": {
-    "semi": false,
-    "singleQuote": true
+    "printWidth": 100,
+    "semi": false
   }
 }

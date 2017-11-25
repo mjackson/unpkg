@@ -1,6 +1,6 @@
-const db = require('./RedisClient')
-const CloudflareAPI = require('./CloudflareAPI')
-const BlacklistAPI = require('./BlacklistAPI')
+const db = require("./RedisClient")
+const CloudflareAPI = require("./CloudflareAPI")
+const BlacklistAPI = require("./BlacklistAPI")
 
 function prunePackages(packagesMap) {
   return Promise.all(
@@ -38,7 +38,7 @@ function createScoresMap(array) {
 
 function getScoresMap(key, n = 100) {
   return new Promise((resolve, reject) => {
-    db.zrevrange(key, 0, n, 'withscores', (error, value) => {
+    db.zrevrange(key, 0, n, "withscores", (error, value) => {
       if (error) {
         reject(error)
       } else {
@@ -49,15 +49,11 @@ function getScoresMap(key, n = 100) {
 }
 
 function getPackageRequests(date, n = 100) {
-  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n).then(
-    prunePackages
-  )
+  return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n).then(prunePackages)
 }
 
 function getPackageBandwidth(date, n = 100) {
-  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n).then(
-    prunePackages
-  )
+  return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n).then(prunePackages)
 }
 
 function getProtocolRequests(date) {
@@ -90,9 +86,7 @@ function sumMaps(maps) {
 }
 
 function addDailyMetrics(result) {
-  return Promise.all(
-    result.timeseries.map(addDailyMetricsToTimeseries)
-  ).then(() => {
+  return Promise.all(result.timeseries.map(addDailyMetricsToTimeseries)).then(() => {
     result.totals.requests.package = sumMaps(
       result.timeseries.map(timeseries => {
         return timeseries.requests.package
@@ -140,15 +134,11 @@ function extractPublicInfo(data) {
   }
 }
 
-const DomainNames = ['unpkg.com', 'npmcdn.com']
+const DomainNames = ["unpkg.com", "npmcdn.com"]
 
 function fetchStats(since, until) {
   return CloudflareAPI.getZones(DomainNames).then(zones => {
-    return CloudflareAPI.getZoneAnalyticsDashboard(
-      zones,
-      since,
-      until
-    ).then(dashboard => {
+    return CloudflareAPI.getZoneAnalyticsDashboard(zones, since, until).then(dashboard => {
       return {
         timeseries: dashboard.timeseries.map(extractPublicInfo),
         totals: extractPublicInfo(dashboard.totals)

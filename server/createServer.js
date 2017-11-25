@@ -1,20 +1,20 @@
-const fs = require('fs')
-const path = require('path')
-const express = require('express')
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const morgan = require('morgan')
+const fs = require("fs")
+const path = require("path")
+const express = require("express")
+const bodyParser = require("body-parser")
+const cors = require("cors")
+const morgan = require("morgan")
 
-const checkBlacklist = require('./middleware/checkBlacklist')
-const fetchFile = require('./middleware/fetchFile')
-const parseURL = require('./middleware/parseURL')
-const requireAuth = require('./middleware/requireAuth')
-const serveFile = require('./middleware/serveFile')
-const userToken = require('./middleware/userToken')
-const validatePackageURL = require('./middleware/validatePackageURL')
+const checkBlacklist = require("./middleware/checkBlacklist")
+const fetchFile = require("./middleware/fetchFile")
+const parseURL = require("./middleware/parseURL")
+const requireAuth = require("./middleware/requireAuth")
+const serveFile = require("./middleware/serveFile")
+const userToken = require("./middleware/userToken")
+const validatePackageURL = require("./middleware/validatePackageURL")
 
-morgan.token('fwd', function(req) {
-  return req.get('x-forwarded-for').replace(/\s/g, '')
+morgan.token("fwd", function(req) {
+  return req.get("x-forwarded-for").replace(/\s/g, "")
 })
 
 function errorHandler(err, req, res, next) {
@@ -22,8 +22,8 @@ function errorHandler(err, req, res, next) {
 
   res
     .status(500)
-    .type('text')
-    .send('Internal Server Error')
+    .type("text")
+    .send("Internal Server Error")
 
   next(err)
 }
@@ -37,16 +37,16 @@ function createRouter(setup) {
 function createServer() {
   const app = express()
 
-  app.disable('x-powered-by')
+  app.disable("x-powered-by")
 
-  if (process.env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV !== "test") {
     app.use(
       morgan(
-        process.env.NODE_ENV === 'production'
+        process.env.NODE_ENV === "production"
           ? // Modified version of the Heroku router's log format
             // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
             'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
-          : 'dev'
+          : "dev"
       )
     )
   }
@@ -54,8 +54,8 @@ function createServer() {
   app.use(errorHandler)
 
   app.use(
-    express.static('build', {
-      maxAge: '365d'
+    express.static("build", {
+      maxAge: "365d"
     })
   )
 
@@ -63,43 +63,35 @@ function createServer() {
   app.use(bodyParser.json())
   app.use(userToken)
 
-  app.get('/_publicKey', require('./actions/showPublicKey'))
+  app.get("/_publicKey", require("./actions/showPublicKey"))
 
   app.use(
-    '/_auth',
+    "/_auth",
     createRouter(app => {
-      app.post('/', require('./actions/createAuth'))
-      app.get('/', require('./actions/showAuth'))
+      app.post("/", require("./actions/createAuth"))
+      app.get("/", require("./actions/showAuth"))
     })
   )
 
   app.use(
-    '/_blacklist',
+    "/_blacklist",
     createRouter(app => {
-      app.post(
-        '/',
-        requireAuth('blacklist.add'),
-        require('./actions/addToBlacklist')
-      )
-      app.get(
-        '/',
-        requireAuth('blacklist.read'),
-        require('./actions/showBlacklist')
-      )
+      app.post("/", requireAuth("blacklist.add"), require("./actions/addToBlacklist"))
+      app.get("/", requireAuth("blacklist.read"), require("./actions/showBlacklist"))
       app.delete(
         /.*/,
-        requireAuth('blacklist.remove'),
+        requireAuth("blacklist.remove"),
         validatePackageURL,
-        require('./actions/removeFromBlacklist')
+        require("./actions/removeFromBlacklist")
       )
     })
   )
 
-  if (process.env.NODE_ENV !== 'test') {
-    app.get('/_stats', require('./actions/showStats'))
+  if (process.env.NODE_ENV !== "test") {
+    app.get("/_stats", require("./actions/showStats"))
   }
 
-  app.use('/', parseURL, checkBlacklist, fetchFile, serveFile)
+  app.use("/", parseURL, checkBlacklist, fetchFile, serveFile)
 
   return app
 }

@@ -1,19 +1,19 @@
-const fs = require('fs')
-const path = require('path')
-const crypto = require('crypto')
-const jwt = require('jsonwebtoken')
-const invariant = require('invariant')
-const forge = require('node-forge')
-const db = require('./RedisClient')
+const fs = require("fs")
+const path = require("path")
+const crypto = require("crypto")
+const jwt = require("jsonwebtoken")
+const invariant = require("invariant")
+const forge = require("node-forge")
+const db = require("./RedisClient")
 
 let keys
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   keys = {
-    public: fs.readFileSync(path.resolve(__dirname, '../public.key'), 'utf8'),
+    public: fs.readFileSync(path.resolve(__dirname, "../public.key"), "utf8"),
     private: process.env.PRIVATE_KEY
   }
 
-  invariant(keys.private, 'Missing $PRIVATE_KEY environment variable')
+  invariant(keys.private, "Missing $PRIVATE_KEY environment variable")
 } else {
   // Generate a random keypair for dev/testing.
   // See https://gist.github.com/sebadoom/2b70969e70db5da9a203bebd9cff099f
@@ -29,19 +29,19 @@ function getCurrentSeconds() {
 }
 
 function createTokenId() {
-  return crypto.randomBytes(16).toString('hex')
+  return crypto.randomBytes(16).toString("hex")
 }
 
 function createToken(scopes = {}) {
   return new Promise((resolve, reject) => {
     const payload = {
       jti: createTokenId(),
-      iss: 'https://unpkg.com',
+      iss: "https://unpkg.com",
       iat: getCurrentSeconds(),
       scopes
     }
 
-    jwt.sign(payload, keys.private, { algorithm: 'RS256' }, (error, token) => {
+    jwt.sign(payload, keys.private, { algorithm: "RS256" }, (error, token) => {
       if (error) {
         reject(error)
       } else {
@@ -51,11 +51,11 @@ function createToken(scopes = {}) {
   })
 }
 
-const RevokedTokensSet = 'revoked-tokens'
+const RevokedTokensSet = "revoked-tokens"
 
 function verifyToken(token) {
   return new Promise((resolve, reject) => {
-    const options = { algorithms: ['RS256'] }
+    const options = { algorithms: ["RS256"] }
 
     jwt.verify(token, keys.public, options, (error, payload) => {
       if (error) {

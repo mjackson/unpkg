@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require("fs")
 
 function getFileStats(file) {
   return new Promise((resolve, reject) => {

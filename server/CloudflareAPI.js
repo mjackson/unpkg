@@ -1,21 +1,21 @@
-require('isomorphic-fetch')
-const invariant = require('invariant')
-const gunzip = require('gunzip-maybe')
-const ndjson = require('ndjson')
+require("isomorphic-fetch")
+const invariant = require("invariant")
+const gunzip = require("gunzip-maybe")
+const ndjson = require("ndjson")
 
-const CloudflareAPIURL = 'https://api.cloudflare.com'
+const CloudflareAPIURL = "https://api.cloudflare.com"
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL
 const CloudflareKey = process.env.CLOUDFLARE_KEY
 
-invariant(CloudflareEmail, 'Missing the $CLOUDFLARE_EMAIL environment variable')
+invariant(CloudflareEmail, "Missing the $CLOUDFLARE_EMAIL environment variable")
 
-invariant(CloudflareKey, 'Missing the $CLOUDFLARE_KEY environment variable')
+invariant(CloudflareKey, "Missing the $CLOUDFLARE_KEY environment variable")
 
 function get(path, headers) {
   return fetch(`${CloudflareAPIURL}/client/v4${path}`, {
     headers: Object.assign({}, headers, {
-      'X-Auth-Email': CloudflareEmail,
-      'X-Auth-Key': CloudflareKey
+      "X-Auth-Email": CloudflareEmail,
+      "X-Auth-Key": CloudflareKey
     })
   })
 }
@@ -29,7 +29,7 @@ function getJSON(path, headers) {
       if (!data.success) {
         console.error(`CloudflareAPI.getJSON failed at ${path}`)
         console.error(data)
-        throw new Error('Failed to getJSON from Cloudflare')
+        throw new Error("Failed to getJSON from Cloudflare")
       }
 
       return data.result
@@ -52,9 +52,9 @@ function reduceResults(target, values) {
   Object.keys(values).forEach(key => {
     const value = values[key]
 
-    if (typeof value === 'object' && value) {
+    if (typeof value === "object" && value) {
       target[key] = reduceResults(target[key] || {}, value)
-    } else if (typeof value === 'number') {
+    } else if (typeof value === "number") {
       target[key] = (target[key] || 0) + values[key]
     }
   })
@@ -78,7 +78,7 @@ function getZoneAnalyticsDashboard(zones, since, until) {
 
 function getJSONStream(path, headers) {
   const acceptGzipHeaders = Object.assign({}, headers, {
-    'Accept-Encoding': 'gzip'
+    "Accept-Encoding": "gzip"
   })
 
   return get(path, acceptGzipHeaders)
@@ -91,9 +91,7 @@ function getJSONStream(path, headers) {
 }
 
 function getLogs(zoneId, startTime, endTime) {
-  return getJSONStream(
-    `/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`
-  )
+  return getJSONStream(`/zones/${zoneId}/logs/requests?start=${startTime}&end=${endTime}`)
 }
 
 module.exports = {

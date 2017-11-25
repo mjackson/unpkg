@@ -1,4 +1,4 @@
-const BlacklistAPI = require('../BlacklistAPI')
+const BlacklistAPI = require("../BlacklistAPI")
 
 function showBlacklist(req, res) {
   BlacklistAPI.getPackages().then(
@@ -8,7 +8,7 @@ function showBlacklist(req, res) {
     error => {
       console.error(error)
       res.status(500).send({
-        error: 'Unable to fetch blacklist'
+        error: "Unable to fetch blacklist"
       })
     }
   )

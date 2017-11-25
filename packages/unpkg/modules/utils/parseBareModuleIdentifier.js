@@ -5,7 +5,7 @@ function parseBareModuleIdentifier(id) {
 
   return {
     packageName: match[1],
-    file: match[2] || ''
+    file: match[2] || ""
   }
 }
 

@@ -1,14 +1,14 @@
-require('isomorphic-fetch')
-const fs = require('fs')
-const path = require('path')
-const tmpdir = require('os-tmpdir')
-const gunzip = require('gunzip-maybe')
-const mkdirp = require('mkdirp')
-const tar = require('tar-fs')
-const createMutex = require('./createMutex')
+require("isomorphic-fetch")
+const fs = require("fs")
+const path = require("path")
+const tmpdir = require("os-tmpdir")
+const gunzip = require("gunzip-maybe")
+const mkdirp = require("mkdirp")
+const tar = require("tar-fs")
+const createMutex = require("./createMutex")
 
 function createTempPath(name, version) {
-  const normalName = name.replace(/\//g, '-')
+  const normalName = name.replace(/\//g, "-")
   return path.join(tmpdir(), `unpkg-${normalName}-${version}`)
 }
 
@@ -17,12 +17,12 @@ function stripNamePrefix(headers) {
   // so we shorten that to just "index.js" here. A few packages use a
   // prefix other than "package/". e.g. the firebase package uses the
   // "firebase_npm/" prefix. So we just strip the first dir name.
-  headers.name = headers.name.replace(/^[^\/]+\//, '')
+  headers.name = headers.name.replace(/^[^\/]+\//, "")
   return headers
 }
 
 function ignoreSymlinks(file, headers) {
-  return headers.type === 'link'
+  return headers.type === "link"
 }
 
 function extractResponse(response, outputDir) {
@@ -36,8 +36,8 @@ function extractResponse(response, outputDir) {
     response.body
       .pipe(gunzip())
       .pipe(extract)
-      .on('finish', resolve)
-      .on('error', reject)
+      .on("finish", resolve)
+      .on("error", reject)
   })
 }
 
@@ -54,7 +54,7 @@ const fetchMutex = createMutex((payload, callback) => {
 
   fs.access(outputDir, function(error) {
     if (error) {
-      if (error.code === 'ENOENT' || error.code === 'ENOTDIR') {
+      if (error.code === "ENOENT" || error.code === "ENOTDIR") {
         // ENOENT or ENOTDIR are to be expected when we haven't yet
         // fetched a package for the first time. Carry on!
         mkdirp(outputDir, function(error) {

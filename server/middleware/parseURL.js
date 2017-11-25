@@ -1,6 +1,6 @@
-const validateNpmPackageName = require('validate-npm-package-name')
-const parsePackageURL = require('../utils/parsePackageURL')
-const createSearch = require('./utils/createSearch')
+const validateNpmPackageName = require("validate-npm-package-name")
+const parsePackageURL = require("../utils/parsePackageURL")
+const createSearch = require("./utils/createSearch")
 
 const KnownQueryParams = {
   main: true,
@@ -32,14 +32,14 @@ function sanitizeQuery(query) {
 function parseURL(req, res, next) {
   // Redirect /_meta/path to /path?meta.
   if (req.path.match(/^\/_meta\//)) {
-    req.query.meta = ''
+    req.query.meta = ""
     return res.redirect(302, req.path.substr(6) + createSearch(req.query))
   }
 
   // Redirect /path?json => /path?meta
   if (req.query.json != null) {
     delete req.query.json
-    req.query.meta = ''
+    req.query.meta = ""
     return res.redirect(302, req.path + createSearch(req.query))
   }
 
@@ -56,7 +56,7 @@ function parseURL(req, res, next) {
   if (url == null) {
     return res
       .status(403)
-      .type('text')
+      .type("text")
       .send(`Invalid URL: ${req.url}`)
   }
 
@@ -64,10 +64,10 @@ function parseURL(req, res, next) {
 
   // Disallow invalid package names.
   if (nameErrors) {
-    const reason = nameErrors.join(', ')
+    const reason = nameErrors.join(", ")
     return res
       .status(403)
-      .type('text')
+      .type("text")
       .send(`Invalid package name "${url.packageName}" (${reason})`)
   }
 

@@ -1,6 +1,6 @@
-const db = require('./RedisClient')
+const db = require("./RedisClient")
 
-const BlacklistSet = 'blacklisted-packages'
+const BlacklistSet = "blacklisted-packages"
 
 function addPackage(packageName) {
   return new Promise((resolve, reject) => {

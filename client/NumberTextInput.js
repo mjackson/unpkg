@@ -1,6 +1,6 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { parseNumber, formatNumber } from './NumberUtils'
+import React from "react"
+import PropTypes from "prop-types"
+import { parseNumber, formatNumber } from "./NumberUtils"
 
 class NumberTextInput extends React.Component {
   static propTypes = {
@@ -37,14 +37,7 @@ class NumberTextInput extends React.Component {
     const { parseNumber, formatNumber, ...props } = this.props // eslint-disable-line no-unused-vars
     const displayValue = formatNumber(value)
 
-    return (
-      <input
-        {...props}
-        type="text"
-        value={displayValue}
-        onChange={this.handleChange}
-      />
-    )
+    return <input {...props} type="text" value={displayValue} onChange={this.handleChange} />
   }
 }
 
