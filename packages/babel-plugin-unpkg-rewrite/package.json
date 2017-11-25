@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-unpkg-rewrite",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Rewrite bare ES module specifiers as unpkg.com URLs with Babel",
   "repository": "unpkg/unpkg",
   "license": "MIT",
