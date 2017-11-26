@@ -1,14 +1,14 @@
-'use strict';
+"use strict"
 
-var path = require('path');
-var fs = require('fs');
-var url = require('url');
+var path = require("path")
+var fs = require("fs")
+var url = require("url")
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
-var appDirectory = fs.realpathSync(process.cwd());
+var appDirectory = fs.realpathSync(process.cwd())
 function resolveApp(relativePath) {
-  return path.resolve(appDirectory, relativePath);
+  return path.resolve(appDirectory, relativePath)
 }
 
 // We support resolving modules according to `NODE_PATH`.
@@ -26,27 +26,27 @@ function resolveApp(relativePath) {
 // Otherwise, we risk importing Node.js core modules into an app instead of Webpack shims.
 // https://github.com/facebookincubator/create-react-app/issues/1023#issuecomment-265344421
 
-var nodePaths = (process.env.NODE_PATH || '')
-  .split(process.platform === 'win32' ? ';' : ':')
+var nodePaths = (process.env.NODE_PATH || "")
+  .split(process.platform === "win32" ? ";" : ":")
   .filter(Boolean)
   .filter(folder => !path.isAbsolute(folder))
-  .map(resolveApp);
+  .map(resolveApp)
 
-var envPublicUrl = process.env.PUBLIC_URL;
+var envPublicUrl = process.env.PUBLIC_URL
 
 function ensureSlash(path, needsSlash) {
-  var hasSlash = path.endsWith('/');
+  var hasSlash = path.endsWith("/")
   if (hasSlash && !needsSlash) {
-    return path.substr(path, path.length - 1);
+    return path.substr(path, path.length - 1)
   } else if (!hasSlash && needsSlash) {
-    return path + '/';
+    return path + "/"
   } else {
-    return path;
+    return path
   }
 }
 
 function getPublicUrl(appPackageJson) {
-  return envPublicUrl || require(appPackageJson).homepage;
+  return envPublicUrl || require(appPackageJson).homepage
 }
 
 // We use `PUBLIC_URL` environment variable or "homepage" field to infer
@@ -56,25 +56,23 @@ function getPublicUrl(appPackageJson) {
 // We can't use a relative path in HTML because we don't want to load something
 // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
 function getServedPath(appPackageJson) {
-  var publicUrl = getPublicUrl(appPackageJson);
-  var servedUrl = envPublicUrl || (
-    publicUrl ? url.parse(publicUrl).pathname : '/'
-  );
-  return ensureSlash(servedUrl, true);
+  var publicUrl = getPublicUrl(appPackageJson)
+  var servedUrl = envPublicUrl || (publicUrl ? url.parse(publicUrl).pathname : "/")
+  return ensureSlash(servedUrl, true)
 }
 
 // config after eject: we're in ./config/
 module.exports = {
-  appBuild: resolveApp('build'),
-  appPublic: resolveApp('public'),
-  appHtml: resolveApp('public/index.html'),
-  appIndexJs: resolveApp('client/index.js'),
-  appPackageJson: resolveApp('package.json'),
-  appSrc: resolveApp('client'),
-  yarnLockFile: resolveApp('yarn.lock'),
-  testsSetup: resolveApp('client/setupTests.js'),
-  appNodeModules: resolveApp('node_modules'),
+  appBuild: resolveApp("build"),
+  appPublic: resolveApp("public"),
+  appHtml: resolveApp("public/index.html"),
+  appIndexJs: resolveApp("client/index.js"),
+  appPackageJson: resolveApp("package.json"),
+  appSrc: resolveApp("client"),
+  yarnLockFile: resolveApp("yarn.lock"),
+  testsSetup: resolveApp("client/setupTests.js"),
+  appNodeModules: resolveApp("node_modules"),
   nodePaths: nodePaths,
-  publicUrl: getPublicUrl(resolveApp('package.json')),
-  servedPath: getServedPath(resolveApp('package.json'))
-};
+  publicUrl: getPublicUrl(resolveApp("package.json")),
+  servedPath: getServedPath(resolveApp("package.json"))
+}
