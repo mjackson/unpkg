@@ -31,10 +31,10 @@ function createHTML(props) {
   return DOCTYPE + ReactDOMServer.renderToStaticMarkup(e(IndexPage, props))
 }
 
-function getIndexHTML(packageInfo, version, baseDir, dir, callback) {
-  getEntries(path.join(baseDir, dir))
-    .then(entries => createHTML({ packageInfo, version, dir, entries }))
-    .then(html => callback(null, html), callback)
+function getIndexHTML(packageInfo, version, baseDir, dir) {
+  return getEntries(path.join(baseDir, dir)).then(entries =>
+    createHTML({ packageInfo, version, dir, entries })
+  )
 }
 
 module.exports = getIndexHTML

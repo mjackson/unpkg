@@ -17,16 +17,15 @@ const AutoIndex = !process.env.DISABLE_INDEX
  */
 const MaximumDepth = 128
 
-const FileTransforms = {
-  expand: function(file, dependencies, callback) {
-    const options = {
-      plugins: [unpkgRewrite(dependencies)]
-    }
-
-    babel.transformFile(file, options, function(error, result) {
-      callback(error, result && result.code)
-    })
+function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
+  const dependencies = Object.assign({}, packageConfig.peerDependencies, packageConfig.dependencies)
+  const options = {
+    plugins: [unpkgRewrite(dependencies)]
   }
+
+  babel.transformFile(file, options, (error, result) => {
+    callback(error, result && result.code)
+  })
 }
 
 /**
@@ -35,7 +34,7 @@ const FileTransforms = {
 function serveFile(req, res, next) {
   if (req.query.meta != null) {
     // Serve JSON metadata.
-    getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, function(error, metadata) {
+    getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, (error, metadata) => {
       if (error) {
         console.error(error)
         res
@@ -62,13 +61,7 @@ function serveFile(req, res, next) {
 
     if (contentType === "application/javascript" && req.query.module != null) {
       // Serve a JavaScript module.
-      const dependencies = Object.assign(
-        {},
-        req.packageConfig.peerDependencies,
-        req.packageConfig.dependencies
-      )
-
-      FileTransforms.expand(file, dependencies, function(error, code) {
+      rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
         if (error) {
           console.error(error)
           const debugInfo =
@@ -113,7 +106,7 @@ function serveFile(req, res, next) {
 
       const stream = fs.createReadStream(file)
 
-      stream.on("error", function(error) {
+      stream.on("error", error => {
         console.error(`Cannot send file ${req.packageSpec}${req.filename}`)
         console.error(error)
         res.sendStatus(500)
@@ -123,17 +116,8 @@ function serveFile(req, res, next) {
     }
   } else if (AutoIndex && req.stats.isDirectory()) {
     // Serve an HTML directory listing.
-    getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.filename, function(
-      error,
-      html
-    ) {
-      if (error) {
-        console.error(error)
-        res
-          .status(500)
-          .type("text")
-          .send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
-      } else {
+    getIndexHTML(req.packageInfo, req.packageVersion, req.packageDir, req.filename).then(
+      html => {
         // Cache HTML directory listings for 1 minute.
         res
           .set({
@@ -141,8 +125,15 @@ function serveFile(req, res, next) {
             "Cache-Tag": "index"
           })
           .send(html)
+      },
+      error => {
+        console.error(error)
+        res
+          .status(500)
+          .type("text")
+          .send(`Cannot generate index page for ${req.packageSpec}${req.filename}`)
       }
-    })
+    )
   } else {
     res
       .status(403)
