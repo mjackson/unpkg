@@ -78,7 +78,7 @@ function serveFile(req, res, next) {
           // Cache modules for 1 year.
           res
             .set({
-              "Content-Type": contentType,
+              "Content-Type": `${contentType}; charset=utf-8`,
               "Content-Length": Buffer.byteLength(code),
               "Cache-Control": "public, max-age=31536000",
               "Cache-Tag": "file,js-file,js-module"
@@ -91,8 +91,9 @@ function serveFile(req, res, next) {
       const tags = ["file"]
 
       const ext = path.extname(req.filename).substr(1)
-
       if (ext) tags.push(`${ext}-file`)
+
+      if (contentType === "application/javascript") contentType += "; charset=utf-8"
 
       // Cache files for 1 year.
       res.set({
