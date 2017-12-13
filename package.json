@@ -8,7 +8,6 @@
     "dev": "heroku local -f Procfile.dev -p 3001"
   },
   "dependencies": {
-    "algoliasearch": "^3.24.3",
     "babel-plugin-unpkg-rewrite": "^3.6.0",
     "body-parser": "^1.18.2",
     "cors": "^2.8.1",
