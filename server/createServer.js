@@ -1,9 +1,7 @@
-const fs = require("fs")
-const path = require("path")
 const express = require("express")
 const bodyParser = require("body-parser")
-const cors = require("cors")
 const morgan = require("morgan")
+const cors = require("cors")
 
 const checkBlacklist = require("./middleware/checkBlacklist")
 const fetchFile = require("./middleware/fetchFile")

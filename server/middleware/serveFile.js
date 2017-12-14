@@ -31,7 +31,7 @@ function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
 /**
  * Send the file, JSON metadata, or HTML directory listing.
  */
-function serveFile(req, res, next) {
+function serveFile(req, res) {
   if (req.query.meta != null) {
     // Serve JSON metadata.
     getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, (error, metadata) => {

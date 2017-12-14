@@ -1,7 +1,7 @@
 const url = require("url")
 const validatePackageName = require("./validatePackageName")
 
-const URLFormat = /^\/((?:@[^\/@]+\/)?[^\/@]+)(?:@([^\/]+))?(\/.*)?$/
+const URLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/
 
 function decodeParam(param) {
   if (param) {

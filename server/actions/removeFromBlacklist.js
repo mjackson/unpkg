@@ -1,4 +1,3 @@
-const validateNpmPackageName = require("validate-npm-package-name")
 const BlacklistAPI = require("../BlacklistAPI")
 
 function removeFromBlacklist(req, res) {

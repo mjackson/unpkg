@@ -1,0 +1,17 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/errors"
+  ],
+  "rules": {
+    "no-console": 0
+  },
+  "globals": {
+    "fetch": true,
+    "Promise": true
+  }
+}
