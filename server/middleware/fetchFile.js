@@ -24,8 +24,8 @@ function findFile(base, useIndex, callback) {
   FindExtensions.reduceRight((next, ext) => {
     const file = base + ext
 
-    return function() {
-      fs.stat(file, function(error, stats) {
+    return () => {
+      fs.stat(file, (error, stats) => {
         if (error) {
           if (error.code === "ENOENT" || error.code === "ENOTDIR") {
             next()
@@ -33,7 +33,7 @@ function findFile(base, useIndex, callback) {
             callback(error)
           }
         } else if (useIndex && stats.isDirectory()) {
-          findFile(path.join(file, "index"), false, function(error, indexFile, indexStats) {
+          findFile(path.join(file, "index"), false, (error, indexFile, indexStats) => {
             if (error) {
               callback(error)
             } else if (indexFile) {
@@ -52,11 +52,10 @@ function findFile(base, useIndex, callback) {
 
 /**
  * Fetch the file from the registry and get its stats. Redirect if the URL
- * does not specify an exact version number or targets a directory with no
- * trailing slash.
+ * specifies a tag, a semver version number, or an inexact path in ?module mode.
  */
 function fetchFile(req, res, next) {
-  getPackageInfo(req.packageName, function(error, packageInfo) {
+  getPackageInfo(req.packageName, (error, packageInfo) => {
     if (error) {
       console.error(error)
       return res
@@ -77,7 +76,7 @@ function fetchFile(req, res, next) {
       // A valid request for a package we haven't downloaded yet.
       req.packageConfig = req.packageInfo.versions[req.packageVersion]
 
-      getPackage(req.packageConfig, function(error, outputDir) {
+      getPackage(req.packageConfig, (error, outputDir) => {
         if (error) {
           console.error(error)
           res
@@ -93,8 +92,9 @@ function fetchFile(req, res, next) {
           if (req.query.module != null) {
             // They want an ES module. Try "module", "jsnext:main", and "/"
             // https://github.com/rollup/rollup/wiki/pkg.module
-            if (!filename)
+            if (!filename) {
               filename = req.packageConfig.module || req.packageConfig["jsnext:main"] || "/"
+            }
           } else if (filename) {
             // They are requesting an explicit filename. Only try to find an
             // index file if they are NOT requesting an HTML directory listing.
@@ -125,14 +125,15 @@ function fetchFile(req, res, next) {
             filename = req.packageConfig.main || "/"
           }
 
-          findFile(path.join(req.packageDir, filename), useIndex, function(error, file, stats) {
+          findFile(path.join(req.packageDir, filename), useIndex, (error, file, stats) => {
             if (error) console.error(error)
 
-            if (file == null)
+            if (file == null) {
               return res
                 .status(404)
                 .type("text")
                 .send(`Cannot find module "${filename}" in package ${req.packageSpec}`)
+            }
 
             filename = file.replace(req.packageDir, "")
 
