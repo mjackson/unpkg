@@ -33,7 +33,7 @@ unpkg is not affiliated with or supported by npm, Inc. in any way. Please do not
 
 ### Abuse
 
-unpkg maintains of packages that are known to be malicious. If you find such a package on npm, please let us know!
+unpkg maintains a list of packages that are known to be malicious. If you find such a package on npm, please let us know!
 
 ### Feedback
 
