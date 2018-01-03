@@ -11,7 +11,7 @@ const serveFile = require("./middleware/serveFile")
 const userToken = require("./middleware/userToken")
 const validatePackageURL = require("./middleware/validatePackageURL")
 
-morgan.token("fwd", function(req) {
+morgan.token("fwd", req => {
   return req.get("x-forwarded-for").replace(/\s/g, "")
 })
 
@@ -77,7 +77,7 @@ function createServer() {
       app.post("/", requireAuth("blacklist.add"), require("./actions/addToBlacklist"))
       app.get("/", requireAuth("blacklist.read"), require("./actions/showBlacklist"))
       app.delete(
-        /.*/,
+        "*",
         requireAuth("blacklist.remove"),
         validatePackageURL,
         require("./actions/removeFromBlacklist")
