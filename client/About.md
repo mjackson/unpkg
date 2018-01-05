@@ -25,7 +25,7 @@ Browsers are instructed (via the `Cache-Control` header) to cache assets for 4 h
 
 unpkg is a free, best-effort service and cannot provide any uptime or support guarantees.
 
-I do my best to keep it running, but sometimes things go wrong. Sometimes there are network or provider issues outside my control. Sometimes abusive traffic temporarily affects response times. Sometimes I break things by doing something dumb, but I try not to.
+I do my best to keep it running, but sometimes things go wrong. Sometimes there are network or provider issues outside my control. Sometimes abusive traffic temporarily affects response times. Sometimes I break things by doing something bonkers, but I try not to.
 
 The goal of unpkg is to provide a hassle-free CDN for npm package authors. It's also a great resource for people creating demos and instructional material. However, if you rely on it to serve files that are crucial to your business, you should probably pay for a host with well-supported infrastructure and uptime guarantees.
 
