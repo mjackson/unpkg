@@ -2,10 +2,10 @@ const fs = require("fs")
 const path = require("path")
 const etag = require("etag")
 const babel = require("babel-core")
-const unpkgRewrite = require("babel-plugin-unpkg-rewrite")
 const getMetadata = require("./utils/getMetadata")
 const getFileContentType = require("./utils/getFileContentType")
 const getIndexHTML = require("./utils/getIndexHTML")
+const unpkgRewrite = require("./utils/unpkgRewriteBabelPlugin")
 
 /**
  * Automatically generate HTML pages that show package contents.
@@ -37,6 +37,7 @@ function serveFile(req, res) {
     getMetadata(req.packageDir, req.filename, req.stats, MaximumDepth, (error, metadata) => {
       if (error) {
         console.error(error)
+
         res
           .status(500)
           .type("text")
@@ -64,12 +65,14 @@ function serveFile(req, res) {
       rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
         if (error) {
           console.error(error)
+
           const debugInfo =
             error.constructor.name +
             ": " +
             error.message.replace(/^.*?\/unpkg-.+?\//, `/${req.packageSpec}/`) +
             "\n\n" +
             error.codeFrame
+
           res
             .status(500)
             .type("text")
@@ -129,6 +132,7 @@ function serveFile(req, res) {
       },
       error => {
         console.error(error)
+
         res
           .status(500)
           .type("text")

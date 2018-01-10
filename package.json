@@ -8,7 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "babel-plugin-unpkg-rewrite": "^3.6.0",
+    "babel-plugin-syntax-export-extensions": "^6.13.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "body-parser": "^1.18.2",
@@ -40,7 +40,8 @@
     "tar-fs": "^1.15.2",
     "throng": "^4.0.0",
     "validate-npm-package-name": "^3.0.0",
-    "warning": "^3.0.0"
+    "warning": "^3.0.0",
+    "whatwg-url": "^6.4.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
