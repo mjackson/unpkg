@@ -20,6 +20,10 @@ const MaximumDepth = 128
 function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
   const dependencies = Object.assign({}, packageConfig.peerDependencies, packageConfig.dependencies)
   const options = {
+    // Ignore .babelrc and package.json babel config
+    // because we haven't installed dependencies so
+    // we can't load plugins; see #84
+    babelrc: false,
     plugins: [unpkgRewrite(dependencies)]
   }
 
