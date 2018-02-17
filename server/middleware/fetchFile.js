@@ -1,20 +1,20 @@
-const fs = require("fs")
-const path = require("path")
-const semver = require("semver")
-const createPackageURL = require("../utils/createPackageURL")
-const createSearch = require("./utils/createSearch")
-const getPackageInfo = require("./utils/getPackageInfo")
-const getPackage = require("./utils/getPackage")
-const incrementCounter = require("./utils/incrementCounter")
+const fs = require("fs");
+const path = require("path");
+const semver = require("semver");
+const createPackageURL = require("../utils/createPackageURL");
+const createSearch = require("./utils/createSearch");
+const getPackageInfo = require("./utils/getPackageInfo");
+const getPackage = require("./utils/getPackage");
+const incrementCounter = require("./utils/incrementCounter");
 
 function getBasename(file) {
-  return path.basename(file, path.extname(file))
+  return path.basename(file, path.extname(file));
 }
 
 /**
  * File extensions to look for when automatically resolving.
  */
-const FindExtensions = ["", ".js", ".json"]
+const FindExtensions = ["", ".js", ".json"];
 
 /**
  * Resolves a path like "lib/file" into "lib/file.js" or "lib/file.json"
@@ -22,32 +22,36 @@ const FindExtensions = ["", ".js", ".json"]
  */
 function findFile(base, useIndex, callback) {
   FindExtensions.reduceRight((next, ext) => {
-    const file = base + ext
+    const file = base + ext;
 
     return () => {
       fs.stat(file, (error, stats) => {
         if (error) {
           if (error.code === "ENOENT" || error.code === "ENOTDIR") {
-            next()
+            next();
           } else {
-            callback(error)
+            callback(error);
           }
         } else if (useIndex && stats.isDirectory()) {
-          findFile(path.join(file, "index"), false, (error, indexFile, indexStats) => {
-            if (error) {
-              callback(error)
-            } else if (indexFile) {
-              callback(null, indexFile, indexStats)
-            } else {
-              next()
+          findFile(
+            path.join(file, "index"),
+            false,
+            (error, indexFile, indexStats) => {
+              if (error) {
+                callback(error);
+              } else if (indexFile) {
+                callback(null, indexFile, indexStats);
+              } else {
+                next();
+              }
             }
-          })
+          );
         } else {
-          callback(null, file, stats)
+          callback(null, file, stats);
         }
-      })
-    }
-  }, callback)()
+      });
+    };
+  }, callback)();
 }
 
 /**
@@ -57,112 +61,134 @@ function findFile(base, useIndex, callback) {
 function fetchFile(req, res, next) {
   getPackageInfo(req.packageName, (error, packageInfo) => {
     if (error) {
-      console.error(error)
+      console.error(error);
+
       return res
         .status(500)
         .type("text")
-        .send(`Cannot get info for package "${req.packageName}"`)
+        .send(`Cannot get info for package "${req.packageName}"`);
     }
 
     if (packageInfo == null || packageInfo.versions == null)
       return res
         .status(404)
         .type("text")
-        .send(`Cannot find package "${req.packageName}"`)
+        .send(`Cannot find package "${req.packageName}"`);
 
-    req.packageInfo = packageInfo
+    req.packageInfo = packageInfo;
 
     if (req.packageVersion in req.packageInfo.versions) {
       // A valid request for a package we haven't downloaded yet.
-      req.packageConfig = req.packageInfo.versions[req.packageVersion]
+      req.packageConfig = req.packageInfo.versions[req.packageVersion];
 
       getPackage(req.packageConfig, (error, outputDir) => {
         if (error) {
-          console.error(error)
+          console.error(error);
           res
             .status(500)
             .type("text")
-            .send(`Cannot fetch package ${req.packageSpec}`)
+            .send(`Cannot fetch package ${req.packageSpec}`);
         } else {
-          req.packageDir = outputDir
+          req.packageDir = outputDir;
 
-          let filename = req.filename
-          let useIndex = true
+          let filename = req.filename;
+          let useIndex = true;
 
           if (req.query.module != null) {
             // They want an ES module. Try "module", "jsnext:main", and "/"
             // https://github.com/rollup/rollup/wiki/pkg.module
             if (!filename) {
-              filename = req.packageConfig.module || req.packageConfig["jsnext:main"] || "/"
+              filename =
+                req.packageConfig.module ||
+                req.packageConfig["jsnext:main"] ||
+                "/";
             }
           } else if (filename) {
             // They are requesting an explicit filename. Only try to find an
             // index file if they are NOT requesting an HTML directory listing.
-            useIndex = filename[filename.length - 1] !== "/"
-          } else if (req.query.main && typeof req.packageConfig[req.query.main] === "string") {
+            useIndex = filename[filename.length - 1] !== "/";
+          } else if (
+            req.query.main &&
+            typeof req.packageConfig[req.query.main] === "string"
+          ) {
             // They specified a custom ?main field.
-            filename = req.packageConfig[req.query.main]
+            filename = req.packageConfig[req.query.main];
 
             incrementCounter(
               "package-json-custom-main",
               req.packageSpec + "?main=" + req.query.main,
               1
-            )
+            );
           } else if (typeof req.packageConfig.unpkg === "string") {
             // The "unpkg" field allows packages to explicitly declare the
             // file to serve at the bare URL (see #59).
-            filename = req.packageConfig.unpkg
+            filename = req.packageConfig.unpkg;
           } else if (typeof req.packageConfig.browser === "string") {
             // Fall back to the "browser" field if declared (only support strings).
-            filename = req.packageConfig.browser
+            filename = req.packageConfig.browser;
 
             // Count which packages + versions are actually using this fallback
             // so we can warn them when we deprecate this functionality.
             // See https://github.com/unpkg/unpkg/issues/63
-            incrementCounter("package-json-browser-fallback", req.packageSpec, 1)
+            incrementCounter(
+              "package-json-browser-fallback",
+              req.packageSpec,
+              1
+            );
           } else {
             // Fall back to "main" or / (same as npm).
-            filename = req.packageConfig.main || "/"
+            filename = req.packageConfig.main || "/";
           }
 
-          findFile(path.join(req.packageDir, filename), useIndex, (error, file, stats) => {
-            if (error) console.error(error)
+          findFile(
+            path.join(req.packageDir, filename),
+            useIndex,
+            (error, file, stats) => {
+              if (error) console.error(error);
 
-            if (file == null) {
-              return res
-                .status(404)
-                .type("text")
-                .send(`Cannot find module "${filename}" in package ${req.packageSpec}`)
+              if (file == null) {
+                return res
+                  .status(404)
+                  .type("text")
+                  .send(
+                    `Cannot find module "${filename}" in package ${
+                      req.packageSpec
+                    }`
+                  );
+              }
+
+              filename = file.replace(req.packageDir, "");
+
+              if (
+                req.query.main != null ||
+                getBasename(req.filename) !== getBasename(filename)
+              ) {
+                // Need to redirect to the module file so relative imports resolve
+                // correctly. Cache module redirects for 1 minute.
+                delete req.query.main;
+                res
+                  .set({
+                    "Cache-Control": "public, max-age=60",
+                    "Cache-Tag": "redirect,module-redirect"
+                  })
+                  .redirect(
+                    302,
+                    createPackageURL(
+                      req.packageName,
+                      req.packageVersion,
+                      filename,
+                      createSearch(req.query)
+                    )
+                  );
+              } else {
+                req.filename = filename;
+                req.stats = stats;
+                next();
+              }
             }
-
-            filename = file.replace(req.packageDir, "")
-
-            if (req.query.main != null || getBasename(req.filename) !== getBasename(filename)) {
-              // Need to redirect to the module file so relative imports resolve
-              // correctly. Cache module redirects for 1 minute.
-              delete req.query.main
-              res
-                .set({
-                  "Cache-Control": "public, max-age=60",
-                  "Cache-Tag": "redirect,module-redirect"
-                })
-                .redirect(
-                  302,
-                  createPackageURL(
-                    req.packageName,
-                    req.packageVersion,
-                    filename,
-                    createSearch(req.query)
-                  )
-                )
-            } else {
-              req.filename = filename
-              req.stats = stats
-              next()
-            }
-          })
+          );
         }
-      })
+      });
     } else if (req.packageVersion in req.packageInfo["dist-tags"]) {
       // Cache tag redirects for 1 minute.
       res
@@ -178,12 +204,12 @@ function fetchFile(req, res, next) {
             req.filename,
             req.search
           )
-        )
+        );
     } else {
       const maxVersion = semver.maxSatisfying(
         Object.keys(req.packageInfo.versions),
         req.packageVersion
-      )
+      );
 
       if (maxVersion) {
         // Cache semver redirects for 1 minute.
@@ -192,15 +218,23 @@ function fetchFile(req, res, next) {
             "Cache-Control": "public, max-age=60",
             "Cache-Tag": "redirect,semver-redirect"
           })
-          .redirect(302, createPackageURL(req.packageName, maxVersion, req.filename, req.search))
+          .redirect(
+            302,
+            createPackageURL(
+              req.packageName,
+              maxVersion,
+              req.filename,
+              req.search
+            )
+          );
       } else {
         res
           .status(404)
           .type("text")
-          .send(`Cannot find package ${req.packageSpec}`)
+          .send(`Cannot find package ${req.packageSpec}`);
       }
     }
-  })
+  });
 }
 
-module.exports = fetchFile
+module.exports = fetchFile;

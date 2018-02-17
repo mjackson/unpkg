@@ -1,97 +1,67 @@
-const express = require("express")
-const bodyParser = require("body-parser")
-const morgan = require("morgan")
-const cors = require("cors")
+const http = require("http");
+const express = require("express");
+const morgan = require("morgan");
 
-const checkBlacklist = require("./middleware/checkBlacklist")
-const fetchFile = require("./middleware/fetchFile")
-const parseURL = require("./middleware/parseURL")
-const requireAuth = require("./middleware/requireAuth")
-const serveFile = require("./middleware/serveFile")
-const userToken = require("./middleware/userToken")
-const validatePackageURL = require("./middleware/validatePackageURL")
+const staticAssets = require("./middleware/staticAssets");
+const createRouter = require("./createRouter");
 
 morgan.token("fwd", req => {
-  return req.get("x-forwarded-for").replace(/\s/g, "")
-})
+  return req.get("x-forwarded-for").replace(/\s/g, "");
+});
 
 function errorHandler(err, req, res, next) {
-  console.error(err.stack)
+  console.error(err.stack);
 
   res
     .status(500)
     .type("text")
-    .send("Internal Server Error")
+    .send("Internal Server Error");
 
-  next(err)
+  next(err);
 }
 
-function createRouter(setup) {
-  const app = express.Router()
-  setup(app)
-  return app
-}
+function createServer(publicDir, statsFile) {
+  const app = express();
 
-function createServer() {
-  const app = express()
-
-  app.disable("x-powered-by")
+  app.disable("x-powered-by");
 
   if (process.env.NODE_ENV !== "test") {
     app.use(
       morgan(
-        process.env.NODE_ENV === "production"
-          ? // Modified version of the Heroku router's log format
-            // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
-            'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
-          : "dev"
+        // Modified version of the Heroku router's log format
+        // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
+        'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
       )
-    )
+    );
   }
 
-  app.use(errorHandler)
+  app.use(errorHandler);
+  app.use(express.static(publicDir, { maxAge: "365d" }));
+  app.use(staticAssets(statsFile));
+  app.use(createRouter());
 
-  app.use(
-    express.static("build", {
-      maxAge: "365d"
-    })
-  )
+  const server = http.createServer(app);
 
-  app.use(cors())
-  app.use(bodyParser.json())
-  app.use(userToken)
+  // Heroku dynos automatically timeout after 30s. Set our
+  // own timeout here to force sockets to close before that.
+  // https://devcenter.heroku.com/articles/request-timeout
+  server.setTimeout(25000, socket => {
+    const message = `Timeout of 25 seconds exceeded`;
 
-  app.get("/_publicKey", require("./actions/showPublicKey"))
+    socket.end(
+      [
+        "HTTP/1.1 503 Service Unavailable",
+        "Date: " + new Date().toGMTString(),
+        "Content-Length: " + Buffer.byteLength(message),
+        "Content-Type: text/plain",
+        "Connection: close",
+        "",
+        message
+      ].join("\r\n")
+    );
+  });
 
-  app.use(
-    "/_auth",
-    createRouter(app => {
-      app.post("/", require("./actions/createAuth"))
-      app.get("/", require("./actions/showAuth"))
-    })
-  )
-
-  app.use(
-    "/_blacklist",
-    createRouter(app => {
-      app.post("/", requireAuth("blacklist.add"), require("./actions/addToBlacklist"))
-      app.get("/", requireAuth("blacklist.read"), require("./actions/showBlacklist"))
-      app.delete(
-        "*",
-        requireAuth("blacklist.remove"),
-        validatePackageURL,
-        require("./actions/removeFromBlacklist")
-      )
-    })
-  )
-
-  if (process.env.NODE_ENV !== "test") {
-    app.get("/_stats", require("./actions/showStats"))
-  }
-
-  app.use("/", parseURL, checkBlacklist, fetchFile, serveFile)
-
-  return app
+  return server;
 }
 
-module.exports = createServer
+module.exports = createServer;

@@ -1,7 +1,8 @@
 .DS_Store
 .env
 /node_modules
-/build
+/public/_assets
+/server/stats.json
 
 npm-debug.log*
 yarn-debug.log*

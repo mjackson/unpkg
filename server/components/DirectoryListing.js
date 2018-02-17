@@ -1,15 +1,15 @@
-const React = require("react")
-const prettyBytes = require("pretty-bytes")
-const getFileContentType = require("../utils/getFileContentType")
+const React = require("react");
+const prettyBytes = require("pretty-bytes");
+const getFileContentType = require("../utils/getFileContentType");
 
-const e = React.createElement
+const e = React.createElement;
 
-const formatTime = time => new Date(time).toISOString()
+const formatTime = time => new Date(time).toISOString();
 
-const DirectoryListing = ({ dir, entries }) => {
+function DirectoryListing({ dir, entries }) {
   const rows = entries.map(({ file, stats }, index) => {
-    const isDir = stats.isDirectory()
-    const href = file + (isDir ? "/" : "")
+    const isDir = stats.isDirectory();
+    const href = file + (isDir ? "/" : "");
 
     return e(
       "tr",
@@ -18,10 +18,10 @@ const DirectoryListing = ({ dir, entries }) => {
       e("td", null, isDir ? "-" : getFileContentType(file)),
       e("td", null, isDir ? "-" : prettyBytes(stats.size)),
       e("td", null, isDir ? "-" : formatTime(stats.mtime))
-    )
-  })
+    );
+  });
 
-  if (dir !== "/")
+  if (dir !== "/") {
     rows.unshift(
       e(
         "tr",
@@ -31,7 +31,8 @@ const DirectoryListing = ({ dir, entries }) => {
         e("td", null, "-"),
         e("td", null, "-")
       )
-    )
+    );
+  }
 
   return e(
     "table",
@@ -49,7 +50,7 @@ const DirectoryListing = ({ dir, entries }) => {
       )
     ),
     e("tbody", null, rows)
-  )
+  );
 }
 
-module.exports = DirectoryListing
+module.exports = DirectoryListing;
