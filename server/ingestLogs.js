@@ -5,14 +5,14 @@ const parsePackageURL = require("./utils/parsePackageURL");
 const CloudflareAPI = require("./CloudflareAPI");
 const StatsAPI = require("./StatsAPI");
 
-const db = require("./RedisClient");
+const db = require("./utils/redis");
 
 /**
  * Domains we want to analyze.
  */
 const DomainNames = [
   "unpkg.com"
-  //'npmcdn.com' // We don't have log data on npmcdn.com yet :/
+  //"npmcdn.com" // We don't have log data on npmcdn.com yet :/
 ];
 
 /**

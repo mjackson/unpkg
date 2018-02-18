@@ -1,4 +1,4 @@
-const db = require("../../RedisClient");
+const db = require("../../utils/redis");
 
 function createCache(keyPrefix) {
   function createKey(key) {

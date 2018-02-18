@@ -4,7 +4,8 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const invariant = require("invariant");
 const forge = require("node-forge");
-const db = require("./RedisClient");
+
+const db = require("./utils/redis");
 
 let keys;
 if (process.env.NODE_ENV === "production") {
