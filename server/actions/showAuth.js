@@ -1,5 +1,5 @@
 function showAuth(req, res) {
-  res.send({ auth: req.user })
+  res.send({ auth: req.user });
 }
 
-module.exports = showAuth
+module.exports = showAuth;

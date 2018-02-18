@@ -1,5 +1,5 @@
-const babel = require("babel-core")
-const unpkgRewrite = require("../unpkgRewriteBabelPlugin")
+const babel = require("babel-core");
+const unpkgRewrite = require("../unpkgRewriteBabelPlugin");
 
 const testCases = [
   {
@@ -8,7 +8,8 @@ const testCases = [
   },
   {
     before: "import router from '@angular/router';",
-    after: "import router from 'https://unpkg.com/@angular/router@4.3.5?module';"
+    after:
+      "import router from 'https://unpkg.com/@angular/router@4.3.5?module';"
   },
   {
     before: "import map from 'lodash.map';",
@@ -54,23 +55,23 @@ const testCases = [
     before: "export var message = 'hello';",
     after: "export var message = 'hello';"
   }
-]
+];
 
 const dependencies = {
   react: "15.6.1",
   "@angular/router": "4.3.5",
   "lodash.map": "4.6.0",
   pn: "1.0.0"
-}
+};
 
 describe("Rewriting imports/exports", () => {
   testCases.forEach(testCase => {
     it(`successfully rewrites "${testCase.before}"`, () => {
       const result = babel.transform(testCase.before, {
         plugins: [unpkgRewrite(dependencies)]
-      })
+      });
 
-      expect(result.code).toEqual(testCase.after)
-    })
-  })
-})
+      expect(result.code).toEqual(testCase.after);
+    });
+  });
+});

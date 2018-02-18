@@ -3,37 +3,38 @@
  * permissions. Otherwise rejects the request.
  */
 function requireAuth(scope) {
-  let checkScopes
+  let checkScopes;
   if (scope.includes(".")) {
-    const parts = scope.split(".")
-    checkScopes = scopes => parts.reduce((memo, part) => memo && memo[part], scopes) != null
+    const parts = scope.split(".");
+    checkScopes = scopes =>
+      parts.reduce((memo, part) => memo && memo[part], scopes) != null;
   } else {
-    checkScopes = scopes => scopes[scope] != null
+    checkScopes = scopes => scopes[scope] != null;
   }
 
   return function(req, res, next) {
     if (req.auth && req.auth.includes(scope)) {
-      return next() // Already auth'd
+      return next(); // Already auth'd
     }
 
-    const user = req.user
+    const user = req.user;
 
     if (!user) {
-      return res.status(403).send({ error: "Missing auth token" })
+      return res.status(403).send({ error: "Missing auth token" });
     }
 
     if (!user.scopes || !checkScopes(user.scopes)) {
-      return res.status(403).send({ error: "Insufficient scopes" })
+      return res.status(403).send({ error: "Insufficient scopes" });
     }
 
     if (req.auth) {
-      req.auth.push(scope)
+      req.auth.push(scope);
     } else {
-      req.auth = [scope]
+      req.auth = [scope];
     }
 
-    next()
-  }
+    next();
+  };
 }
 
-module.exports = requireAuth
+module.exports = requireAuth;

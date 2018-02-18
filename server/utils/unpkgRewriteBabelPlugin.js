@@ -1,7 +1,7 @@
-const URL = require("whatwg-url")
-const warning = require("warning")
+const URL = require("whatwg-url");
+const warning = require("warning");
 
-const BareIdentifierFormat = /^((?:@[^\/]+\/)?[^\/]+)(\/.*)?$/
+const BareIdentifierFormat = /^((?:@[^\/]+\/)?[^\/]+)(\/.*)?$/;
 
 function unpkgRewriteBabelPlugin(dependencies = {}) {
   return {
@@ -9,36 +9,36 @@ function unpkgRewriteBabelPlugin(dependencies = {}) {
 
     visitor: {
       "ImportDeclaration|ExportNamedDeclaration|ExportAllDeclaration"(path) {
-        if (!path.node.source) return // probably a variable declaration
+        if (!path.node.source) return; // probably a variable declaration
 
         if (
           URL.parseURL(path.node.source.value) != null ||
           path.node.source.value.substr(0, 2) === "//"
         )
-          return // valid URL or URL w/o protocol, leave it alone
+          return; // valid URL or URL w/o protocol, leave it alone
 
         if ([".", "/"].indexOf(path.node.source.value.charAt(0)) >= 0) {
           // local path
-          path.node.source.value = `${path.node.source.value}?module`
+          path.node.source.value = `${path.node.source.value}?module`;
         } else {
           // "bare" identifier
-          const match = BareIdentifierFormat.exec(path.node.source.value)
-          const packageName = match[1]
-          const file = match[2] || ""
+          const match = BareIdentifierFormat.exec(path.node.source.value);
+          const packageName = match[1];
+          const file = match[2] || "";
 
           warning(
             dependencies[packageName],
             'Missing version info for package "%s" in dependencies; falling back to "latest"',
             packageName
-          )
+          );
 
-          const version = dependencies[packageName] || "latest"
+          const version = dependencies[packageName] || "latest";
 
-          path.node.source.value = `https://unpkg.com/${packageName}@${version}${file}?module`
+          path.node.source.value = `https://unpkg.com/${packageName}@${version}${file}?module`;
         }
       }
     }
-  }
+  };
 }
 
-module.exports = unpkgRewriteBabelPlugin
+module.exports = unpkgRewriteBabelPlugin;

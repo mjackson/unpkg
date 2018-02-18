@@ -1,7 +1,7 @@
-const validateNpmPackageName = require("validate-npm-package-name")
+const validateNpmPackageName = require("validate-npm-package-name");
 
 function validatePackageName(packageName) {
-  return validateNpmPackageName(packageName).errors == null
+  return validateNpmPackageName(packageName).errors == null;
 }
 
-module.exports = validatePackageName
+module.exports = validatePackageName;

@@ -1,15 +1,15 @@
-const fs = require("fs")
+const fs = require("fs");
 
 function getFileStats(file) {
   return new Promise((resolve, reject) => {
     fs.lstat(file, (error, stats) => {
       if (error) {
-        reject(error)
+        reject(error);
       } else {
-        resolve(stats)
+        resolve(stats);
       }
-    })
-  })
+    });
+  });
 }
 
-module.exports = getFileStats
+module.exports = getFileStats;

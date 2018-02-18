@@ -4,8 +4,8 @@ Some API methods require an authentication token. This token is a [JSON web toke
 
 Once you obtain an API token (see below) you can pass it to the server in one of two ways:
 
-  - For GET/HEAD requests, use the `?token` query parameter
-  - For all other requests, use the `{token}` parameter as part of the JSON in the request body
+* For GET/HEAD requests, use the `?token` query parameter
+* For all other requests, use the `{token}` parameter as part of the JSON in the request body
 
 ### POST /\_auth
 
@@ -40,7 +40,7 @@ Required scope: none
 
 Query parameters:
 
-  - `token` - The auth token to verify and decode
+* `token` - The auth token to verify and decode
 
 Example:
 
@@ -102,8 +102,8 @@ Required scope: `blacklist.add`
 
 Body parameters:
 
-  - `token` - The auth token
-  - `packageName` - The package to add to the blacklist
+* `token` - The auth token
+* `packageName` - The package to add to the blacklist
 
 Example:
 
@@ -122,7 +122,7 @@ Required scope: `blacklist.remove`
 
 Body parameters:
 
-  - `token` - The auth token
+* `token` - The auth token
 
 Example:
 

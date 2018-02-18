@@ -1,35 +1,35 @@
-const url = require("url")
-const validatePackageName = require("./validatePackageName")
+const url = require("url");
+const validatePackageName = require("./validatePackageName");
 
-const URLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/
+const URLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
 function decodeParam(param) {
   if (param) {
     try {
-      return decodeURIComponent(param)
+      return decodeURIComponent(param);
     } catch (error) {
       // Ignore invalid params.
     }
   }
 
-  return ""
+  return "";
 }
 
 function parsePackageURL(packageURL) {
-  const { pathname, search, query } = url.parse(packageURL, true)
+  const { pathname, search, query } = url.parse(packageURL, true);
 
-  const match = URLFormat.exec(pathname)
+  const match = URLFormat.exec(pathname);
 
   // Disallow invalid URL formats.
-  if (match == null) return null
+  if (match == null) return null;
 
-  const packageName = match[1]
+  const packageName = match[1];
 
   // Disallow invalid npm package names.
-  if (!validatePackageName(packageName)) return null
+  if (!validatePackageName(packageName)) return null;
 
-  const packageVersion = decodeParam(match[2]) || "latest"
-  const filename = decodeParam(match[3])
+  const packageVersion = decodeParam(match[2]) || "latest";
+  const filename = decodeParam(match[3]);
 
   return {
     // If the URL is /@scope/name@version/file.js?main=browser:
@@ -39,7 +39,7 @@ function parsePackageURL(packageURL) {
     packageName, // @scope/name
     packageVersion, // version
     filename // /file.js
-  }
+  };
 }
 
-module.exports = parsePackageURL
+module.exports = parsePackageURL;

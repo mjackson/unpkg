@@ -1,6 +1,8 @@
-import React from "react"
-import contentHTML from "./Home.md"
+import React from "react";
+import contentHTML from "./Home.md";
 
-const Home = () => <div className="wrapper" dangerouslySetInnerHTML={{ __html: contentHTML }} />
+const Home = () => (
+  <div className="wrapper" dangerouslySetInnerHTML={{ __html: contentHTML }} />
+);
 
-export default Home
+export default Home;

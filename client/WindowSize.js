@@ -1,34 +1,34 @@
-import React from "react"
-import PropTypes from "prop-types"
-import addEvent from "./utils/addEvent"
-import removeEvent from "./utils/removeEvent"
+import React from "react";
+import PropTypes from "prop-types";
+import addEvent from "./utils/addEvent";
+import removeEvent from "./utils/removeEvent";
 
-const ResizeEvent = "resize"
+const ResizeEvent = "resize";
 
 class WindowSize extends React.Component {
   static propTypes = {
     onChange: PropTypes.func
-  }
+  };
 
   handleWindowResize = () => {
     if (this.props.onChange)
       this.props.onChange({
         width: window.innerWidth,
         height: window.innerHeight
-      })
-  }
+      });
+  };
 
   componentDidMount() {
-    addEvent(window, ResizeEvent, this.handleWindowResize)
+    addEvent(window, ResizeEvent, this.handleWindowResize);
   }
 
   componentWillUnmount() {
-    removeEvent(window, ResizeEvent, this.handleWindowResize)
+    removeEvent(window, ResizeEvent, this.handleWindowResize);
   }
 
   render() {
-    return null
+    return null;
   }
 }
 
-export default WindowSize
+export default WindowSize;
