@@ -49,7 +49,7 @@ function MainPage({
     e(
       "body",
       null,
-      e("div", { id: "app", dangerouslySetInnerHTML: { __html: content } }),
+      e("div", { id: "root", dangerouslySetInnerHTML: { __html: content } }),
       scripts.map(s => e("script", { key: s, src: s }))
     )
   );
