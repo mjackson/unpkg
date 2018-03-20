@@ -1,5 +1,5 @@
 const url = require("url");
-const validatePackageName = require("./validatePackageName");
+const isValidPackageName = require("./isValidPackageName");
 
 const URLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
@@ -15,18 +15,22 @@ function decodeParam(param) {
   return "";
 }
 
-function parsePackageURL(packageURL) {
-  const { pathname, search, query } = url.parse(packageURL, true);
+function parsePackageURL(originalURL) {
+  const { pathname, search, query } = url.parse(originalURL, true);
 
   const match = URLFormat.exec(pathname);
 
   // Disallow invalid URL formats.
-  if (match == null) return null;
+  if (match == null) {
+    return null;
+  }
 
   const packageName = match[1];
 
   // Disallow invalid npm package names.
-  if (!validatePackageName(packageName)) return null;
+  if (!isValidPackageName(packageName)) {
+    return null;
+  }
 
   const packageVersion = decodeParam(match[2]) || "latest";
   const filename = decodeParam(match[3]);

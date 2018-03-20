@@ -2,14 +2,14 @@ const validateNpmPackageName = require("validate-npm-package-name");
 const parsePackageURL = require("../utils/parsePackageURL");
 const createSearch = require("./utils/createSearch");
 
-const KnownQueryParams = {
+const knownQueryParams = {
   main: true,
   meta: true,
   module: true
 };
 
 function isKnownQueryParam(param) {
-  return !!KnownQueryParams[param];
+  return !!knownQueryParams[param];
 }
 
 function queryIsKnown(query) {
