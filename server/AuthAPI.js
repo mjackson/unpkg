@@ -52,7 +52,7 @@ function createToken(scopes = {}) {
   });
 }
 
-const RevokedTokensSet = "revoked-tokens";
+const revokedTokensSet = "revoked-tokens";
 
 function verifyToken(token) {
   return new Promise((resolve, reject) => {
@@ -63,7 +63,7 @@ function verifyToken(token) {
         reject(error);
       } else {
         if (payload.jti) {
-          db.sismember(RevokedTokensSet, payload.jti, (error, value) => {
+          db.sismember(revokedTokensSet, payload.jti, (error, value) => {
             if (error) {
               reject(error);
             } else {
@@ -82,7 +82,7 @@ function revokeToken(token) {
   return verifyToken(token).then(payload => {
     if (payload) {
       return new Promise((resolve, reject) => {
-        db.sadd(RevokedTokensSet, payload.jti, error => {
+        db.sadd(revokedTokensSet, payload.jti, error => {
           if (error) {
             reject(error);
           } else {
@@ -96,7 +96,7 @@ function revokeToken(token) {
 
 function removeAllRevokedTokens() {
   return new Promise((resolve, reject) => {
-    db.del(RevokedTokensSet, error => {
+    db.del(revokedTokensSet, error => {
       if (error) {
         reject(error);
       } else {

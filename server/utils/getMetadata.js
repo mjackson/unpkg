@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const SRIToolbox = require("sri-toolbox");
+
 const getFileContentType = require("./getFileContentType");
 const getFileStats = require("./getFileStats");
 const getFileType = require("./getFileType");

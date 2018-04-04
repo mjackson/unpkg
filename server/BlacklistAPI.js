@@ -1,10 +1,10 @@
 const db = require("./utils/redis");
 
-const BlacklistSet = "blacklisted-packages";
+const blacklistSet = "blacklisted-packages";
 
 function addPackage(packageName) {
   return new Promise((resolve, reject) => {
-    db.sadd(BlacklistSet, packageName, (error, value) => {
+    db.sadd(blacklistSet, packageName, (error, value) => {
       if (error) {
         reject(error);
       } else {
@@ -16,7 +16,7 @@ function addPackage(packageName) {
 
 function removePackage(packageName) {
   return new Promise((resolve, reject) => {
-    db.srem(BlacklistSet, packageName, (error, value) => {
+    db.srem(blacklistSet, packageName, (error, value) => {
       if (error) {
         reject(error);
       } else {
@@ -28,7 +28,7 @@ function removePackage(packageName) {
 
 function removeAllPackages() {
   return new Promise((resolve, reject) => {
-    db.del(BlacklistSet, error => {
+    db.del(blacklistSet, error => {
       if (error) {
         reject(error);
       } else {
@@ -40,7 +40,7 @@ function removeAllPackages() {
 
 function getPackages() {
   return new Promise((resolve, reject) => {
-    db.smembers(BlacklistSet, (error, value) => {
+    db.smembers(blacklistSet, (error, value) => {
       if (error) {
         reject(error);
       } else {
@@ -52,7 +52,7 @@ function getPackages() {
 
 function includesPackage(packageName) {
   return new Promise((resolve, reject) => {
-    db.sismember(BlacklistSet, packageName, (error, value) => {
+    db.sismember(blacklistSet, packageName, (error, value) => {
       if (error) {
         reject(error);
       } else {

@@ -3,22 +3,22 @@ const invariant = require("invariant");
 const gunzip = require("gunzip-maybe");
 const ndjson = require("ndjson");
 
-const CloudflareAPIURL = "https://api.cloudflare.com";
-const CloudflareEmail = process.env.CLOUDFLARE_EMAIL;
-const CloudflareKey = process.env.CLOUDFLARE_KEY;
+const cloudflareAPIURL = "https://api.cloudflare.com";
+const cloudflareEmail = process.env.CLOUDFLARE_EMAIL;
+const cloudflareKey = process.env.CLOUDFLARE_KEY;
 
 invariant(
-  CloudflareEmail,
+  cloudflareEmail,
   "Missing the $CLOUDFLARE_EMAIL environment variable"
 );
 
-invariant(CloudflareKey, "Missing the $CLOUDFLARE_KEY environment variable");
+invariant(cloudflareKey, "Missing the $CLOUDFLARE_KEY environment variable");
 
 function get(path, headers) {
-  return fetch(`${CloudflareAPIURL}/client/v4${path}`, {
+  return fetch(`${cloudflareAPIURL}/client/v4${path}`, {
     headers: Object.assign({}, headers, {
-      "X-Auth-Email": CloudflareEmail,
-      "X-Auth-Key": CloudflareKey
+      "X-Auth-Email": cloudflareEmail,
+      "X-Auth-Key": cloudflareKey
     })
   });
 }

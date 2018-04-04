@@ -1,7 +1,7 @@
 const URL = require("whatwg-url");
 const warning = require("warning");
 
-const BareIdentifierFormat = /^((?:@[^\/]+\/)?[^\/]+)(\/.*)?$/;
+const bareIdentifierFormat = /^((?:@[^\/]+\/)?[^\/]+)(\/.*)?$/;
 
 function unpkgRewriteBabelPlugin(dependencies = {}) {
   return {
@@ -22,7 +22,7 @@ function unpkgRewriteBabelPlugin(dependencies = {}) {
           path.node.source.value = `${path.node.source.value}?module`;
         } else {
           // "bare" identifier
-          const match = BareIdentifierFormat.exec(path.node.source.value);
+          const match = bareIdentifierFormat.exec(path.node.source.value);
           const packageName = match[1];
           const file = match[2] || "";
 

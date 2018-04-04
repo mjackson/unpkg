@@ -1,16 +1,17 @@
 const parseURL = require("url").parse;
 const startOfDay = require("date-fns/start_of_day");
 const addDays = require("date-fns/add_days");
-const parsePackageURL = require("./utils/parsePackageURL");
-const CloudflareAPI = require("./CloudflareAPI");
-const StatsAPI = require("./StatsAPI");
 
 const db = require("./utils/redis");
+const parsePackageURL = require("./utils/parsePackageURL");
+
+const CloudflareAPI = require("./CloudflareAPI");
+const StatsAPI = require("./StatsAPI");
 
 /**
  * Domains we want to analyze.
  */
-const DomainNames = [
+const domainNames = [
   "unpkg.com"
   //"npmcdn.com" // We don't have log data on npmcdn.com yet :/
 ];
@@ -18,7 +19,7 @@ const DomainNames = [
 /**
  * The window of time to download in a single fetch.
  */
-const LogWindowSeconds = 30;
+const logWindowSeconds = 30;
 
 function getSeconds(date) {
   return Math.floor(date.getTime() / 1000);
@@ -207,7 +208,7 @@ function startZone(zone) {
       const maxSeconds = toSeconds(now - oneMinute * 30);
 
       if (startSeconds < maxSeconds) {
-        const endSeconds = startSeconds + LogWindowSeconds;
+        const endSeconds = startSeconds + logWindowSeconds;
 
         ingestLogs(zone, startSeconds, endSeconds).then(
           function() {
@@ -228,7 +229,7 @@ function startZone(zone) {
   takeATurn();
 }
 
-Promise.all(DomainNames.map(CloudflareAPI.getZones)).then(results => {
+Promise.all(domainNames.map(CloudflareAPI.getZones)).then(results => {
   const zones = results.reduce((memo, zones) => {
     return memo.concat(zones);
   });

@@ -1,4 +1,5 @@
 const db = require("./utils/redis");
+
 const CloudflareAPI = require("./CloudflareAPI");
 const BlacklistAPI = require("./BlacklistAPI");
 

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+
 const getFileStats = require("./getFileStats");
 
 function getEntries(dir) {
