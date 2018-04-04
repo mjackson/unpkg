@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const semver = require("semver");
+
 const createPackageURL = require("../utils/createPackageURL");
 const createSearch = require("./utils/createSearch");
 const getPackageInfo = require("./utils/getPackageInfo");
@@ -69,11 +70,12 @@ function fetchFile(req, res, next) {
         .send(`Cannot get info for package "${req.packageName}"`);
     }
 
-    if (packageInfo == null || packageInfo.versions == null)
+    if (packageInfo == null || packageInfo.versions == null) {
       return res
         .status(404)
         .type("text")
         .send(`Cannot find package "${req.packageName}"`);
+    }
 
     req.packageInfo = packageInfo;
 
@@ -84,6 +86,7 @@ function fetchFile(req, res, next) {
       getPackage(req.packageConfig, (error, outputDir) => {
         if (error) {
           console.error(error);
+
           res
             .status(500)
             .type("text")
@@ -95,9 +98,9 @@ function fetchFile(req, res, next) {
           let useIndex = true;
 
           if (req.query.module != null) {
-            // They want an ES module. Try "module", "jsnext:main", and "/"
-            // https://github.com/rollup/rollup/wiki/pkg.module
+            // They want an ES module.
             if (!filename) {
+              // See https://github.com/rollup/rollup/wiki/pkg.module
               filename =
                 req.packageConfig.module ||
                 req.packageConfig["jsnext:main"] ||
@@ -105,15 +108,18 @@ function fetchFile(req, res, next) {
             }
           } else if (filename) {
             // They are requesting an explicit filename. Only try to find an
-            // index file if they are NOT requesting an HTML directory listing.
-            useIndex = filename[filename.length - 1] !== "/";
+            // index.js if they are NOT requesting an HTML directory listing.
+            useIndex = filename.charAt(filename.length - 1) !== "/";
           } else if (
             req.query.main &&
             typeof req.packageConfig[req.query.main] === "string"
           ) {
             // They specified a custom ?main field.
+            // Deprecated, see https://github.com/unpkg/unpkg/issues/63
             filename = req.packageConfig[req.query.main];
 
+            // Count which packages are using this so we can warn them when we
+            // remove this functionality.
             incrementCounter(
               "package-json-custom-main",
               req.packageSpec + "?main=" + req.query.main,
@@ -121,15 +127,15 @@ function fetchFile(req, res, next) {
             );
           } else if (typeof req.packageConfig.unpkg === "string") {
             // The "unpkg" field allows packages to explicitly declare the
-            // file to serve at the bare URL (see #59).
+            // file to serve at the bare URL.
             filename = req.packageConfig.unpkg;
           } else if (typeof req.packageConfig.browser === "string") {
             // Fall back to the "browser" field if declared (only support strings).
+            // Deprecated, see https://github.com/unpkg/unpkg/issues/63
             filename = req.packageConfig.browser;
 
             // Count which packages + versions are actually using this fallback
             // so we can warn them when we deprecate this functionality.
-            // See https://github.com/unpkg/unpkg/issues/63
             incrementCounter(
               "package-json-browser-fallback",
               req.packageSpec,
@@ -166,6 +172,7 @@ function fetchFile(req, res, next) {
                 // Need to redirect to the module file so relative imports resolve
                 // correctly. Cache module redirects for 1 minute.
                 delete req.query.main;
+
                 res
                   .set({
                     "Cache-Control": "public, max-age=60",

@@ -1,11 +1,12 @@
 require("isomorphic-fetch");
+
 const createCache = require("./createCache");
 const createMutex = require("./createMutex");
 
-const RegistryURL =
+const registryURL =
   process.env.NPM_REGISTRY_URL || "https://registry.npmjs.org";
 
-const PackageInfoCache = createCache("packageInfo");
+const packageInfoCache = createCache("packageInfo");
 
 function fetchPackageInfo(packageName) {
   console.log(`info: Fetching package info for ${packageName}`);
@@ -17,7 +18,7 @@ function fetchPackageInfo(packageName) {
     encodedPackageName = encodeURIComponent(packageName);
   }
 
-  const url = `${RegistryURL}/${encodedPackageName}`;
+  const url = `${registryURL}/${encodedPackageName}`;
 
   return fetch(url, {
     headers: {
@@ -34,25 +35,25 @@ const PackageNotFound = "PackageNotFound";
 // the registry for the same package info.
 const fetchMutex = createMutex((packageName, callback) => {
   fetchPackageInfo(packageName).then(
-    function(value) {
+    value => {
       if (value == null) {
         // Cache 404s for 5 minutes. This prevents us from making
         // unnecessary requests to the registry for bad package names.
         // In the worst case, a brand new package's info will be
         // available within 5 minutes.
-        PackageInfoCache.set(packageName, PackageNotFound, 300, function() {
+        packageInfoCache.set(packageName, PackageNotFound, 300, () => {
           callback(null, value);
         });
       } else {
         // Cache valid package info for 1 minute.
-        PackageInfoCache.set(packageName, value, 60, function() {
+        packageInfoCache.set(packageName, value, 60, () => {
           callback(null, value);
         });
       }
     },
-    function(error) {
+    error => {
       // Do not cache errors.
-      PackageInfoCache.del(packageName, function() {
+      packageInfoCache.del(packageName, () => {
         callback(error);
       });
     }
@@ -60,7 +61,7 @@ const fetchMutex = createMutex((packageName, callback) => {
 });
 
 function getPackageInfo(packageName, callback) {
-  PackageInfoCache.get(packageName, function(error, value) {
+  packageInfoCache.get(packageName, (error, value) => {
     if (error || value != null) {
       callback(error, value === PackageNotFound ? null : value);
     } else {

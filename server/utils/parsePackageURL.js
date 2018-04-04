@@ -1,7 +1,8 @@
 const url = require("url");
+
 const isValidPackageName = require("./isValidPackageName");
 
-const URLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
+const packageURLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
 function decodeParam(param) {
   if (param) {
@@ -18,7 +19,7 @@ function decodeParam(param) {
 function parsePackageURL(originalURL) {
   const { pathname, search, query } = url.parse(originalURL, true);
 
-  const match = URLFormat.exec(pathname);
+  const match = packageURLFormat.exec(pathname);
 
   // Disallow invalid URL formats.
   if (match == null) {
