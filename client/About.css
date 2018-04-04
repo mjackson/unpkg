@@ -1,0 +1,13 @@
+.about-logos {
+  margin: 2em 0;
+  display: flex;
+  justify-content: center;
+}
+.about-logo {
+  text-align: center;
+  flex: 1;
+  max-width: 80%;
+}
+.about-logo img {
+  max-width: 60%;
+}

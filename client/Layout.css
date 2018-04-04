@@ -1,0 +1,38 @@
+.layout-title {
+  margin: 0;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 5em;
+}
+
+.layout-nav {
+  margin: 0 0 3em;
+}
+
+.layout-navList {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+.layout-navList li {
+  flex-basis: auto;
+  list-style-type: none;
+  display: inline-block;
+  font-size: 1.1em;
+  margin: 0 10px;
+}
+.layout-navList li a:link {
+  text-decoration: none;
+}
+.layout-navList li a:link,
+.layout-navList li a:visited {
+  color: black;
+}
+
+.layout-navUnderline {
+  height: 4px;
+  background-color: black;
+  position: absolute;
+  left: 0;
+}

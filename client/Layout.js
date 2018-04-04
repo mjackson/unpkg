@@ -1,7 +1,10 @@
+import "./Layout.css";
+
 import React from "react";
 import PropTypes from "prop-types";
 import { Motion, spring } from "react-motion";
 import { Switch, Route, Link, withRouter } from "react-router-dom";
+
 import WindowSize from "./WindowSize";
 import About from "./About";
 import Stats from "./Stats";
@@ -78,14 +81,14 @@ class Layout extends React.Component {
     };
 
     return (
-      <div>
+      <div className="layout">
         <WindowSize onChange={this.adjustUnderline} />
         <div className="wrapper">
           <header>
             <h1 className="layout-title">unpkg</h1>
             <nav className="layout-nav">
               <ol
-                className="layout-nav-list"
+                className="layout-navList"
                 ref={node => (this.listNode = node)}
               >
                 <li>
@@ -103,7 +106,7 @@ class Layout extends React.Component {
                 style={style}
                 children={style => (
                   <div
-                    className="layout-nav-underline"
+                    className="layout-navUnderline"
                     style={{
                       WebkitTransform: `translate3d(${style.left}px,0,0)`,
                       transform: `translate3d(${style.left}px,0,0)`,

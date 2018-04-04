@@ -1,0 +1,8 @@
+.table-filter {
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.regions-table .country-row td.country-name {
+  padding-left: 20px;
+}

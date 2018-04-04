@@ -1,9 +1,10 @@
 body {
-  font-size: 16px;
+  font-size: 14px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.7;
   padding: 5px 20px;
+  color: #000000;
 }
 
 @media (min-width: 800px) {
@@ -59,74 +60,4 @@ td {
 .wrapper {
   max-width: 700px;
   margin: 0 auto;
-}
-
-.layout-title {
-  margin: 0;
-  text-transform: uppercase;
-  text-align: center;
-  font-size: 5em;
-}
-
-.layout-nav {
-  margin: 0 0 3em;
-}
-.layout-nav-list {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-}
-.layout-nav-list li {
-  flex-basis: auto;
-  list-style-type: none;
-  display: inline-block;
-  font-size: 1.1em;
-  margin: 0 10px;
-}
-.layout-nav-list li a:link {
-  text-decoration: none;
-}
-.layout-nav-list li a:link,
-.layout-nav-list li a:visited {
-  color: black;
-}
-.layout-nav-underline {
-  height: 4px;
-  background-color: black;
-  position: absolute;
-  left: 0;
-}
-
-.home-example {
-  text-align: center;
-  background-color: #eee;
-  margin: 2em 0;
-  padding: 5px 0;
-}
-
-.table-filter {
-  font-size: 0.8em;
-  text-align: right;
-}
-
-.regions-table .continent-row {
-  font-weight: bold;
-}
-.regions-table .country-row td.country-name {
-  padding-left: 20px;
-}
-
-.about-logos {
-  margin: 2em 0;
-  display: flex;
-  justify-content: center;
-}
-.about-logo {
-  text-align: center;
-  flex: 1;
-  max-width: 80%;
-}
-.about-logo img {
-  max-width: 60%;
 }

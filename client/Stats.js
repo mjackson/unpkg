@@ -1,23 +1,28 @@
+import "./Stats.css";
+
 import React from "react";
 import PropTypes from "prop-types";
 import formatBytes from "pretty-bytes";
 import formatDate from "date-fns/format";
 import parseDate from "date-fns/parse";
+import { continents, countries } from "countries-list";
+
 import formatNumber from "./utils/formatNumber";
 import formatPercent from "./utils/formatPercent";
 
-import { continents, countries } from "countries-list";
-
-const getCountriesByContinent = continent =>
-  Object.keys(countries).filter(
+function getCountriesByContinent(continent) {
+  return Object.keys(countries).filter(
     country => countries[country].continent === continent
   );
+}
 
-const sumKeyValues = (hash, keys) =>
-  keys.reduce((n, key) => n + (hash[key] || 0), 0);
+function sumKeyValues(hash, keys) {
+  return keys.reduce((n, key) => n + (hash[key] || 0), 0);
+}
 
-const sumValues = hash =>
-  Object.keys(hash).reduce((memo, key) => memo + hash[key], 0);
+function sumValues(hash) {
+  return Object.keys(hash).reduce((memo, key) => memo + hash[key], 0);
+}
 
 class Stats extends React.Component {
   static propTypes = {
@@ -110,16 +115,22 @@ class Stats extends React.Component {
       ) {
         regionRows.push(
           <tr key={continent} className="continent-row">
-            <td>{continentName}</td>
             <td>
-              {formatNumber(continentData.requests)} ({formatPercent(
-                continentData.requests / totals.requests.all
-              )}%)
+              <strong>{continentName}</strong>
             </td>
             <td>
-              {formatBytes(continentData.bandwidth)} ({formatPercent(
-                continentData.bandwidth / totals.bandwidth.all
-              )}%)
+              <strong>
+                {formatNumber(continentData.requests)} ({formatPercent(
+                  continentData.requests / totals.requests.all
+                )}%)
+              </strong>
+            </td>
+            <td>
+              <strong>
+                {formatBytes(continentData.bandwidth)} ({formatPercent(
+                  continentData.bandwidth / totals.bandwidth.all
+                )}%)
+              </strong>
             </td>
           </tr>
         );
@@ -220,9 +231,15 @@ class Stats extends React.Component {
         <table cellSpacing="0" cellPadding="0" style={{ width: "100%" }}>
           <thead>
             <tr>
-              <th>Package</th>
-              <th>Requests (% of total)</th>
-              <th>Bandwidth (% of total)</th>
+              <th>
+                <strong>Package</strong>
+              </th>
+              <th>
+                <strong>Requests (% of total)</strong>
+              </th>
+              <th>
+                <strong>Bandwidth (% of total)</strong>
+              </th>
             </tr>
           </thead>
           <tbody>{packageRows}</tbody>
@@ -263,9 +280,15 @@ class Stats extends React.Component {
         >
           <thead>
             <tr>
-              <th>Region</th>
-              <th>Requests (% of total)</th>
-              <th>Bandwidth (% of total)</th>
+              <th>
+                <strong>Region</strong>
+              </th>
+              <th>
+                <strong>Requests (% of total)</strong>
+              </th>
+              <th>
+                <strong>Bandwidth (% of total)</strong>
+              </th>
             </tr>
           </thead>
           <tbody>{regionRows}</tbody>
@@ -282,8 +305,12 @@ class Stats extends React.Component {
         <table cellSpacing="0" cellPadding="0" style={{ width: "100%" }}>
           <thead>
             <tr>
-              <th>Protocol</th>
-              <th>Requests (% of total)</th>
+              <th>
+                <strong>Protocol</strong>
+              </th>
+              <th>
+                <strong>Requests (% of total)</strong>
+              </th>
             </tr>
           </thead>
           <tbody>{protocolRows}</tbody>
