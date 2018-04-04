@@ -1,19 +1,23 @@
 const React = require("react");
 const semver = require("semver");
-const DirectoryListing = require("./DirectoryListing");
+
 const readCSS = require("../utils/readCSS");
+
+const DirectoryListing = require("./DirectoryListing");
 
 const e = React.createElement;
 
 const IndexPageStyle = readCSS(__dirname, "IndexPage.css");
 const IndexPageScript = `
-var s = document.getElementById('version'), v = s.value
+var s = document.getElementById('version'), v = s.value;
 s.onchange = function () {
-  window.location.href = window.location.href.replace('@' + v, '@' + s.value)
-}
+  window.location.href = window.location.href.replace('@' + v, '@' + s.value);
+};
 `;
 
-const byVersion = (a, b) => (semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0);
+function byVersion(a, b) {
+  return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
+}
 
 function IndexPage({ packageInfo, version, dir, entries }) {
   const versions = Object.keys(packageInfo.versions).sort(byVersion);

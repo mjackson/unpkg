@@ -1,10 +1,12 @@
 const React = require("react");
-const prettyBytes = require("pretty-bytes");
+const formatBytes = require("pretty-bytes");
 const getFileContentType = require("../utils/getFileContentType");
 
 const e = React.createElement;
 
-const formatTime = time => new Date(time).toISOString();
+function formatTime(time) {
+  return new Date(time).toISOString();
+}
 
 function DirectoryListing({ dir, entries }) {
   const rows = entries.map(({ file, stats }, index) => {
@@ -16,7 +18,7 @@ function DirectoryListing({ dir, entries }) {
       { key: file, className: index % 2 ? "odd" : "even" },
       e("td", null, e("a", { title: file, href }, file)),
       e("td", null, isDir ? "-" : getFileContentType(file)),
-      e("td", null, isDir ? "-" : prettyBytes(stats.size)),
+      e("td", null, isDir ? "-" : formatBytes(stats.size)),
       e("td", null, isDir ? "-" : formatTime(stats.mtime))
     );
   });
