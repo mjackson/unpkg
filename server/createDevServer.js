@@ -30,6 +30,7 @@ function createDevServer(publicDir, webpackConfig, devOrigin) {
 
     // webpack-dev-server options
     contentBase: false,
+    disableHostCheck: true,
     before(app) {
       // This runs before webpack-dev-middleware
       app.disable("x-powered-by");
