@@ -3,7 +3,7 @@
 [build-badge]: https://img.shields.io/travis/unpkg/unpkg/master.svg?style=flat-square
 [build]: https://travis-ci.org/unpkg/unpkg
 
-unpkg is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for everything on [npm](https://www.npmjs.com/). Use it to quickly and easily load any file from any package using a URL like:
+[unpkg](https://unpkg.com) is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for everything on [npm](https://www.npmjs.com/). Use it to quickly and easily load any file from any package using a URL like:
 
 <div style="text-align:center">
   <code>unpkg.com/:package@:version/:file</code>
