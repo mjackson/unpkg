@@ -36,8 +36,15 @@ function createServer(publicDir, statsFile) {
   }
 
   app.use(errorHandler);
-  app.use(express.static(publicDir, { maxAge: "365d" }));
-  app.use(staticAssets(statsFile));
+
+  if (publicDir) {
+    app.use(express.static(publicDir, { maxAge: "365d" }));
+  }
+
+  if (statsFile) {
+    app.use(staticAssets(statsFile));
+  }
+
   app.use(createRouter());
 
   const server = http.createServer(app);

@@ -40,7 +40,11 @@ function createDevServer(publicDir, webpackConfig, devOrigin) {
 
   // This runs after webpack-dev-middleware
   server.use(devErrorHandler());
-  server.use(express.static(publicDir));
+
+  if (publicDir) {
+    server.use(express.static(publicDir));
+  }
+
   server.use(devAssets(compiler));
   server.use(createRouter());
 
