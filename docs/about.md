@@ -6,16 +6,16 @@ The fast, global infrastructure that powers unpkg is generously donated by [Clou
 
 <div class="about-logos">
   <div class="about-logo">
-    <a href="https://www.cloudflare.com"><img src="./CloudflareLogo.png"></a>
+    <a href="https://www.cloudflare.com"><img src="cloudflare-logo.png"></a>
   </div>
   <div class="about-logo">
-    <a href="https://www.heroku.com"><img src="./HerokuLogo.png"></a>
+    <a href="https://www.heroku.com"><img src="heroku-logo.png"></a>
   </div>
 </div>
 
 ### Cache Behavior
 
-The CDN caches all files based on their permanent URL, which includes the npm package version. This works because npm does not allow package authors to overwrite a package that has already been published with a different one at the same version number.
+The CDN caches files based on their permanent URL, which includes the npm package version. This works because npm does not allow package authors to overwrite a package that has already been published with a different one at the same version number.
 
 URLs that do not specify a package version number redirect to one that does. This is the `latest` version when no version is specified, or the `maxSatisfying` version when a [semver version](https://github.com/npm/node-semver) is given. Redirects are cached for 5 minutes.
 
@@ -37,4 +37,4 @@ unpkg maintains a list of packages that are known to be malicious. If you find s
 
 ### Feedback
 
-If you think this is useful, I'd love to hear from you. Please reach out to [@mjackson](https://twitter.com/mjackson) with any questions/concerns.
+If you think this is useful, we'd love to hear from you. Please reach out to [@unpkg](https://twitter.com/unpkg) with any questions or concerns.

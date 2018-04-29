@@ -2,15 +2,10 @@ import "./About.css";
 
 import React from "react";
 
-import contentHTML from "./About.md";
+import html from "../docs/about.md";
 
 function About() {
-  return (
-    <div
-      className="wrapper"
-      dangerouslySetInnerHTML={{ __html: contentHTML }}
-    />
-  );
+  return <div className="wrapper" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export default About;

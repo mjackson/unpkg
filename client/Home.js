@@ -2,15 +2,10 @@ import "./Home.css";
 
 import React from "react";
 
-import contentHTML from "./Home.md";
+import html from "../docs/home.md";
 
 function Home() {
-  return (
-    <div
-      className="wrapper"
-      dangerouslySetInnerHTML={{ __html: contentHTML }}
-    />
-  );
+  return <div className="wrapper" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export default Home;
