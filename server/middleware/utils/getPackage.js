@@ -22,7 +22,7 @@ function stripNamePrefix(headers) {
 }
 
 function ignoreSymlinks(file, headers) {
-  return headers.type === "link";
+  return headers.type === "symlink";
 }
 
 function extractResponse(response, outputDir) {
