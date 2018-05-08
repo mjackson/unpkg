@@ -21,8 +21,8 @@ function stripNamePrefix(headers) {
   return headers;
 }
 
-function ignoreSymlinks(file, headers) {
-  return headers.type === "symlink";
+function ignoreLinks(file, headers) {
+  return headers.type === "link" || headers.type === "symlink";
 }
 
 function extractResponse(response, outputDir) {
@@ -30,7 +30,7 @@ function extractResponse(response, outputDir) {
     const extract = tar.extract(outputDir, {
       readable: true, // All dirs/files should be readable.
       map: stripNamePrefix,
-      ignore: ignoreSymlinks
+      ignore: ignoreLinks
     });
 
     response.body
