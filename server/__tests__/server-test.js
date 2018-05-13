@@ -20,6 +20,15 @@ describe("The server", () => {
       });
   });
 
+  it("rejects Object.prototype methods", done => {
+    request(server)
+      .get("/hasOwnProperty/")
+      .end((err, res) => {
+        expect(res.statusCode).toBe(403);
+        done();
+      });
+  });
+
   it("redirects invalid query params", done => {
     request(server)
       .get("/react?main=index&invalid")
