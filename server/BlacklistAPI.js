@@ -1,6 +1,7 @@
 const db = require("./utils/redis");
 
 const blacklistSet = "blacklisted-packages";
+const objectPrototypes = Object.getOwnPropertyNames(Object.prototype);
 
 function addPackage(packageName) {
   return new Promise((resolve, reject) => {
@@ -52,13 +53,17 @@ function getPackages() {
 
 function includesPackage(packageName) {
   return new Promise((resolve, reject) => {
-    db.sismember(blacklistSet, packageName, (error, value) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(value === 1);
-      }
-    });
+    if (objectPrototypes.indexOf(packageName) > -1) {
+      reject("Disallowed package name.");
+    } else {
+      db.sismember(blacklistSet, packageName, (error, value) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(value === 1);
+        }
+      });
+    }
   });
 }
 
