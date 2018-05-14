@@ -1,5 +1,5 @@
 function createMutex(doWork) {
-  const mutex = {};
+  const mutex = Object.create(null);
 
   return (key, payload, callback) => {
     if (mutex[key]) {
