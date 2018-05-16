@@ -20,6 +20,35 @@ const AutoIndex = !process.env.DISABLE_INDEX;
  */
 const MaximumDepth = 128;
 
+function serveMetadata(req, res) {
+  getMetadata(
+    req.packageDir,
+    req.filename,
+    req.stats,
+    MaximumDepth,
+    (error, metadata) => {
+      if (error) {
+        console.error(error);
+
+        res
+          .status(500)
+          .type("text")
+          .send(
+            `Cannot generate metadata for ${req.packageSpec}${req.filename}`
+          );
+      } else {
+        // Cache metadata for 1 year.
+        res
+          .set({
+            "Cache-Control": "public, max-age=31536000",
+            "Cache-Tag": "meta"
+          })
+          .send(metadata);
+      }
+    }
+  );
+}
+
 function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
   const dependencies = Object.assign(
     {},
@@ -40,140 +69,126 @@ function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
   });
 }
 
+function serveJavaScriptModule(req, res) {
+  const file = path.join(req.packageDir, req.filename);
+
+  rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
+    if (error) {
+      console.error(error);
+
+      const debugInfo =
+        error.constructor.name +
+        ": " +
+        error.message.replace(/^.*?\/unpkg-.+?\//, `/${req.packageSpec}/`) +
+        "\n\n" +
+        error.codeFrame;
+
+      res
+        .status(500)
+        .type("text")
+        .send(
+          `Cannot generate module for ${req.packageSpec}${
+            req.filename
+          }\n\n${debugInfo}`
+        );
+    } else {
+      // Cache modules for 1 year.
+      res
+        .set({
+          "Content-Type": "application/javascript; charset=utf-8",
+          "Content-Length": Buffer.byteLength(code),
+          "Cache-Control": "public, max-age=31536000",
+          "Cache-Tag": "file,js-file,js-module"
+        })
+        .send(code);
+    }
+  });
+}
+
+function serveStaticFile(req, res) {
+  const file = path.join(req.packageDir, req.filename);
+  const tags = ["file"];
+
+  const ext = path.extname(req.filename).substr(1);
+
+  if (ext) {
+    tags.push(`${ext}-file`);
+  }
+
+  let contentType = getFileContentType(file);
+
+  if (contentType === "application/javascript") {
+    contentType += "; charset=utf-8";
+  }
+
+  // Cache files for 1 year.
+  res.set({
+    "Content-Type": contentType,
+    "Content-Length": req.stats.size,
+    "Cache-Control": "public, max-age=31536000",
+    "Last-Modified": req.stats.mtime.toUTCString(),
+    ETag: etag(req.stats),
+    "Cache-Tag": tags.join(",")
+  });
+
+  const stream = fs.createReadStream(file);
+
+  stream.on("error", error => {
+    console.error(`Cannot send file ${req.packageSpec}${req.filename}`);
+    console.error(error);
+    res.sendStatus(500);
+  });
+
+  stream.pipe(res);
+}
+
+function serveIndex(req, res) {
+  const dir = path.join(req.packageDir, req.filename);
+
+  getEntries(dir).then(
+    entries => {
+      const html = renderPage(IndexPage, {
+        packageInfo: req.packageInfo,
+        version: req.packageVersion,
+        dir: req.filename,
+        entries
+      });
+
+      // Cache HTML directory listings for 1 minute.
+      res
+        .set({
+          "Cache-Control": "public, max-age=60",
+          "Cache-Tag": "index"
+        })
+        .send(html);
+    },
+    error => {
+      console.error(error);
+
+      res
+        .status(500)
+        .type("text")
+        .send(`Cannot read entries for ${req.packageSpec}${req.filename}`);
+    }
+  );
+}
+
 /**
  * Send the file, JSON metadata, or HTML directory listing.
  */
 function serveFile(req, res) {
   if (req.query.meta != null) {
-    // Serve JSON metadata.
-    getMetadata(
-      req.packageDir,
-      req.filename,
-      req.stats,
-      MaximumDepth,
-      (error, metadata) => {
-        if (error) {
-          console.error(error);
-
-          res
-            .status(500)
-            .type("text")
-            .send(
-              `Cannot generate metadata for ${req.packageSpec}${req.filename}`
-            );
-        } else {
-          // Cache metadata for 1 year.
-          res
-            .set({
-              "Cache-Control": "public, max-age=31536000",
-              "Cache-Tag": "meta"
-            })
-            .send(metadata);
-        }
-      }
-    );
+    serveMetadata(req, res);
   } else if (req.stats.isFile()) {
-    // Serve a file.
-    const file = path.join(req.packageDir, req.filename);
-
-    let contentType = getFileContentType(file);
+    const contentType = getFileContentType(req.filename);
 
     if (contentType === "application/javascript" && req.query.module != null) {
-      contentType += "; charset=utf-8";
-
-      // Serve a JavaScript module.
-      rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
-        if (error) {
-          console.error(error);
-
-          const debugInfo =
-            error.constructor.name +
-            ": " +
-            error.message.replace(/^.*?\/unpkg-.+?\//, `/${req.packageSpec}/`) +
-            "\n\n" +
-            error.codeFrame;
-
-          res
-            .status(500)
-            .type("text")
-            .send(
-              `Cannot generate module for ${req.packageSpec}${
-                req.filename
-              }\n\n${debugInfo}`
-            );
-        } else {
-          // Cache modules for 1 year.
-          res
-            .set({
-              "Content-Type": contentType,
-              "Content-Length": Buffer.byteLength(code),
-              "Cache-Control": "public, max-age=31536000",
-              "Cache-Tag": "file,js-file,js-module"
-            })
-            .send(code);
-        }
-      });
+      serveJavaScriptModule(req, res);
     } else {
-      // Serve some other static file.
-      const tags = ["file"];
-
-      const ext = path.extname(req.filename).substr(1);
-      if (ext) {
-        tags.push(`${ext}-file`);
-      }
-
-      if (contentType === "application/javascript") {
-        contentType += "; charset=utf-8";
-      }
-
-      // Cache files for 1 year.
-      res.set({
-        "Content-Type": contentType,
-        "Content-Length": req.stats.size,
-        "Cache-Control": "public, max-age=31536000",
-        "Last-Modified": req.stats.mtime.toUTCString(),
-        ETag: etag(req.stats),
-        "Cache-Tag": tags.join(",")
-      });
-
-      const stream = fs.createReadStream(file);
-
-      stream.on("error", error => {
-        console.error(`Cannot send file ${req.packageSpec}${req.filename}`);
-        console.error(error);
-        res.sendStatus(500);
-      });
-
-      stream.pipe(res);
+      serveStaticFile(req, res);
     }
-  } else if (AutoIndex && req.stats.isDirectory()) {
-    // Serve an HTML directory listing.
-    getEntries(path.join(req.packageDir, req.filename)).then(
-      entries => {
-        const html = renderPage(IndexPage, {
-          packageInfo: req.packageInfo,
-          version: req.packageVersion,
-          dir: req.filename,
-          entries
-        });
-
-        // Cache HTML directory listings for 1 minute.
-        res
-          .set({
-            "Cache-Control": "public, max-age=60",
-            "Cache-Tag": "index"
-          })
-          .send(html);
-      },
-      error => {
-        console.error(error);
-
-        res
-          .status(500)
-          .type("text")
-          .send(`Cannot read entries for ${req.packageSpec}${req.filename}`);
-      }
-    );
+  } else if (req.stats.isDirectory() && AutoIndex) {
+    serveIndex(req, res);
   } else {
     res
       .status(403)
