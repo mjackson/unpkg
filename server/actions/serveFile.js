@@ -79,6 +79,8 @@ function serveFile(req, res) {
     let contentType = getFileContentType(file);
 
     if (contentType === "application/javascript" && req.query.module != null) {
+      contentType += "; charset=utf-8";
+
       // Serve a JavaScript module.
       rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
         if (error) {
@@ -103,7 +105,7 @@ function serveFile(req, res) {
           // Cache modules for 1 year.
           res
             .set({
-              "Content-Type": `${contentType}; charset=utf-8`,
+              "Content-Type": contentType,
               "Content-Length": Buffer.byteLength(code),
               "Cache-Control": "public, max-age=31536000",
               "Cache-Tag": "file,js-file,js-module"
