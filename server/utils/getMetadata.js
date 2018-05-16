@@ -8,7 +8,7 @@ const getFileType = require("./getFileType");
 
 function getEntries(dir, file, maximumDepth) {
   return new Promise((resolve, reject) => {
-    fs.readdir(path.join(dir, file), function(error, files) {
+    fs.readdir(path.join(dir, file), (error, files) => {
       if (error) {
         reject(error);
       } else {
@@ -39,7 +39,7 @@ function formatTime(time) {
 
 function getIntegrity(file) {
   return new Promise((resolve, reject) => {
-    fs.readFile(file, function(error, data) {
+    fs.readFile(file, (error, data) => {
       if (error) {
         reject(error);
       } else {
@@ -75,12 +75,9 @@ function getMetadataRecursive(dir, file, stats, maximumDepth) {
 }
 
 function getMetadata(baseDir, path, stats, maximumDepth, callback) {
-  getMetadataRecursive(baseDir, path, stats, maximumDepth).then(function(
-    metadata
-  ) {
+  getMetadataRecursive(baseDir, path, stats, maximumDepth).then(metadata => {
     callback(null, metadata);
-  },
-  callback);
+  }, callback);
 }
 
 module.exports = getMetadata;
