@@ -4,16 +4,17 @@ const createServer = require("./server/createServer");
 const createDevServer = require("./server/createDevServer");
 
 const port = parseInt(process.env.PORT, 10) || 5000;
+const publicDir = path.resolve(__dirname, "public");
 
 function startServer(id) {
   const server =
     process.env.NODE_ENV === "production"
       ? createServer(
-          path.resolve(__dirname, "public"),
+          publicDir,
           path.resolve(__dirname, "server/stats.json")
         )
       : createDevServer(
-          path.resolve(__dirname, "public"),
+          publicDir,
           require("./webpack.config"),
           `http://localhost:${port}`
         );
