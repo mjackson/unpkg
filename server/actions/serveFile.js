@@ -78,8 +78,6 @@ function serveFile(req, res) {
 
     let contentType = getFileContentType(file);
 
-    if (contentType === "text/html") contentType = "text/plain"; // We can't serve HTML because bad people :(
-
     if (contentType === "application/javascript" && req.query.module != null) {
       // Serve a JavaScript module.
       rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
