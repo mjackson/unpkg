@@ -70,18 +70,26 @@ function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
 }
 
 function serveJavaScriptModule(req, res) {
+  if (getFileContentType(req.filename) !== "application/javascript") {
+    return res
+      .status(403)
+      .type("text")
+      .send("?module mode is available only for JavaScript files");
+  }
+
   const file = path.join(req.packageDir, req.filename);
 
   rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
     if (error) {
       console.error(error);
 
-      const debugInfo =
-        error.constructor.name +
-        ": " +
-        error.message.replace(/^.*?\/unpkg-.+?\//, `/${req.packageSpec}/`) +
-        "\n\n" +
-        error.codeFrame;
+      const errorName = error.constructor.name;
+      const errorMessage = error.message.replace(
+        /^.*?\/unpkg-.+?\//,
+        `/${req.packageSpec}/`
+      );
+      const codeFrame = error.codeFrame;
+      const debugInfo = `${errorName}: ${errorMessage}\n\n${codeFrame}`;
 
       res
         .status(500)
@@ -106,17 +114,14 @@ function serveJavaScriptModule(req, res) {
 }
 
 function serveStaticFile(req, res) {
-  const file = path.join(req.packageDir, req.filename);
   const tags = ["file"];
 
   const ext = path.extname(req.filename).substr(1);
-
   if (ext) {
     tags.push(`${ext}-file`);
   }
 
-  let contentType = getFileContentType(file);
-
+  let contentType = getFileContentType(req.filename);
   if (contentType === "application/javascript") {
     contentType += "; charset=utf-8";
   }
@@ -131,6 +136,7 @@ function serveStaticFile(req, res) {
     "Cache-Tag": tags.join(",")
   });
 
+  const file = path.join(req.packageDir, req.filename);
   const stream = fs.createReadStream(file);
 
   stream.on("error", error => {
@@ -180,9 +186,7 @@ function serveFile(req, res) {
   if (req.query.meta != null) {
     serveMetadata(req, res);
   } else if (req.stats.isFile()) {
-    const contentType = getFileContentType(req.filename);
-
-    if (contentType === "application/javascript" && req.query.module != null) {
+    if (req.query.module != null) {
       serveJavaScriptModule(req, res);
     } else {
       serveStaticFile(req, res);
