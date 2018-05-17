@@ -4,10 +4,10 @@ const etag = require("etag");
 const babel = require("babel-core");
 
 const IndexPage = require("../components/IndexPage");
+const unpkgRewrite = require("../plugins/unpkgRewrite");
 const renderPage = require("../utils/renderPage");
 const getMetadata = require("../utils/getMetadata");
 const getFileContentType = require("../utils/getFileContentType");
-const unpkgRewrite = require("../plugins/unpkgRewrite");
 const getEntries = require("../utils/getEntries");
 
 /**

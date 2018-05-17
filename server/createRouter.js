@@ -68,7 +68,8 @@ function createRouter() {
     "*",
     require("./middleware/parseURL"),
     require("./middleware/checkBlacklist"),
-    require("./middleware/fetchFile"),
+    require("./middleware/fetchPackage"),
+    require("./middleware/findFile"),
     require("./actions/serveFile")
   );
 
