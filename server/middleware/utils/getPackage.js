@@ -5,6 +5,7 @@ const tmpdir = require("os-tmpdir");
 const gunzip = require("gunzip-maybe");
 const mkdirp = require("mkdirp");
 const tar = require("tar-fs");
+
 const createMutex = require("./createMutex");
 
 function createTempPath(name, version) {

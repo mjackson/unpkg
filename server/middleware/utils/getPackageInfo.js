@@ -1,10 +1,9 @@
 require("isomorphic-fetch");
 
+const config = require("../../config");
+
 const createCache = require("./createCache");
 const createMutex = require("./createMutex");
-
-const registryURL =
-  process.env.NPM_REGISTRY_URL || "https://registry.npmjs.org";
 
 const packageInfoCache = createCache("packageInfo");
 
@@ -18,7 +17,7 @@ function fetchPackageInfo(packageName) {
     encodedPackageName = encodeURIComponent(packageName);
   }
 
-  const url = `${registryURL}/${encodedPackageName}`;
+  const url = `${config.registryURL}/${encodedPackageName}`;
 
   return fetch(url, {
     headers: {
