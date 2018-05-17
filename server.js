@@ -1,9 +1,9 @@
 const path = require("path");
 const throng = require("throng");
+
 const createServer = require("./server/createServer");
 const createDevServer = require("./server/createDevServer");
-
-const port = parseInt(process.env.PORT, 10) || 5000;
+const config = require("./server/config");
 
 function startServer(id) {
   const server =
@@ -15,11 +15,15 @@ function startServer(id) {
       : createDevServer(
           path.resolve(__dirname, "public"),
           require("./webpack.config"),
-          `http://localhost:${port}`
+          config.origin
         );
 
-  server.listen(port, () => {
-    console.log("Server #%s listening on port %s, Ctrl+C to stop", id, port);
+  server.listen(config.port, () => {
+    console.log(
+      "Server #%s listening on port %s, Ctrl+C to stop",
+      id,
+      config.port
+    );
   });
 }
 

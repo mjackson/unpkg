@@ -1,9 +1,11 @@
 const URL = require("whatwg-url");
 const warning = require("warning");
 
+const config = require("../config");
+
 const bareIdentifierFormat = /^((?:@[^\/]+\/)?[^\/]+)(\/.*)?$/;
 
-function unpkgRewriteBabelPlugin(dependencies = {}) {
+function unpkgRewrite(dependencies = {}) {
   return {
     inherits: require("babel-plugin-syntax-export-extensions"),
 
@@ -34,11 +36,13 @@ function unpkgRewriteBabelPlugin(dependencies = {}) {
 
           const version = dependencies[packageName] || "latest";
 
-          path.node.source.value = `https://unpkg.com/${packageName}@${version}${file}?module`;
+          path.node.source.value = `${
+            config.origin
+          }/${packageName}@${version}${file}?module`;
         }
       }
     }
   };
 }
 
-module.exports = unpkgRewriteBabelPlugin;
+module.exports = unpkgRewrite;

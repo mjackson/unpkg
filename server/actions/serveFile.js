@@ -7,7 +7,7 @@ const IndexPage = require("../components/IndexPage");
 const renderPage = require("../utils/renderPage");
 const getMetadata = require("../utils/getMetadata");
 const getFileContentType = require("../utils/getFileContentType");
-const unpkgRewrite = require("../utils/unpkgRewriteBabelPlugin");
+const unpkgRewrite = require("../plugins/unpkgRewrite");
 const getEntries = require("../utils/getEntries");
 
 /**

@@ -1,5 +1,5 @@
 const babel = require("babel-core");
-const unpkgRewrite = require("../unpkgRewriteBabelPlugin");
+const unpkgRewrite = require("../unpkgRewrite");
 
 const testCases = [
   {
