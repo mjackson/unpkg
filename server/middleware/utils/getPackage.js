@@ -53,12 +53,12 @@ function fetchAndExtract(tarballURL, outputDir) {
 const fetchMutex = createMutex((payload, callback) => {
   const { tarballURL, outputDir } = payload;
 
-  fs.access(outputDir, function(error) {
+  fs.access(outputDir, error => {
     if (error) {
       if (error.code === "ENOENT" || error.code === "ENOTDIR") {
         // ENOENT or ENOTDIR are to be expected when we haven't yet
         // fetched a package for the first time. Carry on!
-        mkdirp(outputDir, function(error) {
+        mkdirp(outputDir, error => {
           if (error) {
             callback(error);
           } else {
@@ -81,7 +81,7 @@ function getPackage(packageConfig, callback) {
   const tarballURL = packageConfig.dist.tarball;
   const outputDir = createTempPath(packageConfig.name, packageConfig.version);
 
-  fetchMutex(tarballURL, { tarballURL, outputDir }, function(error) {
+  fetchMutex(tarballURL, { tarballURL, outputDir }, error => {
     callback(error, outputDir);
   });
 }
