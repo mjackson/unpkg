@@ -54,7 +54,7 @@
     "eslint-plugin-react": "^7.5.1",
     "file-loader": "0.10.0",
     "html-loader": "^0.5.1",
-    "jest": "18.1.0",
+    "jest": "^22.4.4",
     "markdown-loader": "^2.0.1",
     "style-loader": "0.13.1",
     "supertest": "^3.0.0",

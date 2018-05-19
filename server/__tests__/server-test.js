@@ -11,11 +11,22 @@ describe("The server", () => {
     server = createServer();
   });
 
-  it("rejects invalid package names", done => {
+  it("redirects /_meta to ?meta", done => {
     request(server)
-      .get("/_invalid/index.js")
+      .get("/_meta/react")
       .end((err, res) => {
-        expect(res.statusCode).toBe(403);
+        expect(res.statusCode).toBe(301);
+        expect(res.headers.location).toBe("/react?meta");
+        done();
+      });
+  });
+
+  it("redirects ?json to ?meta", done => {
+    request(server)
+      .get("/react?json")
+      .end((err, res) => {
+        expect(res.statusCode).toBe(301);
+        expect(res.headers.location).toBe("/react?meta");
         done();
       });
   });
@@ -30,12 +41,11 @@ describe("The server", () => {
       });
   });
 
-  it("redirects /_meta to ?meta", done => {
+  it("rejects invalid package names", done => {
     request(server)
-      .get("/_meta/react?main=index")
+      .get("/_invalid/index.js")
       .end((err, res) => {
-        expect(res.statusCode).toBe(302);
-        expect(res.headers.location).toBe("/react?main=index&meta");
+        expect(res.statusCode).toBe(403);
         done();
       });
   });
