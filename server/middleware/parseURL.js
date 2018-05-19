@@ -3,7 +3,7 @@ const parsePackageURL = require("../utils/parsePackageURL");
 const createSearch = require("./utils/createSearch");
 
 const knownQueryParams = {
-  main: true,
+  main: true, // Deprecated, see #63
   meta: true,
   module: true
 };
@@ -30,17 +30,17 @@ function sanitizeQuery(query) {
  * Parse and validate the URL.
  */
 function parseURL(req, res, next) {
-  // Redirect /_meta/path to /path?meta.
+  // Permanently redirect /_meta/path to /path?meta.
   if (req.path.match(/^\/_meta\//)) {
     req.query.meta = "";
-    return res.redirect(302, req.path.substr(6) + createSearch(req.query));
+    return res.redirect(301, req.path.substr(6) + createSearch(req.query));
   }
 
-  // Redirect /path?json => /path?meta
+  // Permanently redirect /path?json => /path?meta
   if (req.query.json != null) {
     delete req.query.json;
     req.query.meta = "";
-    return res.redirect(302, req.path + createSearch(req.query));
+    return res.redirect(301, req.path + createSearch(req.query));
   }
 
   // Redirect requests with unknown query params to their equivalents

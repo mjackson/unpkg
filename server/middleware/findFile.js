@@ -69,7 +69,7 @@ function findFile(req, res, next) {
     }
   } else if (filename) {
     // They are requesting an explicit filename. Only try to find an
-    // index.js if they are NOT requesting an HTML directory listing.
+    // index.js if they are NOT requesting an index page.
     useIndex = filename.charAt(filename.length - 1) !== "/";
   } else if (
     req.query.main &&
@@ -120,16 +120,26 @@ function findFile(req, res, next) {
 
       filename = file.replace(req.packageDir, "");
 
-      if (
-        req.query.main != null ||
-        getBasename(req.filename) !== getBasename(filename)
-      ) {
-        // Need to redirect to the module file so relative imports resolve
-        // correctly.
+      if (req.query.main != null) {
+        // Permanently redirect ?main requests to their exact files.
+        // Deprecated, see https://github.com/unpkg/unpkg/issues/63
         delete req.query.main;
 
+        return res.redirect(
+          301,
+          createPackageURL(
+            req.packageName,
+            req.packageVersion,
+            filename,
+            createSearch(req.query)
+          )
+        );
+      }
+
+      if (getBasename(req.filename) !== getBasename(filename)) {
+        // Redirect to the exact file so relative imports resolve correctly.
         // Cache module redirects for 1 minute.
-        res
+        return res
           .set({
             "Cache-Control": "public, max-age=60",
             "Cache-Tag": "redirect,module-redirect"
@@ -143,11 +153,12 @@ function findFile(req, res, next) {
               createSearch(req.query)
             )
           );
-      } else {
-        req.filename = filename;
-        req.stats = stats;
-        next();
       }
+
+      req.filename = filename;
+      req.stats = stats;
+
+      next();
     }
   );
 }
