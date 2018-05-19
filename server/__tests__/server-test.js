@@ -1,11 +1,13 @@
 const request = require("supertest");
+
 const createServer = require("../createServer");
+
 const clearBlacklist = require("./utils/clearBlacklist");
 const withBlacklist = require("./utils/withBlacklist");
 const withRevokedToken = require("./utils/withRevokedToken");
 const withToken = require("./utils/withToken");
 
-describe("The server", () => {
+describe("The production server", () => {
   let server;
   beforeEach(() => {
     server = createServer();
@@ -61,6 +63,17 @@ describe("The server", () => {
     });
   });
 
+  describe("GET /_publicKey", () => {
+    it("echoes the public key", done => {
+      request(server)
+        .get("/_publicKey")
+        .end((err, res) => {
+          expect(res.text).toMatch(/PUBLIC KEY/);
+          done();
+        });
+    });
+  });
+
   describe("POST /_auth", () => {
     it("creates a new auth token", done => {
       request(server)
@@ -111,17 +124,6 @@ describe("The server", () => {
             });
         });
       });
-    });
-  });
-
-  describe("GET /_publicKey", () => {
-    it("echoes the public key", done => {
-      request(server)
-        .get("/_publicKey")
-        .end((err, res) => {
-          expect(res.text).toMatch(/PUBLIC KEY/);
-          done();
-        });
     });
   });
 

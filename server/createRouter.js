@@ -2,9 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const renderPage = require("./utils/renderPage");
-const requireAuth = require("./middleware/requireAuth");
 const MainPage = require("./components/MainPage");
+const renderPage = require("./utils/renderPage");
 
 function route(setup) {
   const app = express.Router();
@@ -43,17 +42,17 @@ function createRouter() {
     route(app => {
       app.post(
         "/",
-        requireAuth("blacklist.add"),
+        require("./middleware/requireAuth")("blacklist.add"),
         require("./actions/addToBlacklist")
       );
       app.get(
         "/",
-        requireAuth("blacklist.read"),
+        require("./middleware/requireAuth")("blacklist.read"),
         require("./actions/showBlacklist")
       );
       app.delete(
         "*",
-        requireAuth("blacklist.remove"),
+        require("./middleware/requireAuth")("blacklist.remove"),
         require("./middleware/validatePackageURL"),
         require("./actions/removeFromBlacklist")
       );
@@ -66,7 +65,10 @@ function createRouter() {
 
   app.get(
     "*",
-    require("./middleware/parseURL"),
+    require("./middleware/redirectLegacyURLs"),
+    require("./middleware/validatePackageURL"),
+    require("./middleware/validatePackageName"),
+    require("./middleware/validateQuery"),
     require("./middleware/checkBlacklist"),
     require("./middleware/fetchPackage"),
     require("./middleware/findFile"),

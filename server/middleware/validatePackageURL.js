@@ -1,8 +1,8 @@
 const parsePackageURL = require("../utils/parsePackageURL");
 
 /**
- * Adds various properties to the request object to do with the
- * package/file being requested.
+ * Parse the URL and add various properties to the request object to
+ * do with the package/file being requested. Reject invalid URLs.
  */
 function validatePackageURL(req, res, next) {
   const url = parsePackageURL(req.url);
@@ -14,7 +14,7 @@ function validatePackageURL(req, res, next) {
   req.packageName = url.packageName;
   req.packageVersion = url.packageVersion;
   req.packageSpec = `${url.packageName}@${url.packageVersion}`;
-  req.pathname = url.pathname;
+  req.pathname = url.pathname; // TODO: remove
   req.filename = url.filename;
   req.search = url.search;
   req.query = url.query;

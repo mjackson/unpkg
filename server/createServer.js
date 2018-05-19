@@ -28,7 +28,7 @@ function createServer(publicDir, statsFile) {
   if (process.env.NODE_ENV !== "test") {
     app.use(
       morgan(
-        // Modified version of the Heroku router's log format
+        // Modified version of Heroku's log format
         // https://devcenter.heroku.com/articles/http-routing#heroku-router-log-format
         'method=:method path=":url" host=:req[host] request_id=:req[x-request-id] cf_ray=:req[cf-ray] fwd=:fwd status=:status bytes=:res[content-length]'
       )
