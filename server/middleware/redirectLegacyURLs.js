@@ -1,4 +1,4 @@
-const createSearch = require("./utils/createSearch");
+const createSearch = require("../utils/createSearch");
 
 /**
  * Redirect old URLs that we no longer support.

@@ -1,4 +1,4 @@
-const db = require("../../utils/redis");
+const db = require("./redis");
 
 function createCache(keyPrefix) {
   function createKey(key) {

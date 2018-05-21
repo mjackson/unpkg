@@ -1,6 +1,7 @@
 const fs = require("fs");
 const invariant = require("invariant");
-const createBundle = require("./utils/createBundle");
+
+const createBundle = require("../utils/createBundle");
 
 /**
  * An express middleware that sets req.bundle from the build
@@ -14,7 +15,7 @@ function staticAssets(webpackStatsFile) {
     invariant(
       false,
       "staticAssets middleware cannot read the build stats in %s; " +
-        "run `yarn build` before starting the server",
+        "run the `build` script before starting the server",
       webpackStatsFile
     );
   }

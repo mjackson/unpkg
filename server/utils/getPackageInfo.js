@@ -1,6 +1,6 @@
 require("isomorphic-fetch");
 
-const config = require("../../config");
+const config = require("../config");
 
 const createCache = require("./createCache");
 const createMutex = require("./createMutex");

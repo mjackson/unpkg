@@ -1,4 +1,4 @@
-const db = require("../../utils/redis");
+const db = require("./redis");
 
 function incrementCounter(counter, key, by) {
   return new Promise((resolve, reject) => {

@@ -1,5 +1,6 @@
 const invariant = require("invariant");
-const createBundle = require("./utils/createBundle");
+
+const createBundle = require("../utils/createBundle");
 
 /**
  * An express middleware that sets req.bundle from the

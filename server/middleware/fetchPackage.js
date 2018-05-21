@@ -1,8 +1,8 @@
 const semver = require("semver");
 
 const createPackageURL = require("../utils/createPackageURL");
-const getPackageInfo = require("./utils/getPackageInfo");
-const getPackage = require("./utils/getPackage");
+const getPackageInfo = require("../utils/getPackageInfo");
+const getPackage = require("../utils/getPackage");
 
 function tagRedirect(req, res) {
   // Cache tag redirects for 1 minute.
