@@ -3,7 +3,7 @@ const invariant = require("invariant");
 const gunzip = require("gunzip-maybe");
 const ndjson = require("ndjson");
 
-const cloudflareAPIURL = "https://api.cloudflare.com";
+const cloudflareURL = "https://api.cloudflare.com";
 const cloudflareEmail = process.env.CLOUDFLARE_EMAIL;
 const cloudflareKey = process.env.CLOUDFLARE_KEY;
 
@@ -15,7 +15,7 @@ invariant(
 invariant(cloudflareKey, "Missing the $CLOUDFLARE_KEY environment variable");
 
 function get(path, headers) {
-  return fetch(`${cloudflareAPIURL}/client/v4${path}`, {
+  return fetch(`${cloudflareURL}/client/v4${path}`, {
     headers: Object.assign({}, headers, {
       "X-Auth-Email": cloudflareEmail,
       "X-Auth-Key": cloudflareKey
@@ -41,14 +41,10 @@ function getJSON(path, headers) {
 
 function getZones(domains) {
   return Promise.all(
-    (Array.isArray(domains) ? domains : [domains]).map(domain => {
-      return getJSON(`/zones?name=${domain}`);
-    })
-  ).then(results => {
-    return results.reduce((memo, zones) => {
-      return memo.concat(zones);
-    });
-  });
+    (Array.isArray(domains) ? domains : [domains]).map(domain =>
+      getJSON(`/zones?name=${domain}`)
+    )
+  ).then(results => results.reduce((memo, zones) => memo.concat(zones)));
 }
 
 function reduceResults(target, values) {
@@ -74,9 +70,7 @@ function getZoneAnalyticsDashboard(zones, since, until) {
         }/analytics/dashboard?since=${since.toISOString()}&until=${until.toISOString()}`
       );
     })
-  ).then(results => {
-    return results.reduce(reduceResults);
-  });
+  ).then(results => results.reduce(reduceResults));
 }
 
 function getJSONStream(path, headers) {
@@ -85,12 +79,8 @@ function getJSONStream(path, headers) {
   });
 
   return get(path, acceptGzipHeaders)
-    .then(res => {
-      return res.body.pipe(gunzip());
-    })
-    .then(stream => {
-      return stream.pipe(ndjson.parse());
-    });
+    .then(res => res.body.pipe(gunzip()))
+    .then(stream => stream.pipe(ndjson.parse()));
 }
 
 function getLogs(zoneId, startTime, endTime) {
