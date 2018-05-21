@@ -1,34 +1,9 @@
-require("isomorphic-fetch");
-
-const config = require("../config");
-
 const createCache = require("./createCache");
 const createMutex = require("./createMutex");
+const fetchPackageInfo = require("./fetchPackageInfo");
 
 const packageInfoCache = createCache("packageInfo");
-
-function fetchPackageInfo(packageName) {
-  console.log(`info: Fetching package info for ${packageName}`);
-
-  let encodedPackageName;
-  if (packageName.charAt(0) === "@") {
-    encodedPackageName = `@${encodeURIComponent(packageName.substring(1))}`;
-  } else {
-    encodedPackageName = encodeURIComponent(packageName);
-  }
-
-  const url = `${config.registryURL}/${encodedPackageName}`;
-
-  return fetch(url, {
-    headers: {
-      Accept: "application/json"
-    }
-  }).then(res => {
-    return res.status === 404 ? null : res.json();
-  });
-}
-
-const PackageNotFound = "PackageNotFound";
+const packageNotFound = "PackageNotFound";
 
 // This mutex prevents multiple concurrent requests to
 // the registry for the same package info.
@@ -40,7 +15,7 @@ const fetchMutex = createMutex((packageName, callback) => {
         // unnecessary requests to the registry for bad package names.
         // In the worst case, a brand new package's info will be
         // available within 5 minutes.
-        packageInfoCache.set(packageName, PackageNotFound, 300, () => {
+        packageInfoCache.set(packageName, packageNotFound, 300, () => {
           callback(null, value);
         });
       } else {
@@ -59,13 +34,23 @@ const fetchMutex = createMutex((packageName, callback) => {
   );
 });
 
-function getPackageInfo(packageName, callback) {
-  packageInfoCache.get(packageName, (error, value) => {
-    if (error || value != null) {
-      callback(error, value === PackageNotFound ? null : value);
-    } else {
-      fetchMutex(packageName, packageName, callback);
-    }
+function getPackageInfo(packageName) {
+  return new Promise((resolve, reject) => {
+    packageInfoCache.get(packageName, (error, value) => {
+      if (error) {
+        reject(error);
+      } else if (value != null) {
+        resolve(value === packageNotFound ? null : value);
+      } else {
+        fetchMutex(packageName, (error, value) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(value);
+          }
+        });
+      }
+    });
   });
 }
 

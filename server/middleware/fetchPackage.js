@@ -52,8 +52,42 @@ function semverRedirect(req, res) {
  * version if the request targets a tag or uses a semver version.
  */
 function fetchPackage(req, res, next) {
-  getPackageInfo(req.packageName, (error, packageInfo) => {
-    if (error) {
+  getPackageInfo(req.packageName).then(
+    packageInfo => {
+      if (packageInfo == null || packageInfo.versions == null) {
+        return res
+          .status(404)
+          .type("text")
+          .send(`Cannot find package "${req.packageName}"`);
+      }
+
+      req.packageInfo = packageInfo;
+
+      if (req.packageVersion in req.packageInfo.versions) {
+        // A valid request for a package we haven't downloaded yet.
+        req.packageConfig = req.packageInfo.versions[req.packageVersion];
+
+        getPackage(req.packageConfig).then(
+          outputDir => {
+            req.packageDir = outputDir;
+            next();
+          },
+          error => {
+            console.error(error);
+
+            res
+              .status(500)
+              .type("text")
+              .send(`Cannot fetch package ${req.packageSpec}`);
+          }
+        );
+      } else if (req.packageVersion in req.packageInfo["dist-tags"]) {
+        tagRedirect(req, res);
+      } else {
+        semverRedirect(req, res);
+      }
+    },
+    error => {
       console.error(error);
 
       return res
@@ -61,39 +95,7 @@ function fetchPackage(req, res, next) {
         .type("text")
         .send(`Cannot get info for package "${req.packageName}"`);
     }
-
-    if (packageInfo == null || packageInfo.versions == null) {
-      return res
-        .status(404)
-        .type("text")
-        .send(`Cannot find package "${req.packageName}"`);
-    }
-
-    req.packageInfo = packageInfo;
-
-    if (req.packageVersion in req.packageInfo.versions) {
-      // A valid request for a package we haven't downloaded yet.
-      req.packageConfig = req.packageInfo.versions[req.packageVersion];
-
-      getPackage(req.packageConfig, (error, outputDir) => {
-        if (error) {
-          console.error(error);
-
-          res
-            .status(500)
-            .type("text")
-            .send(`Cannot fetch package ${req.packageSpec}`);
-        } else {
-          req.packageDir = outputDir;
-          next();
-        }
-      });
-    } else if (req.packageVersion in req.packageInfo["dist-tags"]) {
-      tagRedirect(req, res);
-    } else {
-      semverRedirect(req, res);
-    }
-  });
+  );
 }
 
 module.exports = fetchPackage;
