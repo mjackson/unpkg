@@ -12,6 +12,7 @@ function DirectoryListing({ dir, entries }) {
   const rows = entries.map(({ file, stats }, index) => {
     const isDir = stats.isDirectory();
     const href = file + (isDir ? "/" : "");
+    const file = file + (isDir ? "/" : "");
 
     return e(
       "tr",
