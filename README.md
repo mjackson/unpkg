@@ -32,6 +32,10 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
 * [unpkg.com/react/](/react/)
 * [unpkg.com/lodash/](/lodash/)
 
+**To view a source file in your browser, add the `html` parameter:**
+* [unpkg.com/react@^16/umd/react.production.min.js?html](/react@^16/umd/react.production.min.js?html)
+* [unpkg.com/jquery@3.3.1/dist/jquery.js?html](/jquery@3.3.1/dist/jquery.js?html)
+
 ### Query Parameters
 
 <dl>
