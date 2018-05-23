@@ -114,6 +114,13 @@ function serveJavaScriptModule(req, res) {
 }
 
 function serveStaticFile(req, res) {
+	// look whether html param exists
+	const html = req.query.html != undefined ? true : false;
+	console.log(
+		`Trying to send ${req.packageSpec}${req.filename} ${
+			html ? "as html page" : "as file"
+		}`
+	);
 	const tags = ["file"];
 
 	const ext = path.extname(req.filename).substr(1);
@@ -137,7 +144,7 @@ function serveStaticFile(req, res) {
 
 	const file = path.join(req.packageDir, req.filename);
 	const stream = fs.createReadStream(file);
-	
+
 	stream.on("error", error => {
 		console.error(`Cannot send file ${req.packageSpec}${req.filename}`);
 		console.error(error);
@@ -145,37 +152,45 @@ function serveStaticFile(req, res) {
 	});
 
 	let chunks = [];
-	let codeString = '';
-	// push file content chunk-wise from stream to array
+	let codeString = "";
+	// IF HTML: push file content chunk-wise from stream to array
 	stream.on("data", chunk => {
-		chunks.push(chunk);
+		if (html) {
+			chunks.push(chunk);
+		}
 	});
 
-	// return syntax highlighted code as html 
+	// IF HTML: return syntax highlighted code as html
 	stream.on("close", () => {
-
-		// turn chunk-array to string
-		codeString = Buffer.concat(chunks).toString();
-		// html template using highlight.js
-		let highlightStyle = "default";
-		let html = ` 
+		if (html) {
+			// turn chunk-array to string
+			codeString = Buffer.concat(chunks).toString();
+			// html template using highlight.js
+			let highlightStyle = "default";
+			let html = ` 
 			<html>
 			<head>
-				<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${highlightStyle}.min.css">
-				<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-				<script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script>
-				<script>hljs.initHighlightingOnLoad();hljs.initLineNumbersOnLoad();</script> 
-				<style>td.hljs-ln-numbers{text-align:center;color:#ccc;border-right:1px solid #999;vertical-align:top;padding-right:5px;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}td.hljs-ln-code{padding-left:10px}code{white-space:pre-wrap;overflow:auto}</style>
+			<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${highlightStyle}.min.css">
+			<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+			<script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script>
+			<script>hljs.initHighlightingOnLoad();hljs.initLineNumbersOnLoad();</script> 
+			<style>td.hljs-ln-numbers{text-align:center;color:#ccc;border-right:1px solid #999;vertical-align:top;padding-right:5px;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}td.hljs-ln-code{padding-left:10px}code{white-space:pre-wrap;overflow:auto}</style>
 			</head>
 			<body>
-				<pre><code >${codeString}</code></pre>
+			<pre><code >${codeString}</code></pre>
 			</body>
 			</html>
 			`;
 
-		// send back html
-		res.send(html);		
+			// send back html
+			res.send(html);
+		}
 	});
+
+	// send back the file if there is no html parameter given
+	if (!html) {
+		stream.pipe(res);
+	}
 }
 
 function serveIndex(req, res) {
