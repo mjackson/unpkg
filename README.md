@@ -41,9 +41,13 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
 <dl>
   <dt>?meta</dt>
   <dd>Return metadata about any file in a package as JSON (e.g. `/any/file?meta`)</dd>
+  
+  <dt>?html</dt>
+  <dd>Return file as html page (e.g. `/any/file?html`)</dd>
 
   <dt>?module</dt>
   <dd>Expands all ["bare" `import` specifiers](https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier) in JavaScript modules to unpkg URLs. This feature is *very experimental*</dd>
+
 </dl>
 
 ### Cache Behavior
