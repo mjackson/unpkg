@@ -32,15 +32,15 @@ const fetchMutex = createMutex((packageConfig, callback) => {
         callback(error);
       }
     } else {
-      lockfile.check(outputDir).then(isLocked => {
-        if (isLocked) {
+      lockfile.check(outputDir).then(locked => {
+        if (locked) {
           // Another process on this same machine has locked the
           // directory. We need to wait for it to be unlocked
           // before we callback.
           const timer = setInterval(() => {
             lockfile.check(outputDir).then(
-              isLocked => {
-                if (!isLocked) {
+              locked => {
+                if (!locked) {
                   clearInterval(timer);
                   callback(null, outputDir);
                 }

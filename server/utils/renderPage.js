@@ -7,6 +7,7 @@ function renderPage(page, props) {
   const html = ReactDOMServer.renderToStaticMarkup(
     React.createElement(page, props)
   );
+
   return doctype + html;
 }
 
