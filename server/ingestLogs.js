@@ -3,6 +3,7 @@ const startOfDay = require("date-fns/start_of_day");
 const addDays = require("date-fns/add_days");
 
 const db = require("./utils/redis");
+const isValidPackageName = require("./utils/isValidPackageName");
 const parsePackageURL = require("./utils/parsePackageURL");
 
 const CloudflareAPI = require("./CloudflareAPI");
@@ -67,7 +68,7 @@ function computeCounters(stream) {
           const url = parsePackageURL(parseURL(clientRequest.uri).pathname);
           const packageName = url && url.packageName;
 
-          if (packageName) {
+          if (packageName && isValidPackageName(packageName)) {
             incr(
               `stats-packageRequests-${dayKey}`,
               packageName,
