@@ -1,17 +1,16 @@
 function createSearch(query) {
-  const params = [];
+  const keys = Object.keys(query).sort();
+  const params = keys.reduce(
+    (memo, key) =>
+      memo.concat(
+        query[key] === ""
+          ? key // Omit the trailing "=" from key=
+          : `${key}=${encodeURIComponent(query[key])}`
+      ),
+    []
+  );
 
-  Object.keys(query).forEach(param => {
-    if (query[param] === "") {
-      params.push(param); // Omit the trailing "=" from param=
-    } else {
-      params.push(`${param}=${encodeURIComponent(query[param])}`);
-    }
-  });
-
-  const search = params.join("&");
-
-  return search ? `?${search}` : "";
+  return params.length ? `?${params.join("&")}` : "";
 }
 
 module.exports = createSearch;
