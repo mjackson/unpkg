@@ -168,20 +168,18 @@ function serveStaticFile(req, res) {
       // html template using highlight.js
       let highlightStyle = "default";
       let html = ` 
-			<html>
-			<head>
-			<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${highlightStyle}.min.css">
-			<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-			<script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script>
-			<script>hljs.initHighlightingOnLoad();hljs.initLineNumbersOnLoad();</script> 
-			<style>td.hljs-ln-numbers{text-align:center;color:#ccc;border-right:1px solid #999;vertical-align:top;padding-right:5px;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}td.hljs-ln-code{padding-left:10px}code{white-space:pre-wrap;overflow:auto}</style>
-			</head>
-			<body>
-			<pre><code >${codeString}</code></pre>
-			</body>
-			</html>
-			`;
-
+        <html>
+        <head>
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/${highlightStyle}.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.3.0/highlightjs-line-numbers.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();hljs.initLineNumbersOnLoad();</script> 
+        <style>td.hljs-ln-numbers{text-align:center;color:#ccc;border-right:1px solid #999;vertical-align:top;padding-right:5px;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}td.hljs-ln-code{padding-left:10px}code{white-space:pre-wrap;overflow:auto}</style>
+        </head>
+        <body>
+        <pre><code>${codeString}</code></pre>
+        </body>
+        </html>`;
       // send back html
       res.send(html);
     }
