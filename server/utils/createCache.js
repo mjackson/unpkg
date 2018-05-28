@@ -1,5 +1,8 @@
-const db = require("../../utils/redis");
+const db = require("./redis");
 
+/**
+ * A persistent cache for JSON values, using Redis.
+ */
 function createCache(keyPrefix) {
   function createKey(key) {
     return keyPrefix + "-" + key;
@@ -10,7 +13,7 @@ function createCache(keyPrefix) {
   }
 
   function get(key, callback) {
-    db.get(createKey(key), function(error, value) {
+    db.get(createKey(key), (error, value) => {
       callback(error, value && JSON.parse(value));
     });
   }

@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 
 const createPackageURL = require("../utils/createPackageURL");
-const createSearch = require("./utils/createSearch");
-const incrementCounter = require("./utils/incrementCounter");
+const createSearch = require("../utils/createSearch");
+const incrementCounter = require("../utils/incrementCounter");
 
 /**
  * File extensions to look for when automatically resolving.

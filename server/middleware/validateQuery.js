@@ -1,4 +1,4 @@
-const createSearch = require("./utils/createSearch");
+const createSearch = require("../utils/createSearch");
 
 const knownQueryParams = {
   main: true, // Deprecated, see #63
