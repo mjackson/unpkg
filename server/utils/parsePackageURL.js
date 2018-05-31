@@ -30,7 +30,7 @@ function parsePackageURL(originalURL) {
   return {
     // If the URL is /@scope/name@version/file.js?main=browser:
     pathname, // /@scope/name@version/path.js
-    search, // ?main=browser
+    search: search || "", // ?main=browser
     query, // { main: 'browser' }
     packageName, // @scope/name
     packageVersion, // version
