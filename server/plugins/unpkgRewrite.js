@@ -3,7 +3,7 @@ const warning = require("warning");
 
 const config = require("../config");
 
-const bareIdentifierFormat = /^((?:@[^\/]+\/)?[^\/]+)(\/.*)?$/;
+const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 
 function unpkgRewrite(dependencies = {}) {
   return {
