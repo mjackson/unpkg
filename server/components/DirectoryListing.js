@@ -1,8 +1,7 @@
-const React = require("react");
 const formatBytes = require("pretty-bytes");
-const getFileContentType = require("../utils/getFileContentType");
 
-const e = React.createElement;
+const getFileContentType = require("../utils/getFileContentType");
+const e = require("./utils/createElement");
 
 function formatTime(time) {
   return new Date(time).toISOString();

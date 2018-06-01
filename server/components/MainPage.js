@@ -1,16 +1,10 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 
-const e = React.createElement;
+const e = require("./utils/createElement");
+const x = require("./utils/createScript");
 
-function MainPage({
-  title,
-  description,
-  scripts,
-  styles,
-  webpackManifest,
-  content
-}) {
+function MainPage({ title, description, scripts, styles, content }) {
   return e(
     "html",
     { lang: "en" },
@@ -27,23 +21,12 @@ function MainPage({
       }),
       e("meta", { name: "timestamp", content: new Date().toISOString() }),
       e("link", { rel: "shortcut icon", href: "/favicon.ico" }),
-      e("script", {
-        dangerouslySetInnerHTML: {
-          __html:
-            "window.Promise || document.write('\\x3Cscript src=\"/_polyfills/es6-promise.min.js\">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>')"
-        }
-      }),
-      e("script", {
-        dangerouslySetInnerHTML: {
-          __html:
-            "window.fetch || document.write('\\x3Cscript src=\"/_polyfills/fetch.min.js\">\\x3C/script>')"
-        }
-      }),
-      e("script", {
-        dangerouslySetInnerHTML: {
-          __html: "window.webpackManifest = " + JSON.stringify(webpackManifest)
-        }
-      }),
+      x(
+        "window.Promise || document.write('\\x3Cscript src=\"/_polyfills/es6-promise.min.js\">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>')"
+      ),
+      x(
+        "window.fetch || document.write('\\x3Cscript src=\"/_polyfills/fetch.min.js\">\\x3C/script>')"
+      ),
       styles.map(s => e("link", { key: s, rel: "stylesheet", href: s }))
     ),
     e(
@@ -60,7 +43,6 @@ MainPage.propTypes = {
   description: PropTypes.string,
   scripts: PropTypes.arrayOf(PropTypes.string),
   styles: PropTypes.arrayOf(PropTypes.string),
-  webpackManifest: PropTypes.object,
   content: PropTypes.string
 };
 
@@ -69,7 +51,6 @@ MainPage.defaultProps = {
   description: "The CDN for everything on npm",
   scripts: [],
   styles: [],
-  webpackManifest: {},
   content: ""
 };
 

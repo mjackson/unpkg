@@ -1,11 +1,10 @@
-const React = require("react");
 const semver = require("semver");
 
-const readCSS = require("../utils/readCSS");
-
 const DirectoryListing = require("./DirectoryListing");
-
-const e = React.createElement;
+const readCSS = require("./utils/readCSS");
+const e = require("./utils/createElement");
+const s = require("./utils/createStyle");
+const x = require("./utils/createScript");
 
 const IndexPageStyle = readCSS(__dirname, "IndexPage.css");
 const IndexPageScript = `
@@ -33,7 +32,7 @@ function IndexPage({ packageInfo, version, dir, entries }) {
       null,
       e("meta", { charSet: "utf-8" }),
       e("title", null, `Index of ${dir}`),
-      e("style", { dangerouslySetInnerHTML: { __html: IndexPageStyle } })
+      s(IndexPageStyle)
     ),
     e(
       "body",
@@ -47,7 +46,7 @@ function IndexPage({ packageInfo, version, dir, entries }) {
           e("select", { id: "version", defaultValue: version }, options)
         ),
         e("h1", null, `Index of ${dir}`),
-        e("script", { dangerouslySetInnerHTML: { __html: IndexPageScript } }),
+        x(IndexPageScript),
         e("hr"),
         e(DirectoryListing, { dir, entries }),
         e("hr"),
