@@ -65,7 +65,7 @@
     "whatwg-fetch": "2.0.2"
   },
   "engines": {
-    "node": "8.4.x"
+    "node": "8"
   },
   "jest": {
     "testPathIgnorePatterns": [
