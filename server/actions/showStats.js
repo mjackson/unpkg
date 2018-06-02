@@ -1,6 +1,7 @@
 const subDays = require("date-fns/sub_days");
 const startOfDay = require("date-fns/start_of_day");
 const startOfSecond = require("date-fns/start_of_second");
+
 const StatsAPI = require("../StatsAPI");
 
 function showStats(req, res) {

@@ -21,7 +21,7 @@ const domainNames = [
 /**
  * The window of time to download in a single fetch.
  */
-const logWindowSeconds = 60;
+const logWindowSeconds = 30;
 
 /**
  * The minimum time to wait between fetches.
