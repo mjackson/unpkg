@@ -13,24 +13,24 @@
 
 Using a fixed version:
 
-* [unpkg.com/react@16.0.0/umd/react.production.min.js](/react@16.0.0/umd/react.production.min.js)
-* [unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js](/react-dom@16.0.0/umd/react-dom.production.min.js)
+* [unpkg.com/react@16.0.0/umd/react.production.min.js](//unpkg.com/react@16.0.0/umd/react.production.min.js)
+* [unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js](//unpkg.com/react-dom@16.0.0/umd/react-dom.production.min.js)
 
 You may also use a [semver range](https://docs.npmjs.com/misc/semver) or a [tag](https://docs.npmjs.com/cli/dist-tag) instead of a fixed version number, or omit the version/tag entirely to use the `latest` tag.
 
-* [unpkg.com/react@^16/umd/react.production.min.js](/react@^16/umd/react.production.min.js)
-* [unpkg.com/react/umd/react.production.min.js](/react/umd/react.production.min.js)
+* [unpkg.com/react@^16/umd/react.production.min.js](//unpkg.com/react@^16/umd/react.production.min.js)
+* [unpkg.com/react/umd/react.production.min.js](//unpkg.com/react/umd/react.production.min.js)
 
 If you omit the file path (i.e. use a "bare" URL), unpkg will serve the file specified by the `unpkg` field in `package.json`, or fall back to `main`.
 
-* [unpkg.com/d3](/d3)
-* [unpkg.com/jquery](/jquery)
-* [unpkg.com/three](/three)
+* [unpkg.com/d3](//unpkg.com/d3)
+* [unpkg.com/jquery](//unpkg.com/jquery)
+* [unpkg.com/three](//unpkg.com/three)
 
 Append a `/` at the end of a URL to view a listing of all the files in a package.
 
-* [unpkg.com/react/](/react/)
-* [unpkg.com/lodash/](/lodash/)
+* [unpkg.com/react/](//unpkg.com/react/)
+* [unpkg.com/lodash/](//unpkg.com/lodash/)
 
 ### Query Parameters
 
