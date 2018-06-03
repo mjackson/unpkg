@@ -1,18 +1,22 @@
-require("isomorphic-fetch");
+const fetch = require("isomorphic-fetch");
 const gunzip = require("gunzip-maybe");
 const tar = require("tar-fs");
 
-function stripNamePrefix(headers) {
+function stripNamePrefix(header) {
   // Most packages have header names that look like "package/index.js"
   // so we shorten that to just "index.js" here. A few packages use a
   // prefix other than "package/". e.g. the firebase package uses the
   // "firebase_npm/" prefix. So we just strip the first dir name.
-  headers.name = headers.name.replace(/^[^/]+\//, "");
-  return headers;
+  header.name = header.name.replace(/^[^/]+\//, "");
+  return header;
 }
 
-function ignoreLinks(file, headers) {
-  return headers.type === "link" || headers.type === "symlink";
+function ignoreLinks(file, header) {
+  return (
+    header.type === "link" ||
+    header.type === "symlink" ||
+    (header.type === "directory" && !header.name.includes("/")) // Empty directory, see #99
+  );
 }
 
 function extractResponse(response, outputDir) {
@@ -33,7 +37,6 @@ function extractResponse(response, outputDir) {
 
 function fetchPackage(tarballURL, outputDir) {
   console.log(`info: Fetching ${tarballURL} and extracting to ${outputDir}`);
-
   return fetch(tarballURL).then(res => extractResponse(res, outputDir));
 }
 
