@@ -9,5 +9,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-private.key
+secret_key
 /tokens
