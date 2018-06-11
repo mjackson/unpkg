@@ -33,6 +33,9 @@ Append a `/` at the end of a URL to view a listing of all the files in a package
 
   <dt>`?module`</dt>
   <dd>Expands all ["bare" `import` specifiers](https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier) in JavaScript modules to unpkg URLs. This feature is *very experimental*</dd>
+
+  <dt>`?bundle`</dt>
+  <dd>Returns the specified bundle, or the default one if it is not available</dd>
 </dl>
 
 ### Workflow

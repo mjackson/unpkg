@@ -90,6 +90,20 @@ function findFile(req, res, next) {
     // The "unpkg" field allows packages to explicitly declare the
     // file to serve at the bare URL.
     filename = req.packageConfig.unpkg;
+  } else if (typeof req.packageConfig.unpkg === "object") {
+    // The "unpkg" field can also be an object specifying a more
+    // advanced configuration. The "bundles" field is used to
+    // specify different entry points for the same package.
+    const bundles = req.packageConfig.unpkg.bundles;
+    if (typeof bundles === "object") {
+      // Use the `bundle` get parameter. Fall back to the default
+      // bundle if the parameter is not present.
+      const requestedBundle = req.query.bundle || "default";
+      // Check if the requested bundle exists
+      // If it doesn't exist in the available bundles, fall back
+      // to the default one.
+      filename = bundles[requestedBundle] || bundles.default;
+    }
   } else if (typeof req.packageConfig.browser === "string") {
     // Fall back to the "browser" field if declared (only support strings).
     // Deprecated, see https://github.com/unpkg/unpkg/issues/63
@@ -98,7 +112,8 @@ function findFile(req, res, next) {
     // Count which packages + versions are actually using this fallback
     // so we can warn them when we deprecate this functionality.
     incrementCounter("package-json-browser-fallback", req.packageSpec, 1);
-  } else {
+  }
+  if (!filename) {
     // Fall back to "main" or / (same as npm).
     filename = req.packageConfig.main || "/";
   }

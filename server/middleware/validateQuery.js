@@ -3,7 +3,8 @@ const createSearch = require("../utils/createSearch");
 const knownQueryParams = {
   main: true, // Deprecated, see #63
   meta: true,
-  module: true
+  module: true,
+  bundle: true
 };
 
 function isKnownQueryParam(param) {
