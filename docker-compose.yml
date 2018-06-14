@@ -1,0 +1,42 @@
+version: "3"
+
+networks:
+  localnet: {}
+
+volumes:
+  pkgvol: {}
+
+services:
+
+  cache:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data:/data
+    networks:
+      - localnet
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:5000"
+    volumes:
+      - pkgvol:/packages
+    networks:
+      - localnet
+    env_file: .env
+    depends_on:
+      - cache
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    networks:
+      - localnet
+    env_file: .env
+    depends_on:
+      - cache

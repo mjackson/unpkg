@@ -1,5 +1,6 @@
 .DS_Store
 .env
+/data
 /node_modules
 /public/_assets
 /server/stats.json
@@ -7,8 +8,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-dump.rdb
 
 private.key
 /tokens

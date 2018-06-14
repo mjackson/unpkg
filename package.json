@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "heroku local -f Procfile.dev",
+    "start": "echo 'Use `docker-compose up` to start the server",
     "build": "NODE_ENV=production webpack -p --json > server/stats.json",
     "lint": "eslint client && eslint server",
     "test": "jest"
@@ -68,9 +68,6 @@
     "node": "8"
   },
   "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "__tests__/utils"
-    ]
+    "testPathIgnorePatterns": ["/node_modules/", "__tests__/utils"]
   }
 }
