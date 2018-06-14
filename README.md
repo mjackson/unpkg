@@ -1,7 +1,7 @@
 # unpkg [![Travis][build-badge]][build]
 
-[build-badge]: https://img.shields.io/travis/unpkg/unpkg/master.svg?style=flat-square
-[build]: https://travis-ci.org/unpkg/unpkg
+[build-badge]: https://img.shields.io/travis/unpkg/unpkg.com/master.svg?style=flat-square
+[build]: https://travis-ci.org/unpkg/unpkg.com
 
 [unpkg](https://unpkg.com) is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for everything on [npm](https://www.npmjs.com/).
 
