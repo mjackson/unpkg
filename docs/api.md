@@ -40,7 +40,7 @@ Required scope: none
 
 Query parameters:
 
-* `token` - The auth token to verify and decode
+* `token` - The auth token to verify and decode (required)
 
 Example:
 
@@ -83,7 +83,9 @@ Returns a list of all packages that are currently blacklisted.
 
 Required scope: `blacklist.read`
 
-Query parameters: none
+Query parameters:
+
+* `token` - The auth token (required)
 
 Example:
 
@@ -102,8 +104,8 @@ Required scope: `blacklist.add`
 
 Body parameters:
 
-* `token` - The auth token
-* `packageName` - The package to add to the blacklist
+* `token` - The auth token (required)
+* `packageName` - The package to add to the blacklist (required)
 
 Example:
 
@@ -122,7 +124,7 @@ Required scope: `blacklist.remove`
 
 Body parameters:
 
-* `token` - The auth token
+* `token` - The auth token (required)
 
 Example:
 
