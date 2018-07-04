@@ -1,32 +1,26 @@
+const path = require("path");
 const formatBytes = require("pretty-bytes");
+const sortBy = require("sort-by");
 
-const getFileContentType = require("../utils/getFileContentType");
+const cloneElement = require("./utils/cloneElement");
 const e = require("./utils/createElement");
 
-function formatTime(time) {
-  return new Date(time).toISOString();
+function stripLeadingSegment(name) {
+  return name.replace(/^[^\/]+\//, "");
 }
 
-function DirectoryListing({ dir, entries }) {
-  const rows = entries.map(({ file, stats }, index) => {
-    const isDir = stats.isDirectory();
-    const href = file + (isDir ? "/" : "");
+function getValues(object) {
+  return Object.keys(object).map(key => object[key]);
+}
 
-    return e(
-      "tr",
-      { key: file, className: index % 2 ? "odd" : "even" },
-      e("td", null, e("a", { title: file, href }, file)),
-      e("td", null, isDir ? "-" : getFileContentType(file)),
-      e("td", null, isDir ? "-" : formatBytes(stats.size)),
-      e("td", null, isDir ? "-" : formatTime(stats.mtime))
-    );
-  });
+function DirectoryListing({ filename, entry, entries }) {
+  const rows = [];
 
-  if (dir !== "/") {
-    rows.unshift(
+  if (filename !== "/") {
+    rows.push(
       e(
         "tr",
-        { key: "..", className: "odd" },
+        { key: ".." },
         e("td", null, e("a", { title: "Parent directory", href: "../" }, "..")),
         e("td", null, "-"),
         e("td", null, "-"),
@@ -34,6 +28,48 @@ function DirectoryListing({ dir, entries }) {
       )
     );
   }
+
+  const matchingEntries = getValues(entries).filter(
+    ({ name }) =>
+      entry.name !== name && path.dirname(name) === (entry.name || ".")
+  );
+
+  matchingEntries
+    .filter(({ type }) => type === "directory")
+    .sort(sortBy("name"))
+    .forEach(({ name }) => {
+      const relName = stripLeadingSegment(name);
+      const href = relName + "/";
+
+      rows.push(
+        e(
+          "tr",
+          { key: name },
+          e("td", null, e("a", { title: relName, href }, href)),
+          e("td", null, "-"),
+          e("td", null, "-"),
+          e("td", null, "-")
+        )
+      );
+    });
+
+  matchingEntries
+    .filter(({ type }) => type === "file")
+    .sort(sortBy("name"))
+    .forEach(({ name, size, contentType, lastModified }) => {
+      const relName = stripLeadingSegment(name);
+
+      rows.push(
+        e(
+          "tr",
+          { key: name },
+          e("td", null, e("a", { title: relName, href: relName }, relName)),
+          e("td", null, contentType),
+          e("td", null, formatBytes(size)),
+          e("td", null, lastModified)
+        )
+      );
+    });
 
   return e(
     "table",
@@ -50,7 +86,15 @@ function DirectoryListing({ dir, entries }) {
         e("th", null, "Last Modified")
       )
     ),
-    e("tbody", null, rows)
+    e(
+      "tbody",
+      null,
+      rows.map((row, index) =>
+        cloneElement(row, {
+          className: index % 2 ? "odd" : "even"
+        })
+      )
+    )
   );
 }
 

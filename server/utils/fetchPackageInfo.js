@@ -1,4 +1,4 @@
-require("isomorphic-fetch");
+const fetch = require("isomorphic-fetch");
 
 const config = require("../config");
 

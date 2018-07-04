@@ -1,10 +1,13 @@
 const semver = require("semver");
 
+const addLeadingSlash = require("../utils/addLeadingSlash");
 const createPackageURL = require("../utils/createPackageURL");
 const getPackageInfo = require("../utils/getPackageInfo");
-const getPackage = require("../utils/getPackage");
+const incrementCounter = require("../utils/incrementCounter");
 
 function tagRedirect(req, res) {
+  const version = req.packageInfo["dist-tags"][req.packageVersion];
+
   // Cache tag redirects for 1 minute.
   res
     .set({
@@ -13,12 +16,7 @@ function tagRedirect(req, res) {
     })
     .redirect(
       302,
-      createPackageURL(
-        req.packageName,
-        req.packageInfo["dist-tags"][req.packageVersion],
-        req.filename,
-        req.search
-      )
+      createPackageURL(req.packageName, version, req.filename, req.search)
     );
 }
 
@@ -47,9 +45,71 @@ function semverRedirect(req, res) {
   }
 }
 
+function filenameRedirect(req, res) {
+  let filename;
+  if (req.query.module != null) {
+    // See https://github.com/rollup/rollup/wiki/pkg.module
+    filename =
+      req.packageConfig.module ||
+      req.packageConfig["jsnext:main"] ||
+      "/index.js";
+  } else if (
+    req.query.main &&
+    req.packageConfig[req.query.main] &&
+    typeof req.packageConfig[req.query.main] === "string"
+  ) {
+    // Deprecated, see #63
+    filename = req.packageConfig[req.query.main];
+
+    // Count which packages are using this so we can warn them when we
+    // remove this functionality.
+    incrementCounter(
+      "package-json-custom-main",
+      req.packageSpec + "?main=" + req.query.main,
+      1
+    );
+  } else if (
+    req.packageConfig.unpkg &&
+    typeof req.packageConfig.unpkg === "string"
+  ) {
+    filename = req.packageConfig.unpkg;
+  } else if (
+    req.packageConfig.browser &&
+    typeof req.packageConfig.browser === "string"
+  ) {
+    // Deprecated, see #63
+    filename = req.packageConfig.browser;
+
+    // Count which packages are using this so we can warn them when we
+    // remove this functionality.
+    incrementCounter("package-json-browser-fallback", req.packageSpec, 1);
+  } else {
+    filename = req.packageConfig.main || "/index.js";
+  }
+
+  // Redirect to the exact filename so relative imports
+  // and URLs resolve correctly.
+  // TODO: increase the max-age?
+  res
+    .set({
+      "Cache-Control": "public,max-age=60",
+      "Cache-Tag": "redirect,filename-redirect"
+    })
+    .redirect(
+      302,
+      createPackageURL(
+        req.packageName,
+        req.packageVersion,
+        addLeadingSlash(filename),
+        createSearch(req.query)
+      )
+    );
+}
+
 /**
  * Fetch the package metadata and tarball from npm. Redirect to the exact
- * version if the request targets a tag or uses a semver version.
+ * version if the request targets a tag or uses a semver version, or to the
+ * exact filename if the request omits the filename.
  */
 function fetchPackage(req, res, next) {
   getPackageInfo(req.packageName).then(
@@ -62,30 +122,21 @@ function fetchPackage(req, res, next) {
       }
 
       req.packageInfo = packageInfo;
+      req.packageConfig = req.packageInfo.versions[req.packageVersion];
 
-      if (req.packageVersion in req.packageInfo.versions) {
-        // A valid request for a package we haven't downloaded yet.
-        req.packageConfig = req.packageInfo.versions[req.packageVersion];
-
-        getPackage(req.packageConfig).then(
-          outputDir => {
-            req.packageDir = outputDir;
-            next();
-          },
-          error => {
-            console.error(error);
-
-            res
-              .status(500)
-              .type("text")
-              .send(`Cannot fetch package ${req.packageSpec}`);
-          }
-        );
-      } else if (req.packageVersion in req.packageInfo["dist-tags"]) {
-        tagRedirect(req, res);
-      } else {
-        semverRedirect(req, res);
+      if (!req.packageConfig) {
+        if (req.packageVersion in req.packageInfo["dist-tags"]) {
+          return tagRedirect(req, res);
+        } else {
+          return semverRedirect(req, res);
+        }
       }
+
+      if (!req.filename) {
+        return filenameRedirect(req, res);
+      }
+
+      next();
     },
     error => {
       console.error(error);

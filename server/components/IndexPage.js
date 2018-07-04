@@ -18,7 +18,7 @@ function byVersion(a, b) {
   return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
 }
 
-function IndexPage({ packageInfo, version, dir, entries }) {
+function IndexPage({ packageInfo, version, filename, entry, entries }) {
   const versions = Object.keys(packageInfo.versions).sort(byVersion);
   const options = versions.map(v =>
     e("option", { key: v, value: v }, `${packageInfo.name}@${v}`)
@@ -31,7 +31,7 @@ function IndexPage({ packageInfo, version, dir, entries }) {
       "head",
       null,
       e("meta", { charSet: "utf-8" }),
-      e("title", null, `Index of ${dir}`),
+      e("title", null, `Index of ${filename}`),
       s(IndexPageStyle)
     ),
     e(
@@ -45,10 +45,10 @@ function IndexPage({ packageInfo, version, dir, entries }) {
           { className: "version-wrapper" },
           e("select", { id: "version", defaultValue: version }, options)
         ),
-        e("h1", null, `Index of ${dir}`),
+        e("h1", null, `Index of ${filename}`),
         x(IndexPageScript),
         e("hr"),
-        e(DirectoryListing, { dir, entries }),
+        e(DirectoryListing, { filename, entry, entries }),
         e("hr"),
         e("address", null, `${packageInfo.name}@${version}`)
       )

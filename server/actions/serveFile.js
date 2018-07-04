@@ -5,51 +5,55 @@ const babel = require("babel-core");
 
 const IndexPage = require("../components/IndexPage");
 const unpkgRewrite = require("../plugins/unpkgRewrite");
+const addLeadingSlash = require("../utils/addLeadingSlash");
 const renderPage = require("../utils/renderPage");
-const getMetadata = require("../utils/getMetadata");
-const getFileContentType = require("../utils/getFileContentType");
-const getEntries = require("../utils/getEntries");
 
-/**
- * Automatically generate HTML pages that show package contents.
- */
-const AutoIndex = !process.env.DISABLE_INDEX;
-
-/**
- * Maximum recursion depth for meta listings.
- */
-const MaximumDepth = 128;
-
-function serveMetadata(req, res) {
-  getMetadata(
-    req.packageDir,
-    req.filename,
-    req.stats,
-    MaximumDepth,
-    (error, metadata) => {
-      if (error) {
-        console.error(error);
-
-        res
-          .status(500)
-          .type("text")
-          .send(
-            `Cannot generate metadata for ${req.packageSpec}${req.filename}`
-          );
-      } else {
-        // Cache metadata for 1 year.
-        res
-          .set({
-            "Cache-Control": "public, max-age=31536000",
-            "Cache-Tag": "meta"
-          })
-          .send(metadata);
-      }
-    }
-  );
+function getContentTypeHeader(type) {
+  return type === "application/javascript" ? type + "; charset=utf-8" : type;
 }
 
-function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
+function getMetadata(entry, entries) {
+  const metadata = Object.assign(
+    {
+      path: addLeadingSlash(entry.name)
+    },
+    entry.type === "file"
+      ? {
+          type: entry.type,
+          contentType: entry.contentType,
+          integrity: entry.integrity,
+          lastModified: entry.lastModified,
+          size: entry.size
+        }
+      : {
+          type: entry.type
+        }
+  );
+
+  if (entry.type === "directory") {
+    metadata.files = Object.keys(entries)
+      .filter(
+        name =>
+          name !== entry.name && path.dirname(name) === (entry.name || ".")
+      )
+      .map(name => getMetadata(entries[name], entries));
+  }
+
+  return metadata;
+}
+
+function serveMetadata(req, res) {
+  const metadata = getMetadata(req.entry, req.entries);
+
+  res
+    .set({
+      "Cache-Control": "public,max-age=31536000", // 1 year
+      "Cache-Tag": "meta"
+    })
+    .send(metadata);
+}
+
+function rewriteBareModuleIdentifiers(code, packageConfig) {
   const dependencies = Object.assign(
     {},
     packageConfig.peerDependencies,
@@ -64,119 +68,89 @@ function rewriteBareModuleIdentifiers(file, packageConfig, callback) {
     plugins: [unpkgRewrite(dependencies)]
   };
 
-  babel.transformFile(file, options, (error, result) => {
-    callback(error, result && result.code);
-  });
+  return babel.transform(code, options).code;
 }
 
 function serveJavaScriptModule(req, res) {
-  if (getFileContentType(req.filename) !== "application/javascript") {
+  if (req.entry.contentType !== "application/javascript") {
     return res
       .status(403)
       .type("text")
       .send("?module mode is available only for JavaScript files");
   }
 
-  const file = path.join(req.packageDir, req.filename);
+  try {
+    const code = rewriteBareModuleIdentifiers(
+      req.entry.content.toString("utf8"),
+      req.packageConfig
+    );
 
-  rewriteBareModuleIdentifiers(file, req.packageConfig, (error, code) => {
-    if (error) {
-      console.error(error);
+    res
+      .set({
+        "Content-Length": Buffer.byteLength(code),
+        "Content-Type": getContentTypeHeader(req.entry.contentType),
+        "Cache-Control": "public,max-age=31536000", // 1 year
+        ETag: etag(code),
+        "Cache-Tag": "file,js-file,js-module"
+      })
+      .send(code);
+  } catch (error) {
+    console.error(error);
 
-      const errorName = error.constructor.name;
-      const errorMessage = error.message.replace(
-        /^.*?\/unpkg-.+?\//,
-        `/${req.packageSpec}/`
+    const errorName = error.constructor.name;
+    const errorMessage = error.message.replace(
+      /^.*?\/unpkg-.+?\//,
+      `/${req.packageSpec}/`
+    );
+    const codeFrame = error.codeFrame;
+    const debugInfo = `${errorName}: ${errorMessage}\n\n${codeFrame}`;
+
+    res
+      .status(500)
+      .type("text")
+      .send(
+        `Cannot generate module for ${req.packageSpec}${
+          req.filename
+        }\n\n${debugInfo}`
       );
-      const codeFrame = error.codeFrame;
-      const debugInfo = `${errorName}: ${errorMessage}\n\n${codeFrame}`;
-
-      res
-        .status(500)
-        .type("text")
-        .send(
-          `Cannot generate module for ${req.packageSpec}${
-            req.filename
-          }\n\n${debugInfo}`
-        );
-    } else {
-      // Cache modules for 1 year.
-      res
-        .set({
-          "Content-Type": "application/javascript; charset=utf-8",
-          "Content-Length": Buffer.byteLength(code),
-          "Cache-Control": "public, max-age=31536000",
-          "Cache-Tag": "file,js-file,js-module"
-        })
-        .send(code);
-    }
-  });
+  }
 }
 
 function serveStaticFile(req, res) {
   const tags = ["file"];
 
-  const ext = path.extname(req.filename).substr(1);
+  const ext = path.extname(req.entry.name).substr(1);
   if (ext) {
     tags.push(`${ext}-file`);
   }
 
-  let contentType = getFileContentType(req.filename);
-  if (contentType === "application/javascript") {
-    contentType += "; charset=utf-8";
-  }
-
-  // Cache files for 1 year.
-  res.set({
-    "Content-Type": contentType,
-    "Content-Length": req.stats.size,
-    "Cache-Control": "public, max-age=31536000",
-    "Last-Modified": req.stats.mtime.toUTCString(),
-    ETag: etag(req.stats),
-    "Cache-Tag": tags.join(",")
-  });
-
-  const file = path.join(req.packageDir, req.filename);
-  const stream = fs.createReadStream(file);
-
-  stream.on("error", error => {
-    console.error(`Cannot send file ${req.packageSpec}${req.filename}`);
-    console.error(error);
-    res.sendStatus(500);
-  });
-
-  stream.pipe(res);
+  res
+    .set({
+      "Content-Length": req.entry.size,
+      "Content-Type": getContentTypeHeader(req.entry.contentType),
+      "Cache-Control": "public,max-age=31536000", // 1 year
+      "Last-Modified": req.entry.lastModified,
+      ETag: etag(req.entry.content),
+      "Cache-Tag": tags.join(",")
+    })
+    .send(req.entry.content);
 }
 
 function serveIndex(req, res) {
-  const dir = path.join(req.packageDir, req.filename);
+  const html = renderPage(IndexPage, {
+    packageInfo: req.packageInfo,
+    version: req.packageVersion,
+    filename: req.filename,
+    entries: req.entries,
+    entry: req.entry
+  });
 
-  getEntries(dir).then(
-    entries => {
-      const html = renderPage(IndexPage, {
-        packageInfo: req.packageInfo,
-        version: req.packageVersion,
-        dir: req.filename,
-        entries
-      });
-
-      // Cache HTML directory listings for 1 minute.
-      res
-        .set({
-          "Cache-Control": "public, max-age=60",
-          "Cache-Tag": "index"
-        })
-        .send(html);
-    },
-    error => {
-      console.error(error);
-
-      res
-        .status(500)
-        .type("text")
-        .send(`Cannot read entries for ${req.packageSpec}${req.filename}`);
-    }
-  );
+  res
+    .set({
+      "Cache-Control": "public,max-age=60", // 1 minute
+      "Cache-Tag": "index"
+    })
+    .send(html);
 }
 
 /**
@@ -184,21 +158,18 @@ function serveIndex(req, res) {
  */
 function serveFile(req, res) {
   if (req.query.meta != null) {
-    serveMetadata(req, res);
-  } else if (req.stats.isFile()) {
-    if (req.query.module != null) {
-      serveJavaScriptModule(req, res);
-    } else {
-      serveStaticFile(req, res);
-    }
-  } else if (req.stats.isDirectory() && AutoIndex) {
-    serveIndex(req, res);
-  } else {
-    res
-      .status(403)
-      .type("text")
-      .send(`Cannot serve ${req.packageSpec}${req.filename}; it's not a file`);
+    return serveMetadata(req, res);
   }
+
+  if (req.entry.type === "directory") {
+    return serveIndex(req, res);
+  }
+
+  if (req.query.module != null) {
+    return serveJavaScriptModule(req, res);
+  }
+
+  serveStaticFile(req, res);
 }
 
 module.exports = serveFile;
