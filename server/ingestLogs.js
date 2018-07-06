@@ -3,7 +3,7 @@ const startOfDay = require("date-fns/start_of_day");
 const startOfMinute = require("date-fns/start_of_minute");
 const addDays = require("date-fns/add_days");
 
-const db = require("./utils/redis");
+const db = require("./utils/data");
 const isValidPackageName = require("./utils/isValidPackageName");
 const parsePackageURL = require("./utils/parsePackageURL");
 

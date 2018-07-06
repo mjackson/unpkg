@@ -8,34 +8,43 @@ services:
   cache:
     image: redis
     volumes:
-      - ./data:/data
-    ports:
-      - "6379:6379"
+      - ./redis/cache:/data
+    networks:
+      - localnet
+
+  data:
+    image: redis
+    volumes:
+      - ./redis/data:/data
     networks:
       - localnet
 
   server:
     build: .
-    image: server
     command: nodemon --ignore client server.js
+    environment:
+      - CACHE_URL=redis://cache:6379
+      - DATA_URL=redis://data:6379
     env_file: .env
     volumes:
       - .:/app
     depends_on:
       - cache
-    ports:
-      - "8080:5000"
+      - data
     networks:
       - localnet
+    ports:
+      - "8080:5000"
 
   worker:
     build: .
-    image: worker
     command: nodemon --ignore client server/ingestLogs.js
+    environment:
+      - DATA_URL=redis://data:6379
     env_file: .env
     volumes:
       - .:/app
     depends_on:
-      - cache
+      - data
     networks:
       - localnet

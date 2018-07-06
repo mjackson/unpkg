@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
-const db = require("./utils/redis");
+const db = require("./utils/data");
 const secretKey = require("./secretKey");
 
 function getCurrentSeconds() {

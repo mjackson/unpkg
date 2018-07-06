@@ -1,4 +1,4 @@
-const db = require("./utils/redis");
+const db = require("./utils/data");
 
 const CloudflareAPI = require("./CloudflareAPI");
 const BlacklistAPI = require("./BlacklistAPI");

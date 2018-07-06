@@ -1,4 +1,4 @@
-const db = require("./redis");
+const db = require("./cache");
 
 /**
  * A persistent cache for JSON values, using Redis.

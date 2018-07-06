@@ -1,4 +1,4 @@
-const db = require("./utils/redis");
+const db = require("./utils/data");
 
 const blacklistSet = "blacklisted-packages";
 
