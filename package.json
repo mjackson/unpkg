@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "echo 'Use `docker-compose up` to start the server",
+    "start": "docker-compose up",
     "build": "NODE_ENV=production webpack -p --json > server/stats.json",
     "lint": "eslint client && eslint server",
     "test": "jest"

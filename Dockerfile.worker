@@ -1,7 +1,0 @@
-FROM node:8
-
-COPY package.json yarn.lock ./
-RUN yarn --pure-lockfile
-COPY . .
-
-CMD ["node", "server/ingestLogs.js"]
