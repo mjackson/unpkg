@@ -10,7 +10,7 @@ function startServer(id) {
     process.env.NODE_ENV === "production"
       ? createServer(
           path.resolve(__dirname, "public"),
-          path.resolve(__dirname, "server/stats.json")
+          path.resolve(__dirname, "stats.json")
         )
       : createDevServer(
           path.resolve(__dirname, "public"),

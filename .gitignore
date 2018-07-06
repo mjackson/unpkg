@@ -3,7 +3,7 @@
 /data
 /node_modules
 /public/_assets
-/server/stats.json
+/stats.json
 
 npm-debug.log*
 yarn-debug.log*
