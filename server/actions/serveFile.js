@@ -40,7 +40,7 @@ function serveMetadata(req, res) {
         // Cache metadata for 1 year.
         res
           .set({
-            "Cache-Control": "public, max-age=31536000",
+            "Cache-Control": "public, max-age=31536000, immutable",
             "Cache-Tag": "meta"
           })
           .send(metadata);
@@ -105,7 +105,7 @@ function serveJavaScriptModule(req, res) {
         .set({
           "Content-Type": "application/javascript; charset=utf-8",
           "Content-Length": Buffer.byteLength(code),
-          "Cache-Control": "public, max-age=31536000",
+          "Cache-Control": "public, max-age=31536000, immutable",
           "Cache-Tag": "file,js-file,js-module"
         })
         .send(code);
@@ -130,7 +130,7 @@ function serveStaticFile(req, res) {
   res.set({
     "Content-Type": contentType,
     "Content-Length": req.stats.size,
-    "Cache-Control": "public, max-age=31536000",
+    "Cache-Control": "public, max-age=31536000, immutable",
     "Last-Modified": req.stats.mtime.toUTCString(),
     ETag: etag(req.stats),
     "Cache-Tag": tags.join(",")
