@@ -2,9 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const MainPage = require("./components/MainPage");
-const renderPage = require("./utils/renderPage");
-
 function route(setup) {
   const app = express.Router();
   setup(app);
@@ -14,14 +11,7 @@ function route(setup) {
 function createRouter() {
   const app = express.Router();
 
-  app.get("/", (req, res) => {
-    res.send(
-      renderPage(MainPage, {
-        scripts: req.bundle.getScripts("main"),
-        styles: req.bundle.getStyles("main")
-      })
-    );
-  });
+  app.get("/", require("./actions/serveMainPage"));
 
   app.use(cors());
   app.use(bodyParser.json());
