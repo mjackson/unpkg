@@ -1,3 +1,8 @@
 {
-  "presets": ["env", "stage-2", "react"]
+  "presets": ["env", "stage-2", "react"],
+  "env": {
+    "production": {
+      "plugins": ["transform-react-remove-prop-types"]
+    }
+  }
 }

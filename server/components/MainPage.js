@@ -26,6 +26,11 @@ function MainPage({ title, description, scripts, styles, content }) {
       x(
         "window.fetch || document.write('\\x3Cscript src=\"/_polyfills/fetch.min.js\">\\x3C/script>')"
       ),
+      e("script", { src: "/react@16.4.1/umd/react.production.min.js" }),
+      e("script", { src: "/react-dom@16.4.1/umd/react-dom.production.min.js" }),
+      e("script", {
+        src: "/react-router-dom@4.3.1/umd/react-router-dom.min.js"
+      }),
       styles.map(s => e("link", { key: s, rel: "stylesheet", href: s }))
     ),
     e(

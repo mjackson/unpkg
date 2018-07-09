@@ -6,6 +6,12 @@ module.exports = {
     main: path.resolve(__dirname, "client/main.js")
   },
 
+  externals: {
+    react: "React",
+    "react-dom": "ReactDOM",
+    "react-router-dom": "ReactRouterDOM"
+  },
+
   output: {
     filename: "[name]-[hash:8].js",
     path: path.resolve(__dirname, "public/_assets"),
@@ -14,10 +20,10 @@ module.exports = {
 
   module: {
     rules: [
-      { test: /\.js$/, exclude: /node_modules/, use: ["babel-loader"] },
+      { test: /\.js$/, exclude: /node_modules/, use: "babel-loader" },
       { test: /\.css$/, use: ["style-loader", "css-loader"] },
       { test: /\.md$/, use: ["html-loader", "markdown-loader"] },
-      { test: /\.png$/, use: ["file-loader"] }
+      { test: /\.png$/, use: "file-loader" }
     ]
   },
 
