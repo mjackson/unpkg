@@ -2,6 +2,7 @@ const semver = require("semver");
 
 const addLeadingSlash = require("../utils/addLeadingSlash");
 const createPackageURL = require("../utils/createPackageURL");
+const createSearch = require("../utils/createSearch");
 const getPackageInfo = require("../utils/getPackageInfo");
 const incrementCounter = require("../utils/incrementCounter");
 
