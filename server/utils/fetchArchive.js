@@ -1,13 +1,31 @@
-const fetch = require("isomorphic-fetch");
+const url = require("url");
+const https = require("https");
 const gunzip = require("gunzip-maybe");
 const tar = require("tar-stream");
 
-function fetchArchive(packageConfig) {
-  const tarballURL = packageConfig.dist.tarball;
+const agent = new https.Agent({
+  keepAlive: true
+});
 
-  return fetch(tarballURL).then(res =>
-    res.body.pipe(gunzip()).pipe(tar.extract())
-  );
+function fetchArchive(packageConfig) {
+  return new Promise((resolve, reject) => {
+    const tarballURL = url.parse(packageConfig.dist.tarball);
+    const options = {
+      hostname: tarballURL.hostname,
+      path: tarballURL.pathname,
+      agent: agent
+    };
+
+    https
+      .get(options, res => {
+        if (res.statusCode === 200) {
+          resolve(res.pipe(gunzip()).pipe(tar.extract()));
+        } else {
+          reject(res);
+        }
+      })
+      .on("error", reject);
+  });
 }
 
 module.exports = fetchArchive;

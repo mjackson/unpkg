@@ -1,7 +1,4 @@
 const path = require("path");
-const fetch = require("isomorphic-fetch");
-const gunzip = require("gunzip-maybe");
-const tar = require("tar-stream");
 
 const addLeadingSlash = require("../utils/addLeadingSlash");
 const createPackageURL = require("../utils/createPackageURL");
