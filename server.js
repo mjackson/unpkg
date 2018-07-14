@@ -7,7 +7,11 @@ const createDevServer = require("./server/createDevServer");
 const config = require("./server/config");
 
 if (process.env.SENTRY_DSN) {
-  raven.config(process.env.SENTRY_DSN).install();
+  raven
+    .config(process.env.SENTRY_DSN, {
+      release: process.env.HEROKU_RELEASE_VERSION
+    })
+    .install();
 }
 
 function startServer(id) {
