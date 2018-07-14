@@ -1,9 +1,14 @@
 const path = require("path");
 const throng = require("throng");
+const raven = require("raven");
 
 const createServer = require("./server/createServer");
 const createDevServer = require("./server/createDevServer");
 const config = require("./server/config");
+
+if (process.env.SENTRY_DSN) {
+  raven.config(process.env.SENTRY_DSN).install();
+}
 
 function startServer(id) {
   const server =
