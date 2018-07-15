@@ -3,6 +3,7 @@ const https = require("https");
 const gunzip = require("gunzip-maybe");
 const tar = require("tar-stream");
 
+const bufferStream = require("./bufferStream");
 const agent = require("./registryAgent");
 
 function fetchNpmPackage(packageConfig) {
@@ -25,8 +26,17 @@ function fetchNpmPackage(packageConfig) {
         if (res.statusCode === 200) {
           resolve(res.pipe(gunzip()).pipe(tar.extract()));
         } else {
-          const spec = `${packageConfig.name}@${packageConfig.version}`;
-          reject(new Error(`Failed to fetch tarball for ${spec}`));
+          bufferStream(res).then(data => {
+            const spec = `${packageConfig.name}@${packageConfig.version}`;
+            const content = data.toString("utf-8");
+            const error = new Error(
+              `Failed to fetch tarball for ${spec}\nstatus: ${
+                res.statusCode
+              }\ndata: ${content}`
+            );
+
+            reject(error);
+          });
         }
       })
       .on("error", reject);
