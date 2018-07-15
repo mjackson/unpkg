@@ -25,7 +25,8 @@ function fetchNpmPackage(packageConfig) {
         if (res.statusCode === 200) {
           resolve(res.pipe(gunzip()).pipe(tar.extract()));
         } else {
-          reject(res);
+          const spec = `${packageConfig.name}@${packageConfig.version}`;
+          reject(new Error(`Failed to fetch tarball for ${spec}`));
         }
       })
       .on("error", reject);

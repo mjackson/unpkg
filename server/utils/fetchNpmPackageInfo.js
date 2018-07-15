@@ -37,7 +37,7 @@ function fetchNpmPackageInfo(packageName) {
         if (res.statusCode === 200) {
           resolve(parseJSON(res));
         } else {
-          reject(res);
+          reject(new Error(`Failed to fetch info for ${packageName}`));
         }
       })
       .on("error", reject);
