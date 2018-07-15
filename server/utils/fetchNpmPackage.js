@@ -3,17 +3,21 @@ const https = require("https");
 const gunzip = require("gunzip-maybe");
 const tar = require("tar-stream");
 
-const agent = new https.Agent({
-  keepAlive: true
-});
+const agent = require("./registryAgent");
 
-function fetchArchive(packageConfig) {
+function fetchNpmPackage(packageConfig) {
   return new Promise((resolve, reject) => {
-    const tarballURL = url.parse(packageConfig.dist.tarball);
+    const tarballURL = packageConfig.dist.tarball;
+
+    console.log(
+      `info: Fetching package for ${packageConfig.name} from ${tarballURL}`
+    );
+
+    const { hostname, pathname } = url.parse(tarballURL);
     const options = {
-      hostname: tarballURL.hostname,
-      path: tarballURL.pathname,
-      agent: agent
+      agent: agent,
+      hostname: hostname,
+      path: pathname
     };
 
     https
@@ -28,4 +32,4 @@ function fetchArchive(packageConfig) {
   });
 }
 
-module.exports = fetchArchive;
+module.exports = fetchNpmPackage;

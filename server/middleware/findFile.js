@@ -3,7 +3,7 @@ const path = require("path");
 const addLeadingSlash = require("../utils/addLeadingSlash");
 const createPackageURL = require("../utils/createPackageURL");
 const createSearch = require("../utils/createSearch");
-const fetchArchive = require("../utils/fetchArchive");
+const fetchNpmPackage = require("../utils/fetchNpmPackage");
 const getIntegrity = require("../utils/getIntegrity");
 const getContentType = require("../utils/getContentType");
 
@@ -92,9 +92,7 @@ function searchEntries(tarballStream, entryName, wantsHTML) {
 
         const chunks = [];
 
-        stream.on("data", chunk => chunks.push(chunk));
-
-        stream.on("end", () => {
+        stream.on("data", chunk => chunks.push(chunk)).on("end", () => {
           const content = Buffer.concat(chunks);
 
           // Set some extra properties for files that we will
@@ -124,7 +122,7 @@ const trailingSlash = /\/$/;
  * Redirect to the "index" file if a directory was requested.
  */
 function findFile(req, res, next) {
-  fetchArchive(req.packageConfig).then(tarballStream => {
+  fetchNpmPackage(req.packageConfig).then(tarballStream => {
     const entryName = req.filename
       .replace(trailingSlash, "")
       .replace(leadingSlash, "");

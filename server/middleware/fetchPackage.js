@@ -3,7 +3,7 @@ const semver = require("semver");
 const addLeadingSlash = require("../utils/addLeadingSlash");
 const createPackageURL = require("../utils/createPackageURL");
 const createSearch = require("../utils/createSearch");
-const getPackageInfo = require("../utils/getPackageInfo");
+const getNpmPackageInfo = require("../utils/getNpmPackageInfo");
 const incrementCounter = require("../utils/incrementCounter");
 
 function tagRedirect(req, res) {
@@ -113,7 +113,7 @@ function filenameRedirect(req, res) {
  * exact filename if the request omits the filename.
  */
 function fetchPackage(req, res, next) {
-  getPackageInfo(req.packageName).then(
+  getNpmPackageInfo(req.packageName).then(
     packageInfo => {
       if (packageInfo == null || packageInfo.versions == null) {
         return res

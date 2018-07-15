@@ -1,18 +1,18 @@
 const createCache = require("./createCache");
 const createMutex = require("./createMutex");
-const fetchPackageInfo = require("./fetchPackageInfo");
+const fetchNpmPackageInfo = require("./fetchNpmPackageInfo");
 
 const cache = createCache("packageInfo");
 const notFound = "PackageNotFound";
 
-const fetchMutex = createMutex((packageName, callback) => {
+const mutex = createMutex((packageName, callback) => {
   cache.get(packageName, (error, value) => {
     if (error) {
       callback(error);
     } else if (value != null) {
       callback(null, value === notFound ? null : value);
     } else {
-      fetchPackageInfo(packageName).then(
+      fetchNpmPackageInfo(packageName).then(
         value => {
           if (value == null) {
             // Cache 404s for 5 minutes. This prevents us from making
@@ -40,9 +40,9 @@ const fetchMutex = createMutex((packageName, callback) => {
   });
 });
 
-function getPackageInfo(packageName) {
+function getNpmPackageInfo(packageName) {
   return new Promise((resolve, reject) => {
-    fetchMutex(packageName, (error, value) => {
+    mutex(packageName, (error, value) => {
       if (error) {
         reject(error);
       } else {
@@ -52,4 +52,4 @@ function getPackageInfo(packageName) {
   });
 }
 
-module.exports = getPackageInfo;
+module.exports = getNpmPackageInfo;
