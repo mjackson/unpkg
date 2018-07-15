@@ -39,6 +39,6 @@ function startServer(id) {
 throng({
   workers: process.env.WEB_CONCURRENCY || 1,
   lifetime: Infinity,
-  grace: 25000,
+  grace: 5000,
   start: startServer
 });
