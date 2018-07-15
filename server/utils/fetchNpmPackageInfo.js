@@ -36,6 +36,8 @@ function fetchNpmPackageInfo(packageName) {
       .get(options, res => {
         if (res.statusCode === 200) {
           resolve(parseJSON(res));
+        } else if (res.statusCode === 404) {
+          resolve(null);
         } else {
           bufferStream(res).then(data => {
             const content = data.toString("utf-8");
