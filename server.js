@@ -34,11 +34,13 @@ function startServer(id) {
       config.port
     );
   });
+
+  server.timeout = 10000;
 }
 
 throng({
   workers: process.env.WEB_CONCURRENCY || 1,
   lifetime: Infinity,
-  grace: 5000,
+  grace: 11000,
   start: startServer
 });
