@@ -5,10 +5,6 @@ const sortBy = require("sort-by");
 const cloneElement = require("./utils/cloneElement");
 const e = require("./utils/createElement");
 
-function stripLeadingSegment(name) {
-  return name.replace(/^[^\/]+\//, "");
-}
-
 function getValues(object) {
   return Object.keys(object).map(key => object[key]);
 }
@@ -38,7 +34,9 @@ function DirectoryListing({ filename, entry, entries }) {
     .filter(({ type }) => type === "directory")
     .sort(sortBy("name"))
     .forEach(({ name }) => {
-      const relName = stripLeadingSegment(name);
+      const relName = name.substr(
+        entry.name.length ? entry.name.length + 1 : 0
+      );
       const href = relName + "/";
 
       rows.push(
@@ -57,7 +55,9 @@ function DirectoryListing({ filename, entry, entries }) {
     .filter(({ type }) => type === "file")
     .sort(sortBy("name"))
     .forEach(({ name, size, contentType, lastModified }) => {
-      const relName = stripLeadingSegment(name);
+      const relName = name.substr(
+        entry.name.length ? entry.name.length + 1 : 0
+      );
 
       rows.push(
         e(
