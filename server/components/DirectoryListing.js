@@ -5,8 +5,16 @@ const sortBy = require("sort-by");
 const cloneElement = require("./utils/cloneElement");
 const e = require("./utils/createElement");
 
-function getValues(object) {
-  return Object.keys(object).map(key => object[key]);
+function getMatchingEntries(entry, entries) {
+  const dirname = entry.name || ".";
+
+  return Object.keys(entries)
+    .filter(name => entry.name !== name && path.dirname(name) === dirname)
+    .map(name => entries[name]);
+}
+
+function getRelativeName(base, name) {
+  return base.length ? name.substr(base.length + 1) : name;
 }
 
 function DirectoryListing({ filename, entry, entries }) {
@@ -25,18 +33,13 @@ function DirectoryListing({ filename, entry, entries }) {
     );
   }
 
-  const matchingEntries = getValues(entries).filter(
-    ({ name }) =>
-      entry.name !== name && path.dirname(name) === (entry.name || ".")
-  );
+  const matchingEntries = getMatchingEntries(entry, entries);
 
   matchingEntries
     .filter(({ type }) => type === "directory")
     .sort(sortBy("name"))
     .forEach(({ name }) => {
-      const relName = name.substr(
-        entry.name.length ? entry.name.length + 1 : 0
-      );
+      const relName = getRelativeName(entry.name, name);
       const href = relName + "/";
 
       rows.push(
@@ -55,9 +58,7 @@ function DirectoryListing({ filename, entry, entries }) {
     .filter(({ type }) => type === "file")
     .sort(sortBy("name"))
     .forEach(({ name, size, contentType, lastModified }) => {
-      const relName = name.substr(
-        entry.name.length ? entry.name.length + 1 : 0
-      );
+      const relName = getRelativeName(entry.name, name);
 
       rows.push(
         e(

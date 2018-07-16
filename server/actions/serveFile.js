@@ -8,35 +8,29 @@ const unpkgRewrite = require("../plugins/unpkgRewrite");
 const addLeadingSlash = require("../utils/addLeadingSlash");
 const renderPage = require("../utils/renderPage");
 
-function getContentTypeHeader(type) {
-  return type === "application/javascript" ? type + "; charset=utf-8" : type;
+function getMatchingEntries(entry, entries) {
+  const dirname = entry.name || ".";
+
+  return Object.keys(entries)
+    .filter(name => entry.name !== name && path.dirname(name) === dirname)
+    .map(name => entries[name]);
 }
 
 function getMetadata(entry, entries) {
-  const metadata = Object.assign(
-    {
-      path: addLeadingSlash(entry.name)
-    },
-    entry.type === "file"
-      ? {
-          type: entry.type,
-          contentType: entry.contentType,
-          integrity: entry.integrity,
-          lastModified: entry.lastModified,
-          size: entry.size
-        }
-      : {
-          type: entry.type
-        }
-  );
+  const metadata = {
+    path: addLeadingSlash(entry.name),
+    type: entry.type
+  };
 
-  if (entry.type === "directory") {
-    metadata.files = Object.keys(entries)
-      .filter(
-        name =>
-          name !== entry.name && path.dirname(name) === (entry.name || ".")
-      )
-      .map(name => getMetadata(entries[name], entries));
+  if (entry.type === "file") {
+    metadata.contentType = entry.contentType;
+    metadata.integrity = entry.integrity;
+    metadata.lastModified = entry.lastModified;
+    metadata.size = entry.size;
+  } else if (entry.type === "directory") {
+    metadata.files = getMatchingEntries(entry, entries).map(e =>
+      getMetadata(e, entries)
+    );
   }
 
   return metadata;
@@ -69,6 +63,10 @@ function rewriteBareModuleIdentifiers(code, packageConfig) {
   };
 
   return babel.transform(code, options).code;
+}
+
+function getContentTypeHeader(type) {
+  return type === "application/javascript" ? type + "; charset=utf-8" : type;
 }
 
 function serveJavaScriptModule(req, res) {
