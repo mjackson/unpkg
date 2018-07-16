@@ -1,16 +1,17 @@
-const createCache = require("./createCache");
+const cache = require("./cache");
 const createMutex = require("./createMutex");
 const fetchNpmPackageInfo = require("./fetchNpmPackageInfo");
 
-const cache = createCache("packageInfo");
 const notFound = "PackageNotFound";
 
 const mutex = createMutex((packageName, callback) => {
-  cache.get(packageName, (error, value) => {
+  const key = `packageInfo2-${packageName}`;
+
+  cache.get(key, (error, value) => {
     if (error) {
       callback(error);
     } else if (value != null) {
-      callback(null, value === notFound ? null : value);
+      callback(null, value === notFound ? null : JSON.parse(value));
     } else {
       fetchNpmPackageInfo(packageName).then(
         value => {
@@ -19,21 +20,22 @@ const mutex = createMutex((packageName, callback) => {
             // unnecessary requests to the registry for bad package names.
             // In the worst case, a brand new package's info will be
             // available within 5 minutes.
-            cache.set(packageName, notFound, 300, () => {
-              callback(null, value);
+            cache.setex(key, 300, notFound, () => {
+              callback(null, null);
             });
           } else {
-            // Cache valid package info for 1 minute.
-            cache.set(packageName, value, 60, () => {
+            // Cache valid package info for 1 minute. In the worst case,
+            // new versions won't be available for 1 minute.
+            cache.setnx(key, JSON.stringify(value), (error, reply) => {
+              if (reply === 1) cache.expire(key, 60);
               callback(null, value);
             });
           }
         },
         error => {
           // Do not cache errors.
-          cache.del(packageName, () => {
-            callback(error);
-          });
+          cache.del(key);
+          callback(error);
         }
       );
     }
