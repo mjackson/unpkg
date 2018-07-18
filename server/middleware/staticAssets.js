@@ -1,10 +1,10 @@
 const fs = require("fs");
 const invariant = require("invariant");
 
-const createBundle = require("../utils/createBundle");
+const createAssets = require("./utils/createAssets");
 
 /**
- * An express middleware that sets req.bundle from the build
+ * An express middleware that sets req.assets from the build
  * info in the given stats file. Should be used in production.
  */
 function staticAssets(webpackStatsFile) {
@@ -20,10 +20,10 @@ function staticAssets(webpackStatsFile) {
     );
   }
 
-  const bundle = createBundle(stats);
+  const assets = createAssets(stats);
 
   return (req, res, next) => {
-    req.bundle = bundle;
+    req.assets = assets;
     next();
   };
 }

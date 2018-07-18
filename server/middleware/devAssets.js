@@ -1,26 +1,26 @@
 const invariant = require("invariant");
 
-const createBundle = require("../utils/createBundle");
+const createAssets = require("./utils/createAssets");
 
 /**
- * An express middleware that sets req.bundle from the
+ * An express middleware that sets req.assets from the
  * latest result from a running webpack compiler (i.e. using
  * webpack-dev-middleware). Should only be used in dev.
  */
 function devAssets(webpackCompiler) {
-  let bundle;
+  let assets;
   webpackCompiler.plugin("done", stats => {
-    bundle = createBundle(stats.toJson());
+    assets = createAssets(stats.toJson());
   });
 
   return (req, res, next) => {
     invariant(
-      bundle != null,
+      assets != null,
       "devAssets middleware needs a running compiler; " +
         "use webpack-dev-middleware in front of devAssets"
     );
 
-    req.bundle = bundle;
+    req.assets = assets;
 
     next();
   };
