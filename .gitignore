@@ -1,7 +1,6 @@
 .DS_Store
 .env
 
-/redis
 /node_modules
 /public/_assets
 /stats.json

@@ -57,6 +57,7 @@
     "html-loader": "^0.5.1",
     "jest": "^22.4.4",
     "markdown-loader": "^2.0.1",
+    "nodemon": "^1.18.3",
     "style-loader": "0.13.1",
     "supertest": "^3.0.0",
     "url-loader": "0.5.7",

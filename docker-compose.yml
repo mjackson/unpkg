@@ -5,31 +5,22 @@ networks:
 
 services:
 
-  cache:
-    image: redis
-    volumes:
-      - ./redis/cache:/data
-    networks:
-      - localnet
-
   data:
     image: redis
-    volumes:
-      - ./redis/data:/data
     networks:
       - localnet
 
   server:
     build: .
-    command: nodemon --ignore client server.js
-    environment:
-      - CACHE_URL=redis://cache:6379
-      - DATA_URL=redis://data:6379
+    command: node_modules/.bin/nodemon --ignore client server.js
     env_file: .env
+    environment:
+      - CACHE_URL=redis://data:6379
+      - DATA_URL=redis://data:6379
     volumes:
       - .:/app
+      - /app/node_modules
     depends_on:
-      - cache
       - data
     networks:
       - localnet
@@ -38,12 +29,13 @@ services:
 
   worker:
     build: .
-    command: nodemon --ignore client server/ingestLogs.js
+    command: node_modules/.bin/nodemon --ignore client server/ingestLogs.js
+    env_file: .env
     environment:
       - DATA_URL=redis://data:6379
-    env_file: .env
     volumes:
       - .:/app
+      - /app/node_modules
     depends_on:
       - data
     networks:
