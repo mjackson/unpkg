@@ -7,8 +7,8 @@ import formatDate from "date-fns/format";
 import parseDate from "date-fns/parse";
 import { continents, countries } from "countries-list";
 
-import formatNumber from "./utils/formatNumber";
-import formatPercent from "./utils/formatPercent";
+import formatNumber from "../utils/formatNumber";
+import formatPercent from "../utils/formatPercent";
 
 function getCountriesByContinent(continent) {
   return Object.keys(countries).filter(

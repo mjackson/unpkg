@@ -1,9 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import addEvent from "./utils/addEvent";
-import removeEvent from "./utils/removeEvent";
 
-const ResizeEvent = "resize";
+import addEvent from "../utils/addEvent";
+import removeEvent from "../utils/removeEvent";
+
+const resizeEvent = "resize";
 
 class WindowSize extends React.Component {
   static propTypes = {
@@ -19,11 +20,11 @@ class WindowSize extends React.Component {
   };
 
   componentDidMount() {
-    addEvent(window, ResizeEvent, this.handleWindowResize);
+    addEvent(window, resizeEvent, this.handleWindowResize);
   }
 
   componentWillUnmount() {
-    removeEvent(window, ResizeEvent, this.handleWindowResize);
+    removeEvent(window, resizeEvent, this.handleWindowResize);
   }
 
   render() {
