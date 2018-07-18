@@ -17,6 +17,7 @@ services:
     environment:
       - CACHE_URL=redis://data:6379
       - DATA_URL=redis://data:6379
+      - PORT=8080
     volumes:
       - .:/app
       - /app/node_modules
@@ -25,7 +26,7 @@ services:
     networks:
       - localnet
     ports:
-      - "8080:5000"
+      - "8080:8080"
 
   worker:
     build: .
