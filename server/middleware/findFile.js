@@ -85,11 +85,12 @@ function searchEntries(tarballStream, entryName, wantsHTML) {
         // and the client wants HTML.
         if (
           entry.name === entryName ||
-          (wantsHTML && entry.name === entryName + "/index.html") ||
+          // Allow accessing e.g. `/lib/index.html` using `/lib/`
+          (wantsHTML && entry.name === `${entryName}/index.html`) ||
           // Allow accessing e.g. `/index.js` or `/index.json` using
           // `/index` for compatibility with CommonJS
-          (!wantsHTML && entry.name === entryName + ".js") ||
-          (!wantsHTML && entry.name === entryName + ".json")
+          (!wantsHTML && entry.name === `${entryName}.js`) ||
+          (!wantsHTML && entry.name === `${entryName}.json`)
         ) {
           foundEntry = entry;
         }
