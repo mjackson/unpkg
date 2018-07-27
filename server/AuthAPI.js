@@ -90,14 +90,9 @@ function removeAllRevokedTokens() {
   });
 }
 
-function getPublicKey() {
-  return secretKey.public;
-}
-
 module.exports = {
   createToken,
   verifyToken,
   revokeToken,
-  removeAllRevokedTokens,
-  getPublicKey
+  removeAllRevokedTokens
 };
