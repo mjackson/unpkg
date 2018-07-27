@@ -1,7 +1,7 @@
 const URL = require("whatwg-url");
 const warning = require("warning");
 
-const config = require("../config");
+const origin = require("../config").origin;
 
 const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 
@@ -35,10 +35,9 @@ function unpkgRewrite(dependencies = {}) {
           );
 
           const version = dependencies[packageName] || "latest";
+          const url = `${origin}/${packageName}@${version}${file}?module`;
 
-          path.node.source.value = `${
-            config.origin
-          }/${packageName}@${version}${file}?module`;
+          path.node.source.value = url;
         }
       }
     }
