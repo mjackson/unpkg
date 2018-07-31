@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^8.0.3",
+    "babel-jest": "^23.4.2",
     "babel-loader": "^7.1.2",
     "css-loader": "0.26.1",
     "errorhandler": "^1.5.0",
@@ -70,6 +71,9 @@
     "node": "8"
   },
   "jest": {
+    "moduleNameMapper": {
+      "\\.css$": "<rootDir>/modules/__mocks__/styleMock.js"
+    },
     "testPathIgnorePatterns": [
       "/node_modules/",
       "__tests__/utils"
