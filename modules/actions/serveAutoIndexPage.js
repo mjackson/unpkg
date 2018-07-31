@@ -4,6 +4,7 @@ const semver = require("semver");
 
 const MainPage = require("../client/MainPage");
 const AutoIndexApp = require("../client/autoIndex/App");
+const createHTML = require("../client/utils/createHTML");
 const renderPage = require("../utils/renderPage");
 
 const globalScripts =
@@ -33,8 +34,8 @@ function serveAutoIndexPage(req, res) {
     entry: req.entry,
     entries: req.entries
   };
-  const content = ReactDOMServer.renderToString(
-    React.createElement(AutoIndexApp, props)
+  const content = createHTML(
+    ReactDOMServer.renderToString(React.createElement(AutoIndexApp, props))
   );
 
   const html = renderPage(MainPage, {

@@ -11,7 +11,7 @@ function route(setup) {
 function createRouter() {
   const app = express.Router();
 
-  app.get("/", require("./actions/serveMainPage"));
+  app.get("/", require("./actions/serveRootPage"));
 
   app.use(cors());
   app.use(bodyParser.json());

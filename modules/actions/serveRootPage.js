@@ -14,7 +14,7 @@ const globalScripts =
         "/react-router-dom@4.3.1/umd/react-router-dom.js"
       ];
 
-function serveMainPage(req, res) {
+function serveRootPage(req, res) {
   const scripts = globalScripts.concat(req.assets.getScripts("main"));
   const styles = req.assets.getStyles("main");
 
@@ -26,4 +26,4 @@ function serveMainPage(req, res) {
   res.send(html);
 }
 
-module.exports = serveMainPage;
+module.exports = serveRootPage;

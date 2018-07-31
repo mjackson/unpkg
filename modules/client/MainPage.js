@@ -1,7 +1,7 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 
-const h = require("./utils/createHTML");
+const createHTML = require("./utils/createHTML");
 const x = require("./utils/execScript");
 
 function MainPage({ title, description, scripts, styles, data, content }) {
@@ -28,12 +28,16 @@ function MainPage({ title, description, scripts, styles, data, content }) {
         <title>{title}</title>
       </head>
       <body>
-        <div id="root" dangerouslySetInnerHTML={h(content)} />
+        <div id="root" dangerouslySetInnerHTML={content} />
         {scripts.map(s => <script key={s} src={s} />)}
       </body>
     </html>
   );
 }
+
+const htmlType = PropTypes.shape({
+  __html: PropTypes.string
+});
 
 MainPage.propTypes = {
   title: PropTypes.string,
@@ -41,7 +45,7 @@ MainPage.propTypes = {
   scripts: PropTypes.arrayOf(PropTypes.string),
   styles: PropTypes.arrayOf(PropTypes.string),
   data: PropTypes.any,
-  content: PropTypes.string
+  content: htmlType
 };
 
 MainPage.defaultProps = {
@@ -50,7 +54,7 @@ MainPage.defaultProps = {
   scripts: [],
   styles: [],
   data: {},
-  content: ""
+  content: createHTML("")
 };
 
 module.exports = MainPage;
