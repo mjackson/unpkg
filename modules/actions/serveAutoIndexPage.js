@@ -38,6 +38,8 @@ function serveAutoIndexPage(req, res) {
   );
 
   const html = renderPage(MainPage, {
+    title: `UNPKG - ${req.packageName}`,
+    description: `The CDN for ${req.packageName}`,
     scripts: scripts,
     styles: styles,
     data: props,
