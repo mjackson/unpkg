@@ -1,7 +1,7 @@
 const URL = require("whatwg-url");
 const warning = require("warning");
 
-const origin = require("../config").origin;
+const origin = require("../serverConfig").origin;
 
 const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 

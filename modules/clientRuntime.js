@@ -1,6 +1,6 @@
 // Use babel to compile JSX on the fly.
 require("babel-register")({
-  only: /server\/client/
+  only: /modules\/client/
 });
 
 // Ignore require("*.css") calls.

@@ -1,7 +1,7 @@
 const url = require("url");
 const https = require("https");
 
-const config = require("../config");
+const serverConfig = require("../serverConfig");
 const bufferStream = require("./bufferStream");
 const agent = require("./registryAgent");
 
@@ -16,7 +16,7 @@ function fetchNpmPackageInfo(packageName) {
         ? `@${encodeURIComponent(packageName.substring(1))}`
         : encodeURIComponent(packageName);
 
-    const infoURL = `${config.registryURL}/${encodedPackageName}`;
+    const infoURL = `${serverConfig.registryURL}/${encodedPackageName}`;
 
     console.log(
       `info: Fetching package info for ${packageName} from ${infoURL}`

@@ -4,8 +4,8 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
   entry: {
-    main: path.resolve(__dirname, "./server/client/main.js"),
-    autoIndex: path.resolve(__dirname, "./server/client/autoIndex.js")
+    main: path.resolve(__dirname, "./modules/client/main.js"),
+    autoIndex: path.resolve(__dirname, "./modules/client/autoIndex.js")
   },
 
   externals: {

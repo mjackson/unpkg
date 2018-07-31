@@ -2,11 +2,11 @@ const path = require("path");
 const throng = require("throng");
 const raven = require("raven");
 
-const createServer = require("./server/createServer");
-const createDevServer = require("./server/createDevServer");
-const config = require("./server/config");
+const createServer = require("./modules/createServer");
+const createDevServer = require("./modules/createDevServer");
+const serverConfig = require("./modules/serverConfig");
 
-require("./server/clientRuntime");
+require("./modules/clientRuntime");
 
 if (process.env.SENTRY_DSN) {
   raven
@@ -26,14 +26,14 @@ function startServer(id) {
       : createDevServer(
           path.resolve(__dirname, "public"),
           require("./webpack.config"),
-          config.origin
+          serverConfig.origin
         );
 
-  server.listen(config.port, () => {
+  server.listen(serverConfig.port, () => {
     console.log(
       "Server #%s listening on port %s, Ctrl+C to stop",
       id,
-      config.port
+      serverConfig.port
     );
   });
 
