@@ -6,7 +6,8 @@ const staticAssets = require("./middleware/staticAssets");
 const createRouter = require("./createRouter");
 
 morgan.token("fwd", req => {
-  return req.get("x-forwarded-for").replace(/\s/g, "");
+  const fwd = req.get("x-forwarded-for");
+  return fwd ? fwd.replace(/\s/g, "") : "-";
 });
 
 function errorHandler(err, req, res, next) {
