@@ -4,11 +4,8 @@ const ReactDOMServer = require("react-dom/server");
 const doctype = "<!DOCTYPE html>";
 
 function renderPage(page, props) {
-  const html = ReactDOMServer.renderToStaticMarkup(
-    React.createElement(page, props)
-  );
-
-  return doctype + html;
+  const element = React.createElement(page, props);
+  return doctype + ReactDOMServer.renderToStaticMarkup(element);
 }
 
 module.exports = renderPage;

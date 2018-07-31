@@ -1,14 +1,14 @@
-import "./Layout.css";
+require("./Layout.css");
 
-import React from "react";
-import PropTypes from "prop-types";
-import { Motion, spring } from "react-motion";
-import { Switch, Route, Link, withRouter } from "react-router-dom";
+const React = require("react");
+const PropTypes = require("prop-types");
+const { Switch, Route, Link, withRouter } = require("react-router-dom");
+const { Motion, spring } = require("react-motion");
 
-import WindowSize from "./WindowSize";
-import About from "./About";
-import Stats from "./Stats";
-import Home from "./Home";
+const WindowSize = require("./WindowSize");
+const About = require("./About");
+const Stats = require("./Stats");
+const Home = require("./Home");
 
 class Layout extends React.Component {
   static propTypes = {
@@ -132,4 +132,4 @@ class Layout extends React.Component {
   }
 }
 
-export default withRouter(Layout);
+module.exports = withRouter(Layout);

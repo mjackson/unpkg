@@ -6,6 +6,8 @@ const createServer = require("./server/createServer");
 const createDevServer = require("./server/createDevServer");
 const config = require("./server/config");
 
+require("./server/clientRuntime");
+
 if (process.env.SENTRY_DSN) {
   raven
     .config(process.env.SENTRY_DSN, {

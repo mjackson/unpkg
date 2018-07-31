@@ -1,0 +1,17 @@
+.directory-listing table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 0.85em Monaco, monospace;
+}
+
+.directory-listing tr.even {
+  background-color: #eee;
+}
+
+.directory-listing th {
+  text-align: left;
+}
+.directory-listing th,
+.directory-listing td {
+  padding: 0.5em 1em;
+}

@@ -12,7 +12,7 @@ services:
 
   server:
     build: .
-    command: node_modules/.bin/nodemon --ignore client server.js
+    command: node_modules/.bin/nodemon --ignore server/client server.js
     env_file: .env
     environment:
       - CACHE_URL=redis://data:6379
@@ -30,7 +30,7 @@ services:
 
   worker:
     build: .
-    command: node_modules/.bin/nodemon --ignore client server/ingestLogs.js
+    command: node_modules/.bin/nodemon --ignore server/client server/ingestLogs.js
     env_file: .env
     environment:
       - DATA_URL=redis://data:6379

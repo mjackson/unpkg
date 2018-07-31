@@ -1,8 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
+const React = require("react");
+const PropTypes = require("prop-types");
 
-import addEvent from "../utils/addEvent";
-import removeEvent from "../utils/removeEvent";
+const addEvent = require("../utils/addEvent");
+const removeEvent = require("../utils/removeEvent");
 
 const resizeEvent = "resize";
 
@@ -32,4 +32,4 @@ class WindowSize extends React.Component {
   }
 }
 
-export default WindowSize;
+module.exports = WindowSize;

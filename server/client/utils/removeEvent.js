@@ -6,4 +6,4 @@ function removeEvent(node, type, handler) {
   }
 }
 
-export default removeEvent;
+module.exports = removeEvent;

@@ -1,14 +1,14 @@
-import "./Stats.css";
+require("./Stats.css");
 
-import React from "react";
-import PropTypes from "prop-types";
-import formatBytes from "pretty-bytes";
-import formatDate from "date-fns/format";
-import parseDate from "date-fns/parse";
-import { continents, countries } from "countries-list";
+const React = require("react");
+const PropTypes = require("prop-types");
+const formatBytes = require("pretty-bytes");
+const formatDate = require("date-fns/format");
+const parseDate = require("date-fns/parse");
+const { continents, countries } = require("countries-list");
 
-import formatNumber from "../utils/formatNumber";
-import formatPercent from "../utils/formatPercent";
+const formatNumber = require("../utils/formatNumber");
+const formatPercent = require("../utils/formatPercent");
 
 function getCountriesByContinent(continent) {
   return Object.keys(countries).filter(
@@ -320,4 +320,4 @@ class Stats extends React.Component {
   }
 }
 
-export default Stats;
+module.exports = Stats;

@@ -6,4 +6,4 @@ function addEvent(node, type, handler) {
   }
 }
 
-export default addEvent;
+module.exports = addEvent;
