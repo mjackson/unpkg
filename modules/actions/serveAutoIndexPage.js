@@ -10,13 +10,11 @@ const globalScripts =
   process.env.NODE_ENV === "production"
     ? [
         "/react@16.4.1/umd/react.production.min.js",
-        "/react-dom@16.4.1/umd/react-dom.production.min.js",
-        "/react-router-dom@4.3.1/umd/react-router-dom.min.js"
+        "/react-dom@16.4.1/umd/react-dom.production.min.js"
       ]
     : [
         "/react@16.4.1/umd/react.development.js",
-        "/react-dom@16.4.1/umd/react-dom.development.js",
-        "/react-router-dom@4.3.1/umd/react-router-dom.js"
+        "/react-dom@16.4.1/umd/react-dom.development.js"
       ];
 
 function byVersion(a, b) {
