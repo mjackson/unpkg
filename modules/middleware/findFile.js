@@ -10,10 +10,9 @@ const getContentType = require("../utils/getContentType");
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
   // resolve correctly.
-  // TODO: increase the max-age?
   res
     .set({
-      "Cache-Control": "public,max-age=60",
+      "Cache-Control": "public,max-age=31536000", // 1 year
       "Cache-Tag": "redirect,index-redirect"
     })
     .redirect(

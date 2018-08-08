@@ -90,10 +90,9 @@ function filenameRedirect(req, res) {
 
   // Redirect to the exact filename so relative imports
   // and URLs resolve correctly.
-  // TODO: increase the max-age?
   res
     .set({
-      "Cache-Control": "public,max-age=60",
+      "Cache-Control": "public,max-age=31536000", // 1 year
       "Cache-Tag": "redirect,filename-redirect"
     })
     .redirect(
@@ -126,6 +125,7 @@ function fetchPackage(req, res, next) {
       req.packageConfig = req.packageInfo.versions[req.packageVersion];
 
       if (!req.packageConfig) {
+        // Redirect to a fully-resolved version.
         if (req.packageVersion in req.packageInfo["dist-tags"]) {
           return tagRedirect(req, res);
         } else {
