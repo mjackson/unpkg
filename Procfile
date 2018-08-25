@@ -1,2 +1,2 @@
 web: node server.js
-ingest_logs: node server/ingestLogs.js
+ingest_logs: node modules/ingestLogs.js
