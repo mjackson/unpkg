@@ -1,20 +1,11 @@
 const path = require("path");
 const throng = require("throng");
-const raven = require("raven");
 
 const createServer = require("./modules/createServer");
 const createDevServer = require("./modules/createDevServer");
 const serverConfig = require("./modules/serverConfig");
 
 require("./modules/clientRuntime");
-
-if (process.env.SENTRY_DSN) {
-  raven
-    .config(process.env.SENTRY_DSN, {
-      release: process.env.HEROKU_RELEASE_VERSION
-    })
-    .install();
-}
 
 function startServer(id) {
   const server =

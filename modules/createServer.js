@@ -1,6 +1,7 @@
 const http = require("http");
 const express = require("express");
 const morgan = require("morgan");
+const raven = require("raven");
 
 const staticAssets = require("./middleware/staticAssets");
 const createRouter = require("./createRouter");
@@ -10,21 +11,34 @@ morgan.token("fwd", req => {
   return fwd ? fwd.replace(/\s/g, "") : "-";
 });
 
-function errorHandler(err, req, res, next) {
-  console.error(err.stack);
-
-  res
-    .status(500)
-    .type("text")
-    .send("Internal Server Error");
-
-  next(err);
+if (process.env.SENTRY_DSN) {
+  raven
+    .config(process.env.SENTRY_DSN, {
+      release: process.env.HEROKU_RELEASE_VERSION,
+      autoBreadcrumbs: true
+    })
+    .install();
 }
+
+// function errorHandler(err, req, res, next) {
+//   console.error(err.stack);
+
+//   res
+//     .status(500)
+//     .type("text")
+//     .send("Internal Server Error");
+
+//   next(err);
+// }
 
 function createServer(publicDir, statsFile) {
   const app = express();
 
   app.disable("x-powered-by");
+
+  if (process.env.SENTRY_DSN) {
+    app.use(raven.requestHandler());
+  }
 
   if (process.env.NODE_ENV !== "test") {
     app.use(
@@ -36,7 +50,7 @@ function createServer(publicDir, statsFile) {
     );
   }
 
-  app.use(errorHandler);
+  // app.use(errorHandler);
 
   if (publicDir) {
     app.use(express.static(publicDir, { maxAge: "365d" }));
@@ -47,6 +61,10 @@ function createServer(publicDir, statsFile) {
   }
 
   app.use(createRouter());
+
+  if (process.env.SENTRY_DSN) {
+    app.use(raven.errorHandler());
+  }
 
   const server = http.createServer(app);
 
