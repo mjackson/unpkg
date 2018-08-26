@@ -27,13 +27,15 @@ function startServer(id) {
       serverConfig.port
     );
   });
-
-  server.timeout = 10000;
 }
 
 throng({
   workers: process.env.WEB_CONCURRENCY || 1,
+  start: startServer,
   lifetime: Infinity,
-  grace: 11000,
-  start: startServer
+
+  // Heroku shuts down processes forcefully after 30 seconds,
+  // so make sure we exit before that happens.
+  // https://devcenter.heroku.com/articles/dynos#shutdown
+  grace: 25000
 });
