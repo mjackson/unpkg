@@ -30,7 +30,7 @@ services:
 
   worker:
     build: .
-    command: node_modules/.bin/nodemon --ignore modules/client modules/ingestLogs.js
+    command: node_modules/.bin/nodemon --ignore modules/client modules/ingestLogsEveryMinute.js
     env_file: .env
     environment:
       - DATA_URL=redis://data:6379
