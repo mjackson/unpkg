@@ -71,21 +71,21 @@ function createServer(publicDir, statsFile) {
   // Heroku dynos automatically timeout after 30s. Set our
   // own timeout here to force sockets to close before that.
   // https://devcenter.heroku.com/articles/request-timeout
-  // server.setTimeout(25000, socket => {
-  //   const message = `Timeout of 25 seconds exceeded`;
+  server.setTimeout(25000, socket => {
+    const message = `Timeout of 25 seconds exceeded`;
 
-  //   socket.end(
-  //     [
-  //       "HTTP/1.1 503 Service Unavailable",
-  //       "Date: " + new Date().toGMTString(),
-  //       "Content-Length: " + Buffer.byteLength(message),
-  //       "Content-Type: text/plain",
-  //       "Connection: close",
-  //       "",
-  //       message
-  //     ].join("\r\n")
-  //   );
-  // });
+    socket.end(
+      [
+        "HTTP/1.1 503 Service Unavailable",
+        "Date: " + new Date().toGMTString(),
+        "Content-Length: " + Buffer.byteLength(message),
+        "Content-Type: text/plain",
+        "Connection: close",
+        "",
+        message
+      ].join("\r\n")
+    );
+  });
 
   return server;
 }

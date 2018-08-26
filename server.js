@@ -34,8 +34,10 @@ throng({
   start: startServer,
   lifetime: Infinity,
 
-  // Heroku shuts down processes forcefully after 30 seconds,
-  // so make sure we exit before that happens.
+  // In production, increase throng's default grace period to allow
+  // servers that are still handling requests to finish. Heroku shuts
+  // down processes forcefully after 30 seconds, so exit before that
+  // happens to avoid an exit timeout.
   // https://devcenter.heroku.com/articles/dynos#shutdown
-  grace: 25000
+  grace: process.env.NODE_ENV === "production" ? 25000 : 5000
 });
