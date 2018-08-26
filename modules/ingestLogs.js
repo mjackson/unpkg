@@ -5,6 +5,7 @@ const addDays = require("date-fns/add_days");
 const db = require("./utils/data");
 const isValidPackageName = require("./utils/isValidPackageName");
 const parsePackageURL = require("./utils/parsePackageURL");
+const logging = require("./utils/logging");
 
 const CloudflareAPI = require("./CloudflareAPI");
 const StatsAPI = require("./StatsAPI");
@@ -157,8 +158,8 @@ function ingestLogsForZone(zone, startDate, endDate) {
   ).then(stream => {
     const endFetchTime = Date.now();
 
-    console.log(
-      "info: Fetched logs for %s from %s to %s (%dms)",
+    logging.info(
+      "Fetched logs for %s from %s to %s (%dms)",
       zone.name,
       stringifySeconds(startSeconds),
       stringifySeconds(endSeconds),
@@ -170,8 +171,8 @@ function ingestLogsForZone(zone, startDate, endDate) {
     return processLogs(stream).then(totalEntries => {
       const endProcessTime = Date.now();
 
-      console.log(
-        "info: Processed %d log entries for %s (%dms)",
+      logging.info(
+        "Processed %d log entries for %s (%dms)",
         totalEntries,
         zone.name,
         endProcessTime - startProcessTime

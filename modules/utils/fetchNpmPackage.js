@@ -5,13 +5,16 @@ const tar = require("tar-stream");
 
 const bufferStream = require("./bufferStream");
 const agent = require("./registryAgent");
+const logging = require("./logging");
 
 function fetchNpmPackage(packageConfig) {
   return new Promise((resolve, reject) => {
     const tarballURL = packageConfig.dist.tarball;
 
-    console.log(
-      `info: Fetching package for ${packageConfig.name} from ${tarballURL}`
+    logging.debug(
+      "Fetching package for %s from %s",
+      packageConfig.name,
+      tarballURL
     );
 
     const { hostname, pathname } = url.parse(tarballURL);

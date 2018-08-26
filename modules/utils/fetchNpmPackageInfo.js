@@ -4,6 +4,7 @@ const https = require("https");
 const serverConfig = require("../serverConfig");
 const bufferStream = require("./bufferStream");
 const agent = require("./registryAgent");
+const logging = require("./logging");
 
 function parseJSON(res) {
   return bufferStream(res).then(JSON.parse);
@@ -18,9 +19,7 @@ function fetchNpmPackageInfo(packageName) {
 
     const infoURL = `${serverConfig.registryURL}/${encodedPackageName}`;
 
-    console.log(
-      `info: Fetching package info for ${packageName} from ${infoURL}`
-    );
+    logging.debug("Fetching package info for %s from %s", packageName, infoURL);
 
     const { hostname, pathname } = url.parse(infoURL);
     const options = {
