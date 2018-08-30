@@ -21,20 +21,10 @@ URLs that do not specify a package version number redirect to one that does. Thi
 
 Browsers are instructed (via the `Cache-Control` header) to cache assets for 4 hours.
 
-### Support
-
-unpkg is a free, best-effort service and cannot provide any uptime or support guarantees.
-
-I do my best to keep it running, but sometimes things go wrong. Sometimes there are network or provider issues outside my control. Sometimes abusive traffic temporarily affects response times. Sometimes I break things by doing something dumb, but I try not to.
-
-The goal of unpkg is to provide a hassle-free CDN for npm package authors. It's also a great resource for people creating demos and instructional material. However, if you rely on it to serve files that are crucial to your business, you should probably pay for a host with well-supported infrastructure and uptime guarantees.
-
-unpkg is not affiliated with or supported by npm, Inc. in any way. Please do not contact npm for help with unpkg.
-
 ### Abuse
 
 unpkg maintains a list of packages that are known to be malicious. If you find such a package on npm, please let us know!
 
-### Feedback
+### Support
 
-If you think this is useful, we'd love to hear from you. Please reach out to [@unpkg](https://twitter.com/unpkg) with any questions or concerns.
+unpkg is not affiliated with or supported by npm, Inc. in any way. Please do not contact npm for help with unpkg. Instead, please reach out to [@unpkg](https://twitter.com/unpkg) with any questions or concerns.
