@@ -2,12 +2,32 @@
 
 Some API methods require an authentication token. This token is a [JSON web token](https://en.wikipedia.org/wiki/JSON_Web_Token) that contains a list of "scopes" (i.e. permissions).
 
-Once you obtain an API token (see below) you can pass it to the server in one of two ways:
+Once you obtain an API token ([see below](#post-api-auth)) you simply include it in the `Authorization` header of your request as a base-64 encoded string, i.e.
 
-* For GET/HEAD requests, use the `?token` query parameter
-* For all other requests, use the `{token}` parameter as part of the JSON in the request body
+```
+Authorization: base64(token)
+```
 
-### POST /\_auth
+### GET /api/publicKey
+
+The [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) unpkg uses to encrypt authentication tokens, as JSON. You can also find the key as plain text [on GitHub](https://github.com/unpkg/unpkg.com/blob/master/secret_key.pub).
+
+This can be useful to verify a token was issued by unpkg.
+
+Required scope: none
+
+Query parameters: none
+
+Example:
+
+```log
+> curl "https://unpkg.com/api/publicKey"
+{
+  "publicKey": "..."
+}
+```
+
+### POST /api/auth
 
 Creates and returns a new auth token. By default, auth tokens have the following scopes:
 
@@ -26,39 +46,17 @@ Body parameters: none
 Example:
 
 ```log
-> curl -X POST "https://unpkg.com/_auth"
+> curl -X POST "https://unpkg.com/api/auth"
 {
-  "token": "eyJhbGciOiJS..."
+  "token": "..."
 }
 ```
 
-### GET /\_auth
+Please reach out to @mjackson if you need a token with additional scopes.
+
+### GET /api/auth
 
 Verifies and returns the payload contained in the given auth token.
-
-Required scope: none
-
-Query parameters:
-
-* `token` - The auth token to verify and decode (required)
-
-Example:
-
-```log
-> curl "https://unpkg.com/_auth?token=$TOKEN"
-{
-  "jti": "...",
-  "iss": "https://unpkg.com",
-  "iat": ...,
-  "scopes": { ... }
-}
-```
-
-### GET /\_publicKey
-
-The [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) unpkg uses to encrypt authentication tokens, as JSON. You can also find the key as plain text [on GitHub](https://github.com/unpkg/unpkg/blob/master/public.key).
-
-This can be useful to verify a token was issued by unpkg.
 
 Required scope: none
 
@@ -67,9 +65,12 @@ Query parameters: none
 Example:
 
 ```log
-> curl "https://unpkg.com/_publicKey"
+> curl -H "Authorization: $BASE_64_ENCODED_TOKEN" "https://unpkg.com/api/auth"
 {
-  "publicKey": "..."
+  "jti": "...",
+  "iss": "https://unpkg.com",
+  "iat": ...,
+  "scopes": { ... }
 }
 ```
 
@@ -77,26 +78,24 @@ Example:
 
 To protect unpkg users and prevent abuse, unpkg manages a blacklist of npm packages that are known to contain harmful code.
 
-### GET /\_blacklist
+### GET /api/blacklist
 
 Returns a list of all packages that are currently blacklisted.
 
 Required scope: `blacklist.read`
 
-Query parameters:
-
-* `token` - The auth token (required)
+Query parameters: none
 
 Example:
 
 ```log
-> curl "https://unpkg.com/_blacklist?token=$TOKEN"
+> curl -H "Authorization: $BASE_64_ENCODED_TOKEN" "https://unpkg.com/api/blacklist"
 {
   "blacklist": [ ... ]
 }
 ```
 
-### POST /\_blacklist
+### POST /api/blacklist
 
 Adds a package to the blacklist.
 
@@ -104,19 +103,18 @@ Required scope: `blacklist.add`
 
 Body parameters:
 
-* `token` - The auth token (required)
 * `packageName` - The package to add to the blacklist (required)
 
 Example:
 
 ```log
-> curl https://unpkg.com/_blacklist -d '{"token": "$TOKEN", "packageName": "bad-package"}'
+> curl -H "Authorization: $BASE_64_ENCODED_TOKEN" -d '{"packageName":"bad-package"}' "https://unpkg.com/api/blacklist"
 {
   "ok": true
 }
 ```
 
-### DELETE /\_blacklist/:packageName
+### DELETE /api/blacklist
 
 Removes a package from the blacklist.
 
@@ -124,12 +122,12 @@ Required scope: `blacklist.remove`
 
 Body parameters:
 
-* `token` - The auth token (required)
+* `packageName` - The package to remove from the blacklist (required)
 
 Example:
 
 ```log
-> curl -X DELETE https://unpkg.com/_blacklist/bad-package -d '{"token": "$TOKEN"}'
+> curl -X DELETE -H "Authorization: $BASE_64_ENCODED_TOKEN" -d '{"packageName":"bad-package"}' "https://unpkg.com/api/blacklist"
 {
   "ok": true
 }
@@ -137,6 +135,6 @@ Example:
 
 # Stats
 
-### GET /\_stats
+### GET /api/stats
 
 TODO
