@@ -12,8 +12,8 @@ function indexRedirect(req, res, entry) {
   // resolve correctly.
   res
     .set({
-      "Cache-Control": "public,max-age=31536000", // 1 year
-      "Cache-Tag": "redirect,index-redirect"
+      "Cache-Control": "public, max-age=31536000, immutable", // 1 year
+      "Cache-Tag": "redirect, index-redirect"
     })
     .redirect(
       302,
