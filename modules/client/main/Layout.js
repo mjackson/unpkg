@@ -50,7 +50,7 @@ class Layout extends React.Component {
   componentDidMount() {
     this.adjustUnderline();
 
-    fetch("/_stats?period=last-month")
+    fetch("/api/stats?period=last-month")
       .then(res => res.json())
       .then(stats => this.setState({ stats }));
 

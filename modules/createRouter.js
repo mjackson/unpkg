@@ -17,8 +17,40 @@ function createRouter() {
   app.use(bodyParser.json());
   app.use(require("./middleware/userToken"));
 
+  app.use(
+    "/api",
+    route(app => {
+      app.get("/publicKey", require("./actions/showPublicKey"));
+
+      app.post("/auth", require("./actions/createAuth"));
+      app.get("/auth", require("./actions/showAuth"));
+
+      app.post(
+        "/blacklist",
+        require("./middleware/requireAuth")("blacklist.add"),
+        require("./actions/addToBlacklist")
+      );
+      app.get(
+        "/blacklist",
+        require("./middleware/requireAuth")("blacklist.read"),
+        require("./actions/showBlacklist")
+      );
+      app.delete(
+        "/blacklist",
+        require("./middleware/requireAuth")("blacklist.remove"),
+        require("./actions/removeFromBlacklist")
+      );
+
+      if (process.env.NODE_ENV !== "test") {
+        app.get("/stats", require("./actions/showStats"));
+      }
+    })
+  );
+
+  // TODO: Remove
   app.get("/_publicKey", require("./actions/showPublicKey"));
 
+  // TODO: Remove
   app.use(
     "/_auth",
     route(app => {
@@ -27,6 +59,7 @@ function createRouter() {
     })
   );
 
+  // TODO: Remove
   app.use(
     "/_blacklist",
     route(app => {
@@ -49,6 +82,7 @@ function createRouter() {
     })
   );
 
+  // TODO: Remove
   if (process.env.NODE_ENV !== "test") {
     app.get("/_stats", require("./actions/showStats"));
   }

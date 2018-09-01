@@ -1,3 +1,5 @@
+const basicAuth = require("basic-auth");
+
 const AuthAPI = require("../AuthAPI");
 
 const ReadMethods = { GET: true, HEAD: true };
@@ -10,7 +12,10 @@ function userToken(req, res, next) {
     return next();
   }
 
-  const token = (ReadMethods[req.method] ? req.query : req.body).token;
+  const credentials = basicAuth(req);
+  const token = credentials
+    ? credentials.pass
+    : (ReadMethods[req.method] ? req.query : req.body).token;
 
   if (!token) {
     req.user = null;

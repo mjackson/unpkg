@@ -1,7 +1,27 @@
+const validateNpmPackageName = require("validate-npm-package-name");
+
 const BlacklistAPI = require("../BlacklistAPI");
 
 function removeFromBlacklist(req, res) {
-  const packageName = req.packageName;
+  // TODO: Remove req.packageName when DELETE
+  // /_blacklist/:packageName API is removed
+  const packageName = req.body.packageName || req.packageName;
+
+  if (!packageName) {
+    return res
+      .status(403)
+      .send({ error: 'Missing "packageName" body parameter' });
+  }
+
+  const nameErrors = validateNpmPackageName(packageName).errors;
+
+  // Disallow invalid package names.
+  if (nameErrors) {
+    const reason = nameErrors.join(", ");
+    return res.status(403).send({
+      error: `Invalid package name "${packageName}" (${reason})`
+    });
+  }
 
   BlacklistAPI.removePackage(packageName).then(
     removed => {

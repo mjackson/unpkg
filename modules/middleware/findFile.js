@@ -27,7 +27,7 @@ function indexRedirect(req, res, entry) {
 }
 
 function stripLeadingSegment(name) {
-  return name.replace(/^[^\/]+\/?/, "");
+  return name.replace(/^[^/]+\/?/, "");
 }
 
 function searchEntries(tarballStream, entryName, wantsHTML) {

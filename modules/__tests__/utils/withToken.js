@@ -1,7 +1,7 @@
 const AuthAPI = require("../../AuthAPI");
 
-function withToken(scopes, callback) {
-  AuthAPI.createToken(scopes).then(callback);
+function withToken(scopes, done) {
+  AuthAPI.createToken(scopes).then(done);
 }
 
 module.exports = withToken;

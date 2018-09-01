@@ -1,4 +1,5 @@
 const validateNpmPackageName = require("validate-npm-package-name");
+
 const BlacklistAPI = require("../BlacklistAPI");
 
 function addToBlacklist(req, res) {
@@ -29,7 +30,7 @@ function addToBlacklist(req, res) {
         );
       }
 
-      res.set({ "Content-Location": `/_blacklist/${packageName}` }).send({
+      res.send({
         ok: true,
         message: `Package "${packageName}" was ${
           added ? "added to" : "already in"
