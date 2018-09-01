@@ -1,8 +1,10 @@
-const basicAuth = require("basic-auth");
-
 const AuthAPI = require("../AuthAPI");
 
 const ReadMethods = { GET: true, HEAD: true };
+
+function decodeBase64(string) {
+  return Buffer.from(string, "base64").toString();
+}
 
 /**
  * Sets req.user from the payload in the auth token in the request.
@@ -12,9 +14,9 @@ function userToken(req, res, next) {
     return next();
   }
 
-  const credentials = basicAuth(req);
-  const token = credentials
-    ? credentials.pass
+  const auth = req.get("Authorization");
+  const token = auth
+    ? decodeBase64(auth)
     : (ReadMethods[req.method] ? req.query : req.body).token;
 
   if (!token) {
