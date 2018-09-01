@@ -68,7 +68,7 @@ describe("The /api/auth endpoint", () => {
       });
 
       describe("in the Authorization header", () => {
-        it.only("echoes back the auth payload", done => {
+        it("echoes back the auth payload", done => {
           const scopes = { some: { scope: true } };
 
           withAuthHeader(scopes, header => {
