@@ -14,11 +14,10 @@ function checkBlacklist(req, res, next) {
       }
     },
     error => {
-      console.error(error);
+      console.error("Unable to fetch the blacklist: %s", error);
 
-      res.status(500).send({
-        error: "Unable to fetch the blacklist"
-      });
+      // Continue anyway.
+      next();
     }
   );
 }
