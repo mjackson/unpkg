@@ -1,7 +1,7 @@
 const cache = require("./cache");
 const fetchNpmPackageInfo = require("./fetchNpmPackageInfo");
 
-const notFound = "PackageNotFound";
+const notFound = 0;
 
 function getNpmPackageInfo(packageName) {
   return new Promise((resolve, reject) => {
