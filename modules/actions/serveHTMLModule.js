@@ -1,14 +1,20 @@
 const etag = require("etag");
+const cheerio = require("cheerio");
 
 const getContentTypeHeader = require("../utils/getContentTypeHeader");
 const rewriteBareModuleIdentifiers = require("../utils/rewriteBareModuleIdentifiers");
 
-function serveJavaScriptModule(req, res) {
+function serveHTMLModule(req, res) {
   try {
-    const code = rewriteBareModuleIdentifiers(
-      req.entry.content.toString("utf8"),
-      req.packageConfig
-    );
+    const $ = cheerio.load(req.entry.content.toString("utf8"));
+
+    $("script[type=module]").each((index, element) => {
+      $(element).html(
+        rewriteBareModuleIdentifiers($(element).html(), req.packageConfig)
+      );
+    });
+
+    const code = $.html();
 
     res
       .set({
@@ -16,7 +22,7 @@ function serveJavaScriptModule(req, res) {
         "Content-Type": getContentTypeHeader(req.entry.contentType),
         "Cache-Control": "public, max-age=31536000, immutable", // 1 year
         ETag: etag(code),
-        "Cache-Tag": "file,js-file,js-module"
+        "Cache-Tag": "file, html-file, html-module"
       })
       .send(code);
   } catch (error) {
@@ -41,4 +47,4 @@ function serveJavaScriptModule(req, res) {
   }
 }
 
-module.exports = serveJavaScriptModule;
+module.exports = serveHTMLModule;

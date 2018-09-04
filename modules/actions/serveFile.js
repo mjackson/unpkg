@@ -1,4 +1,5 @@
 const serveAutoIndexPage = require("./serveAutoIndexPage");
+const serveHTMLModule = require("./serveHTMLModule");
 const serveJavaScriptModule = require("./serveJavaScriptModule");
 const serveStaticFile = require("./serveStaticFile");
 const serveMetadata = require("./serveMetadata");
@@ -16,7 +17,18 @@ function serveFile(req, res) {
   }
 
   if (req.query.module != null) {
-    return serveJavaScriptModule(req, res);
+    if (req.entry.contentType === "application/javascript") {
+      return serveJavaScriptModule(req, res);
+    }
+
+    if (req.entry.contentType === "text/html") {
+      return serveHTMLModule(req, res);
+    }
+
+    return res
+      .status(403)
+      .type("text")
+      .send("?module mode is available only for JavaScript and HTML files");
   }
 
   serveStaticFile(req, res);
