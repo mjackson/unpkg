@@ -30,7 +30,7 @@ function stripLeadingSegment(name) {
   return name.replace(/^[^/]+\/?/, "");
 }
 
-function searchEntries(tarballStream, entryName, wantsHTML) {
+function searchEntries(tarballStream, entryName, wantsIndex) {
   return new Promise((resolve, reject) => {
     const entries = {};
     let foundEntry = null;
@@ -85,13 +85,13 @@ function searchEntries(tarballStream, entryName, wantsHTML) {
         if (
           entry.name === entryName ||
           // Allow accessing e.g. `/index.html` using `/`
-          (wantsHTML &&
+          (wantsIndex &&
             entry.name ===
               (entryName === "" ? "index.html" : `${entryName}/index.html`)) ||
           // Allow accessing e.g. `/index.js` or `/index.json` using
           // `/index` for compatibility with CommonJS
-          (!wantsHTML && entry.name === `${entryName}.js`) ||
-          (!wantsHTML && entry.name === `${entryName}.json`)
+          (!wantsIndex && entry.name === `${entryName}.js`) ||
+          (!wantsIndex && entry.name === `${entryName}.json`)
         ) {
           foundEntry = entry;
         }
@@ -132,9 +132,9 @@ function findFile(req, res, next) {
     const entryName = req.filename
       .replace(trailingSlash, "")
       .replace(leadingSlash, "");
-    const wantsHTML = trailingSlash.test(req.filename);
+    const wantsIndex = trailingSlash.test(req.filename);
 
-    searchEntries(tarballStream, entryName, wantsHTML).then(
+    searchEntries(tarballStream, entryName, wantsIndex).then(
       ({ entries, foundEntry }) => {
         if (!foundEntry) {
           return res
@@ -148,7 +148,7 @@ function findFile(req, res, next) {
         // inside that directory. This is so our URLs work in a similar way
         // to require("lib") in node where it searches for `lib/index.js`
         // and `lib/index.json` when `lib` is a directory.
-        if (foundEntry.type === "directory" && !wantsHTML) {
+        if (foundEntry.type === "directory" && !wantsIndex) {
           const indexEntry =
             entries[path.join(entryName, "index.js")] ||
             entries[path.join(entryName, "index.json")];
