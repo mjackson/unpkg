@@ -1,5 +1,7 @@
 const url = require("url");
-const https = require("https");
+const https = require(process.env.NPM_REGISTRY_URL.indexOf("http:") !== 0
+  ? "https"
+  : "http");
 const gunzip = require("gunzip-maybe");
 const tar = require("tar-stream");
 
@@ -17,8 +19,10 @@ function fetchNpmPackage(packageConfig) {
       tarballURL
     );
 
-    const { hostname, pathname } = url.parse(tarballURL);
+    const { hostname, pathname, protocol, port } = url.parse(tarballURL);
     const options = {
+      protocol: protocol,
+      port: port,
       agent: agent,
       hostname: hostname,
       path: pathname

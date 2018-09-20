@@ -1,5 +1,5 @@
 const url = require("url");
-const https = require("https");
+const https = require(process.env.NPM_REGISTRY_URL.indexOf("http:") !== 0 ? "https" : "http");
 
 const serverConfig = require("../serverConfig");
 const bufferStream = require("./bufferStream");
@@ -21,8 +21,10 @@ function fetchNpmPackageInfo(packageName) {
 
     logging.debug("Fetching package info for %s from %s", packageName, infoURL);
 
-    const { hostname, pathname } = url.parse(infoURL);
+    const { hostname, pathname, port, protocol } = url.parse(infoURL);
     const options = {
+      protocol: protocol,
+      port: port,
       agent: agent,
       hostname: hostname,
       path: pathname,
