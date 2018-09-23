@@ -1,7 +1,7 @@
 const url = require("url");
-const https = require(process.env.NPM_REGISTRY_URL.indexOf("http:") !== 0 ? "https" : "http");
-
 const serverConfig = require("../serverConfig");
+const https = require(serverConfig.registryURL.indexOf("http:") !== 0 ? "https" : "http");
+
 const bufferStream = require("./bufferStream");
 const agent = require("./registryAgent");
 const logging = require("./logging");
