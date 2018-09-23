@@ -1,5 +1,6 @@
 const url = require("url");
-const https = require(process.env.NPM_REGISTRY_URL.indexOf("http:") !== 0
+const serverConfig = require("../serverConfig");
+const https = require(serverConfig.registryURL.indexOf("http:") !== 0
   ? "https"
   : "http");
 const gunzip = require("gunzip-maybe");
