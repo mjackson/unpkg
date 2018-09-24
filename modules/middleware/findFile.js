@@ -84,10 +84,6 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
         // and the client wants HTML.
         if (
           entry.name === entryName ||
-          // Allow accessing e.g. `/index.html` using `/`
-          (wantsIndex &&
-            entry.name ===
-              (entryName === "" ? "index.html" : `${entryName}/index.html`)) ||
           // Allow accessing e.g. `/index.js` or `/index.json` using
           // `/index` for compatibility with CommonJS
           (!wantsIndex && entry.name === `${entryName}.js`) ||
