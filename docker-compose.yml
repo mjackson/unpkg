@@ -28,16 +28,16 @@ services:
     ports:
       - "8080:8080"
 
-  worker:
-    build: .
-    command: node_modules/.bin/nodemon --ignore modules/client modules/ingestLogsEveryMinute.js
-    env_file: .env
-    environment:
-      - DATA_URL=redis://data:6379
-    volumes:
-      - .:/app
-      - /app/node_modules
-    depends_on:
-      - data
-    networks:
-      - localnet
+  # worker:
+  #   build: .
+  #   command: node_modules/.bin/nodemon --ignore modules/client modules/ingestLogsEveryMinute.js
+  #   env_file: .env
+  #   environment:
+  #     - DATA_URL=redis://data:6379
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+  #   depends_on:
+  #     - data
+  #   networks:
+  #     - localnet
