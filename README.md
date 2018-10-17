@@ -11,7 +11,11 @@ Please visit [the unpkg website](https://unpkg.com) to learn more about how to u
 
 ### Development
 
-To boot the development server, first you'll need to [install Docker](https://docs.docker.com/install/). Then, you can get everything running with `docker-compose up`.
+To boot the development server
+
+1. [install Docker](https://docs.docker.com/install/)
+1. ensure you have a `.env` file. `.env.example` is a good starting place, though if you want to work on features related to Cloudflare statistics, you'll need real credentials
+1. Get everything running with `docker-compose up`
 
 ### Sponsors
 
