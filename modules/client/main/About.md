@@ -19,7 +19,7 @@ The CDN caches files based on their permanent URL, which includes the npm packag
 
 URLs that do not specify a package version number redirect to one that does. This is the `latest` version when no version is specified, or the `maxSatisfying` version when a [semver version](https://github.com/npm/node-semver) is given. Redirects are cached for 5 minutes.
 
-Browsers are instructed (via the `Cache-Control` header) to cache assets for 4 hours.
+Browsers are instructed (via the `Cache-Control` header) to cache assets for 1 year.
 
 ### Abuse
 
