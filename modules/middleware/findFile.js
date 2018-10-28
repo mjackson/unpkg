@@ -118,6 +118,7 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
 
 const leadingSlash = /^\//;
 const trailingSlash = /\/$/;
+const multipleSlash = /\/\/+/;
 
 /**
  * Fetch and search the archive to try and find the requested file.
@@ -126,6 +127,7 @@ const trailingSlash = /\/$/;
 function findFile(req, res, next) {
   fetchNpmPackage(req.packageConfig).then(tarballStream => {
     const entryName = req.filename
+      .replace(multipleSlash, "/")
       .replace(trailingSlash, "")
       .replace(leadingSlash, "");
     const wantsIndex = trailingSlash.test(req.filename);
