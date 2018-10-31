@@ -70,14 +70,5 @@
   },
   "engines": {
     "node": "8"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.css$": "<rootDir>/modules/__mocks__/styleMock.js"
-    },
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "__tests__/utils"
-    ]
   }
 }
