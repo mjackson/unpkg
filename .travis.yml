@@ -1,10 +1,10 @@
 language: node_js
-cache: yarn
+cache: npm
 services:
   - redis-server
 script:
-  - yarn test --silent
-  - yarn build
+  - npm test
+  - npm run build
 deploy:
   provider: heroku
   skip_cleanup: true

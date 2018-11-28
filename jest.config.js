@@ -4,5 +4,6 @@ module.exports = {
   },
   setupTestFrameworkScriptFile:
     "<rootDir>/modules/__tests__/setupTestFramework.js",
-  testMatch: ["**/__tests__/*-test.js"]
+  testMatch: ["**/__tests__/*-test.js"],
+  testURL: "http://localhost/"
 };
