@@ -2,8 +2,8 @@ FROM node:8
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-RUN yarn --pure-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 # COPY . .
 
 ENV PORT 5000

@@ -1,8 +1,10 @@
 const path = require("path");
 const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCSSExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
+  mode: process.env.NODE_ENV || "development",
+
   entry: {
     main: path.resolve(__dirname, "./modules/client/main.js"),
     autoIndex: path.resolve(__dirname, "./modules/client/autoIndex.js")
@@ -25,10 +27,7 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, use: "babel-loader" },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader"
-        })
+        use: [MiniCSSExtractPlugin.loader, "css-loader"]
       },
       { test: /\.md$/, use: ["html-loader", "markdown-loader"] },
       { test: /\.png$/, use: "file-loader" }
@@ -41,7 +40,7 @@ module.exports = {
         process.env.NODE_ENV || "development"
       )
     }),
-    new ExtractTextPlugin("[name]-[hash:8].css")
+    new MiniCSSExtractPlugin()
   ],
 
   devtool:

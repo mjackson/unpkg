@@ -1,8 +1,4 @@
 {
-  "presets": ["env", "stage-2", "react"],
-  "env": {
-    "production": {
-      "plugins": ["transform-react-remove-prop-types"]
-    }
-  }
+  "presets": [["@babel/env", { "loose": true }], "@babel/react"],
+  "plugins": [["@babel/plugin-proposal-class-properties", { "loose": true }]]
 }
