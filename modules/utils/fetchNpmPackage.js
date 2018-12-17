@@ -9,7 +9,7 @@ const logging = require('./logging');
 
 function fetchNpmPackage(packageConfig) {
   return new Promise((resolve, reject) => {
-    const tarballURL = packageConfig.dist.tarball;
+    const tarballURL = packageConfig.tarballURL;
 
     logging.debug(
       'Fetching package for %s from %s',

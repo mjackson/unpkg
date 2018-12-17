@@ -1,9 +1,23 @@
-const redis = require('redis');
+const LRUCache = require('lru-cache');
 
-redis.debug_mode = process.env.DEBUG_REDIS != null;
+const maxMegabytes = 40; // Cap the cache at 40 MB
+const maxLength = maxMegabytes * 1024 * 1024;
 
-const client = redis.createClient(
-  process.env.CACHE_URL || process.env.OPENREDIS_URL || 'redis://localhost:6379'
-);
+const maxSeconds = 60;
+const maxAge = maxSeconds * 1000;
 
-module.exports = client;
+const cache = new LRUCache({
+  max: maxLength,
+  maxAge: maxAge,
+  length: Buffer.byteLength
+});
+
+function get(key) {
+  return cache.get(key);
+}
+
+function setex(key, ttlSeconds, value) {
+  return cache.set(key, value, ttlSeconds * 1000);
+}
+
+module.exports = { get, setex };

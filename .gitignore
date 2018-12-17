@@ -4,6 +4,7 @@
 /node_modules/
 /public/_assets/
 
+/dump.rdb
 /stats.json
 
 npm-debug.log*
