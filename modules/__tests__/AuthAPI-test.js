@@ -1,11 +1,11 @@
-const AuthAPI = require("../AuthAPI");
+const AuthAPI = require('../AuthAPI');
 
-describe("Auth API", () => {
+describe('Auth API', () => {
   beforeEach(done => {
     AuthAPI.removeAllRevokedTokens().then(() => done(), done);
   });
 
-  it("creates tokens with the right scopes", done => {
+  it('creates tokens with the right scopes', done => {
     const scopes = {
       blacklist: {
         add: true,
@@ -24,7 +24,7 @@ describe("Auth API", () => {
     });
   });
 
-  it("refuses to verify revoked tokens", done => {
+  it('refuses to verify revoked tokens', done => {
     const scopes = {};
 
     AuthAPI.createToken(scopes).then(token => {

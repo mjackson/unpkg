@@ -1,6 +1,6 @@
-const db = require("./utils/data");
+const db = require('./utils/data');
 
-const blacklistSet = "blacklisted-packages";
+const blacklistSet = 'blacklisted-packages';
 
 function addPackage(packageName) {
   return new Promise((resolve, reject) => {

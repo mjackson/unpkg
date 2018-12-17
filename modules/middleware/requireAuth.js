@@ -4,8 +4,8 @@
  */
 function requireAuth(scope) {
   let checkScopes;
-  if (scope.includes(".")) {
-    const parts = scope.split(".");
+  if (scope.includes('.')) {
+    const parts = scope.split('.');
     checkScopes = scopes =>
       parts.reduce((memo, part) => memo && memo[part], scopes) != null;
   } else {
@@ -20,11 +20,11 @@ function requireAuth(scope) {
     const user = req.user;
 
     if (!user) {
-      return res.status(403).send({ error: "Missing auth token" });
+      return res.status(403).send({ error: 'Missing auth token' });
     }
 
     if (!user.scopes || !checkScopes(user.scopes)) {
-      return res.status(403).send({ error: "Insufficient scopes" });
+      return res.status(403).send({ error: 'Insufficient scopes' });
     }
 
     if (req.auth) {

@@ -1,3 +1,3 @@
-const closeDatabase = require("./utils/closeDatabase");
+const closeDatabase = require('./utils/closeDatabase');
 
 afterAll(closeDatabase);

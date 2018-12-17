@@ -1,14 +1,14 @@
-const http = require("http");
-const express = require("express");
-const morgan = require("morgan");
-const raven = require("raven");
+const http = require('http');
+const express = require('express');
+const morgan = require('morgan');
+const raven = require('raven');
 
-const staticAssets = require("./middleware/staticAssets");
-const createRouter = require("./createRouter");
+const staticAssets = require('./middleware/staticAssets');
+const createRouter = require('./createRouter');
 
-morgan.token("fwd", req => {
-  const fwd = req.get("x-forwarded-for");
-  return fwd ? fwd.replace(/\s/g, "") : "-";
+morgan.token('fwd', req => {
+  const fwd = req.get('x-forwarded-for');
+  return fwd ? fwd.replace(/\s/g, '') : '-';
 });
 
 if (process.env.SENTRY_DSN) {
@@ -34,13 +34,13 @@ if (process.env.SENTRY_DSN) {
 function createServer(publicDir, statsFile) {
   const app = express();
 
-  app.disable("x-powered-by");
+  app.disable('x-powered-by');
 
   if (process.env.SENTRY_DSN) {
     app.use(raven.requestHandler());
   }
 
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env.NODE_ENV !== 'test') {
     app.use(
       morgan(
         // Modified version of Heroku's log format
@@ -53,7 +53,7 @@ function createServer(publicDir, statsFile) {
   // app.use(errorHandler);
 
   if (publicDir) {
-    app.use(express.static(publicDir, { maxAge: "365d" }));
+    app.use(express.static(publicDir, { maxAge: '365d' }));
   }
 
   if (statsFile) {
@@ -76,14 +76,14 @@ function createServer(publicDir, statsFile) {
 
     socket.end(
       [
-        "HTTP/1.1 503 Service Unavailable",
-        "Date: " + new Date().toGMTString(),
-        "Content-Length: " + Buffer.byteLength(message),
-        "Content-Type: text/plain",
-        "Connection: close",
-        "",
+        'HTTP/1.1 503 Service Unavailable',
+        'Date: ' + new Date().toGMTString(),
+        'Content-Length: ' + Buffer.byteLength(message),
+        'Content-Type: text/plain',
+        'Connection: close',
+        '',
         message
-      ].join("\r\n")
+      ].join('\r\n')
     );
   });
 

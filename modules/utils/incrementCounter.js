@@ -1,4 +1,4 @@
-const db = require("./data");
+const db = require('./data');
 
 function incrementCounter(counter, key, by = 1) {
   return new Promise((resolve, reject) => {

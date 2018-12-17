@@ -1,19 +1,19 @@
-const fs = require("fs");
-const path = require("path");
-const forge = require("node-forge");
-const invariant = require("invariant");
+const fs = require('fs');
+const path = require('path');
+const forge = require('node-forge');
+const invariant = require('invariant');
 
 let secretKey;
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
   invariant(
     process.env.PRIVATE_KEY,
-    "Missing $PRIVATE_KEY environment variable"
+    'Missing $PRIVATE_KEY environment variable'
   );
 
   secretKey = {
     public: fs.readFileSync(
-      path.resolve(__dirname, "../secret_key.pub"),
-      "utf8"
+      path.resolve(__dirname, '../secret_key.pub'),
+      'utf8'
     ),
     private: process.env.PRIVATE_KEY
   };

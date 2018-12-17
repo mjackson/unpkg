@@ -1,7 +1,7 @@
-const db = require("./utils/data");
+const db = require('./utils/data');
 
-const CloudflareAPI = require("./CloudflareAPI");
-const BlacklistAPI = require("./BlacklistAPI");
+const CloudflareAPI = require('./CloudflareAPI');
+const BlacklistAPI = require('./BlacklistAPI');
 
 function prunePackages(packagesMap) {
   return Promise.all(
@@ -39,7 +39,7 @@ function createScoresMap(array) {
 
 function getScoresMap(key, n = 100) {
   return new Promise((resolve, reject) => {
-    db.zrevrange(key, 0, n, "withscores", (error, value) => {
+    db.zrevrange(key, 0, n, 'withscores', (error, value) => {
       if (error) {
         reject(error);
       } else {
@@ -141,7 +141,7 @@ function extractPublicInfo(data) {
   };
 }
 
-const DomainNames = ["unpkg.com", "npmcdn.com"];
+const DomainNames = ['unpkg.com', 'npmcdn.com'];
 
 function fetchStats(since, until) {
   return CloudflareAPI.getZones(DomainNames).then(zones => {

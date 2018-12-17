@@ -1,7 +1,7 @@
-const fs = require("fs");
-const invariant = require("invariant");
+const fs = require('fs');
+const invariant = require('invariant');
 
-const createAssets = require("./utils/createAssets");
+const createAssets = require('./utils/createAssets');
 
 /**
  * An express middleware that sets req.assets from the build
@@ -10,12 +10,12 @@ const createAssets = require("./utils/createAssets");
 function staticAssets(webpackStatsFile) {
   let stats;
   try {
-    stats = JSON.parse(fs.readFileSync(webpackStatsFile, "utf8"));
+    stats = JSON.parse(fs.readFileSync(webpackStatsFile, 'utf8'));
   } catch (error) {
     invariant(
       false,
-      "staticAssets middleware cannot read the build stats in %s; " +
-        "run the `build` script before starting the server",
+      'staticAssets middleware cannot read the build stats in %s; ' +
+        'run the `build` script before starting the server',
       webpackStatsFile
     );
   }

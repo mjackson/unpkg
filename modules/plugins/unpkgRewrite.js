@@ -1,7 +1,7 @@
-const URL = require("whatwg-url");
-const warning = require("warning");
+const URL = require('whatwg-url');
+const warning = require('warning');
 
-const origin = require("../serverConfig").origin;
+const origin = require('../serverConfig').origin;
 
 const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 
@@ -10,7 +10,7 @@ function isValidURL(value) {
 }
 
 function isProbablyURLWithoutProtocol(value) {
-  return value.substr(0, 2) === "//";
+  return value.substr(0, 2) === '//';
 }
 
 function isAbsoluteURL(value) {
@@ -18,7 +18,7 @@ function isAbsoluteURL(value) {
 }
 
 function isBareIdentifier(value) {
-  return value.charAt(0) !== "." && value.charAt(0) !== "/";
+  return value.charAt(0) !== '.' && value.charAt(0) !== '/';
 }
 
 function rewriteValue(/* StringLiteral */ node, dependencies) {
@@ -30,7 +30,7 @@ function rewriteValue(/* StringLiteral */ node, dependencies) {
     // "bare" identifier
     const match = bareIdentifierFormat.exec(node.value);
     const packageName = match[1];
-    const file = match[2] || "";
+    const file = match[2] || '';
 
     warning(
       dependencies[packageName],
@@ -38,7 +38,7 @@ function rewriteValue(/* StringLiteral */ node, dependencies) {
       packageName
     );
 
-    const version = dependencies[packageName] || "latest";
+    const version = dependencies[packageName] || 'latest';
 
     node.value = `${origin}/${packageName}@${version}${file}?module`;
   } else {
@@ -51,16 +51,16 @@ function unpkgRewrite(dependencies = {}) {
   return {
     manipulateOptions(opts, parserOpts) {
       parserOpts.plugins.push(
-        "dynamicImport",
-        "exportDefaultFrom",
-        "exportNamespaceFrom",
-        "importMeta"
+        'dynamicImport',
+        'exportDefaultFrom',
+        'exportNamespaceFrom',
+        'importMeta'
       );
     },
 
     visitor: {
       CallExpression(path) {
-        if (path.node.callee.type !== "Import") {
+        if (path.node.callee.type !== 'Import') {
           // Some other function call, not import();
           return;
         }

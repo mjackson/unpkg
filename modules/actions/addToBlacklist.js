@@ -1,6 +1,6 @@
-const validateNpmPackageName = require("validate-npm-package-name");
+const validateNpmPackageName = require('validate-npm-package-name');
 
-const BlacklistAPI = require("../BlacklistAPI");
+const BlacklistAPI = require('../BlacklistAPI');
 
 function addToBlacklist(req, res) {
   const packageName = req.body.packageName;
@@ -15,7 +15,7 @@ function addToBlacklist(req, res) {
 
   // Disallow invalid package names.
   if (nameErrors) {
-    const reason = nameErrors.join(", ");
+    const reason = nameErrors.join(', ');
     return res.status(403).send({
       error: `Invalid package name "${packageName}" (${reason})`
     });
@@ -33,7 +33,7 @@ function addToBlacklist(req, res) {
       res.send({
         ok: true,
         message: `Package "${packageName}" was ${
-          added ? "added to" : "already in"
+          added ? 'added to' : 'already in'
         } the blacklist`
       });
     },

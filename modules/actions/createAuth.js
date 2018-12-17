@@ -1,4 +1,4 @@
-const AuthAPI = require("../AuthAPI");
+const AuthAPI = require('../AuthAPI');
 
 const defaultScopes = {
   blacklist: {
@@ -15,7 +15,7 @@ function createAuth(req, res) {
       console.error(error);
 
       res.status(500).send({
-        error: "Unable to generate auth token"
+        error: 'Unable to generate auth token'
       });
     }
   );

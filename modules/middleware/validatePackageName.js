@@ -1,4 +1,4 @@
-const validateNpmPackageName = require("validate-npm-package-name");
+const validateNpmPackageName = require('validate-npm-package-name');
 
 const hexValue = /^[a-f0-9]+$/i;
 
@@ -13,18 +13,18 @@ function validatePackageName(req, res, next) {
   if (isHash(req.packageName)) {
     return res
       .status(403)
-      .type("text")
+      .type('text')
       .send(`Invalid package name "${req.packageName}" (cannot be a hash)`);
   }
 
   const errors = validateNpmPackageName(req.packageName).errors;
 
   if (errors) {
-    const reason = errors.join(", ");
+    const reason = errors.join(', ');
 
     return res
       .status(403)
-      .type("text")
+      .type('text')
       .send(`Invalid package name "${req.packageName}" (${reason})`);
   }
 

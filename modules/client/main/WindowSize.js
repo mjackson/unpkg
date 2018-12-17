@@ -1,10 +1,10 @@
-const React = require("react");
-const PropTypes = require("prop-types");
+const React = require('react');
+const PropTypes = require('prop-types');
 
-const addEvent = require("../utils/addEvent");
-const removeEvent = require("../utils/removeEvent");
+const addEvent = require('../utils/addEvent');
+const removeEvent = require('../utils/removeEvent');
 
-const resizeEvent = "resize";
+const resizeEvent = 'resize';
 
 class WindowSize extends React.Component {
   static propTypes = {

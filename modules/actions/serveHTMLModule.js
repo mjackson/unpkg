@@ -1,14 +1,14 @@
-const etag = require("etag");
-const cheerio = require("cheerio");
+const etag = require('etag');
+const cheerio = require('cheerio');
 
-const getContentTypeHeader = require("../utils/getContentTypeHeader");
-const rewriteBareModuleIdentifiers = require("../utils/rewriteBareModuleIdentifiers");
+const getContentTypeHeader = require('../utils/getContentTypeHeader');
+const rewriteBareModuleIdentifiers = require('../utils/rewriteBareModuleIdentifiers');
 
 function serveHTMLModule(req, res) {
   try {
-    const $ = cheerio.load(req.entry.content.toString("utf8"));
+    const $ = cheerio.load(req.entry.content.toString('utf8'));
 
-    $("script[type=module]").each((index, element) => {
+    $('script[type=module]').each((index, element) => {
       $(element).html(
         rewriteBareModuleIdentifiers($(element).html(), req.packageConfig)
       );
@@ -18,11 +18,11 @@ function serveHTMLModule(req, res) {
 
     res
       .set({
-        "Content-Length": Buffer.byteLength(code),
-        "Content-Type": getContentTypeHeader(req.entry.contentType),
-        "Cache-Control": "public, max-age=31536000, immutable", // 1 year
+        'Content-Length': Buffer.byteLength(code),
+        'Content-Type': getContentTypeHeader(req.entry.contentType),
+        'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
         ETag: etag(code),
-        "Cache-Tag": "file, html-file, html-module"
+        'Cache-Tag': 'file, html-file, html-module'
       })
       .send(code);
   } catch (error) {
@@ -38,7 +38,7 @@ function serveHTMLModule(req, res) {
 
     res
       .status(500)
-      .type("text")
+      .type('text')
       .send(
         `Cannot generate module for ${req.packageSpec}${
           req.filename

@@ -1,47 +1,47 @@
-const request = require("supertest");
+const request = require('supertest');
 
-const createServer = require("../createServer");
-const withAuthHeader = require("./utils/withAuthHeader");
-const withRevokedToken = require("./utils/withRevokedToken");
-const withToken = require("./utils/withToken");
+const createServer = require('../createServer');
+const withAuthHeader = require('./utils/withAuthHeader');
+const withRevokedToken = require('./utils/withRevokedToken');
+const withToken = require('./utils/withToken');
 
-describe("The /api/auth endpoint", () => {
+describe('The /api/auth endpoint', () => {
   let server;
   beforeEach(() => {
     server = createServer();
   });
 
-  describe("POST /api/auth", () => {
-    it("creates a new auth token", done => {
+  describe('POST /api/auth', () => {
+    it('creates a new auth token', done => {
       request(server)
-        .post("/api/auth")
+        .post('/api/auth')
         .end((err, res) => {
-          expect(res.body).toHaveProperty("token");
+          expect(res.body).toHaveProperty('token');
           done();
         });
     });
   });
 
-  describe("GET /api/auth", () => {
-    describe("with no auth", () => {
-      it("echoes back null", done => {
+  describe('GET /api/auth', () => {
+    describe('with no auth', () => {
+      it('echoes back null', done => {
         request(server)
-          .get("/api/auth")
+          .get('/api/auth')
           .end((err, res) => {
-            expect(res.body).toHaveProperty("auth");
+            expect(res.body).toHaveProperty('auth');
             expect(res.body.auth).toBe(null);
             done();
           });
       });
     });
 
-    describe("with a revoked auth token", () => {
-      it("echoes back null", done => {
+    describe('with a revoked auth token', () => {
+      it('echoes back null', done => {
         withRevokedToken({ some: { scope: true } }, token => {
           request(server)
-            .get("/api/auth?token=" + token)
+            .get('/api/auth?token=' + token)
             .end((err, res) => {
-              expect(res.body).toHaveProperty("auth");
+              expect(res.body).toHaveProperty('auth');
               expect(res.body.auth).toBe(null);
               done();
             });
@@ -49,16 +49,16 @@ describe("The /api/auth endpoint", () => {
       });
     });
 
-    describe("with a valid auth token", () => {
-      describe("in the query string", () => {
-        it("echoes back the auth payload", done => {
+    describe('with a valid auth token', () => {
+      describe('in the query string', () => {
+        it('echoes back the auth payload', done => {
           const scopes = { some: { scope: true } };
 
           withToken(scopes, token => {
             request(server)
-              .get("/api/auth?token=" + token)
+              .get('/api/auth?token=' + token)
               .end((err, res) => {
-                expect(res.body).toHaveProperty("auth");
+                expect(res.body).toHaveProperty('auth');
                 expect(res.body.auth).toBeDefined();
                 expect(res.body.auth.scopes).toMatchObject(scopes);
                 done();
@@ -67,16 +67,16 @@ describe("The /api/auth endpoint", () => {
         });
       });
 
-      describe("in the Authorization header", () => {
-        it("echoes back the auth payload", done => {
+      describe('in the Authorization header', () => {
+        it('echoes back the auth payload', done => {
           const scopes = { some: { scope: true } };
 
           withAuthHeader(scopes, header => {
             request(server)
-              .get("/api/auth")
+              .get('/api/auth')
               .set({ Authorization: header })
               .end((err, res) => {
-                expect(res.body).toHaveProperty("auth");
+                expect(res.body).toHaveProperty('auth');
                 expect(res.body.auth).toBeDefined();
                 expect(res.body.auth.scopes).toMatchObject(scopes);
                 done();

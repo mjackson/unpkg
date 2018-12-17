@@ -1,7 +1,7 @@
-const React = require("react");
-const { HashRouter } = require("react-router-dom");
+const React = require('react');
+const { HashRouter } = require('react-router-dom');
 
-const Layout = require("./Layout");
+const Layout = require('./Layout');
 
 function App() {
   return (

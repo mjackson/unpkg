@@ -1,7 +1,7 @@
-const addMinutes = require("date-fns/add_minutes");
-const startOfMinute = require("date-fns/start_of_minute");
+const addMinutes = require('date-fns/add_minutes');
+const startOfMinute = require('date-fns/start_of_minute');
 
-const ingestLogs = require("./ingestLogs");
+const ingestLogs = require('./ingestLogs');
 
 const oneSecond = 1000;
 const oneMinute = oneSecond * 60;
@@ -26,18 +26,18 @@ function work() {
 }
 
 function shutdown() {
-  console.log("Shutting down...");
+  console.log('Shutting down...');
 
   clearInterval(timer);
 
   currentWorkload.then(() => {
-    console.log("Goodbye!");
+    console.log('Goodbye!');
     process.exit();
   });
 }
 
 work();
 
-process.on("SIGINT", shutdown).on("SIGTERM", shutdown);
+process.on('SIGINT', shutdown).on('SIGTERM', shutdown);
 
 timer = setInterval(work, oneMinute);

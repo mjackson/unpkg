@@ -1,6 +1,6 @@
-const babel = require("babel-core");
+const babel = require('babel-core');
 
-const unpkgRewrite = require("../plugins/unpkgRewrite");
+const unpkgRewrite = require('../plugins/unpkgRewrite');
 
 function rewriteBareModuleIdentifiers(code, packageConfig) {
   const dependencies = Object.assign(

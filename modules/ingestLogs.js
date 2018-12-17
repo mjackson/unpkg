@@ -1,20 +1,20 @@
-const parseURL = require("url").parse;
-const startOfDay = require("date-fns/start_of_day");
-const addDays = require("date-fns/add_days");
+const parseURL = require('url').parse;
+const startOfDay = require('date-fns/start_of_day');
+const addDays = require('date-fns/add_days');
 
-const db = require("./utils/data");
-const isValidPackageName = require("./utils/isValidPackageName");
-const parsePackageURL = require("./utils/parsePackageURL");
-const logging = require("./utils/logging");
+const db = require('./utils/data');
+const isValidPackageName = require('./utils/isValidPackageName');
+const parsePackageURL = require('./utils/parsePackageURL');
+const logging = require('./utils/logging');
 
-const CloudflareAPI = require("./CloudflareAPI");
-const StatsAPI = require("./StatsAPI");
+const CloudflareAPI = require('./CloudflareAPI');
+const StatsAPI = require('./StatsAPI');
 
 /**
  * Domains we want to analyze.
  */
 const domainNames = [
-  "unpkg.com"
+  'unpkg.com'
   //"npmcdn.com" // We don't have log data on npmcdn.com yet :/
 ];
 
@@ -25,7 +25,7 @@ function getSeconds(date) {
 }
 
 function stringifySeconds(seconds) {
-  return new Date(seconds * 1000).toISOString().replace(/\.0+Z$/, "Z");
+  return new Date(seconds * 1000).toISOString().replace(/\.0+Z$/, 'Z');
 }
 
 function toSeconds(ms) {
@@ -45,8 +45,8 @@ function computeCounters(stream) {
     }
 
     stream
-      .on("error", reject)
-      .on("data", entry => {
+      .on('error', reject)
+      .on('data', entry => {
         totalEntries += 1;
 
         const date = new Date(Math.round(entry.EdgeStartTimestamp / 1000000));
@@ -105,7 +105,7 @@ function computeCounters(stream) {
           );
         }
       })
-      .on("end", () => {
+      .on('end', () => {
         resolve({ counters, expireat, totalEntries });
       });
   });
@@ -137,12 +137,12 @@ function ingestLogsForZone(zone, startDate, endDate) {
 
   const startFetchTime = Date.now();
   const fields = [
-    "EdgeStartTimestamp",
-    "EdgeResponseStatus",
-    "EdgeResponseBytes",
-    "ClientRequestProtocol",
-    "ClientRequestURI",
-    "ClientRequestReferer"
+    'EdgeStartTimestamp',
+    'EdgeResponseStatus',
+    'EdgeResponseBytes',
+    'ClientRequestProtocol',
+    'ClientRequestURI',
+    'ClientRequestReferer'
   ];
 
   return CloudflareAPI.getLogs(
@@ -154,7 +154,7 @@ function ingestLogsForZone(zone, startDate, endDate) {
     const endFetchTime = Date.now();
 
     logging.info(
-      "Fetched logs for %s from %s to %s (%dms)",
+      'Fetched logs for %s from %s to %s (%dms)',
       zone.name,
       stringifySeconds(startSeconds),
       stringifySeconds(endSeconds),
@@ -167,7 +167,7 @@ function ingestLogsForZone(zone, startDate, endDate) {
       const endProcessTime = Date.now();
 
       logging.info(
-        "Processed %d log entries for %s (%dms)",
+        'Processed %d log entries for %s (%dms)',
         totalEntries,
         zone.name,
         endProcessTime - startProcessTime

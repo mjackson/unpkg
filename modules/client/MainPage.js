@@ -1,8 +1,8 @@
-const React = require("react");
-const PropTypes = require("prop-types");
+const React = require('react');
+const PropTypes = require('prop-types');
 
-const createHTML = require("./utils/createHTML");
-const x = require("./utils/execScript");
+const createHTML = require('./utils/createHTML');
+const x = require('./utils/execScript');
 
 function MainPage({ title, description, scripts, styles, data, content }) {
   return (
@@ -17,19 +17,23 @@ function MainPage({ title, description, scripts, styles, data, content }) {
         />
         <meta name="timestamp" content={new Date().toISOString()} />
         <link rel="shortcut icon" href="/favicon.ico" />
-        {styles.map(s => <link key={s} rel="stylesheet" href={s} />)}
+        {styles.map(s => (
+          <link key={s} rel="stylesheet" href={s} />
+        ))}
         {x(
-          "window.Promise || document.write('\\x3Cscript src=\"/_polyfills/es6-promise.min.js\">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>')"
+          'window.Promise || document.write(\'\\x3Cscript src="/_polyfills/es6-promise.min.js">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>\')'
         )}
         {x(
-          "window.fetch || document.write('\\x3Cscript src=\"/_polyfills/fetch.min.js\">\\x3C/script>')"
+          'window.fetch || document.write(\'\\x3Cscript src="/_polyfills/fetch.min.js">\\x3C/script>\')'
         )}
         {x(`window.__DATA__ = ${JSON.stringify(data)}`)}
         <title>{title}</title>
       </head>
       <body>
         <div id="root" dangerouslySetInnerHTML={content} />
-        {scripts.map(s => <script key={s} src={s} />)}
+        {scripts.map(s => (
+          <script key={s} src={s} />
+        ))}
       </body>
     </html>
   );
@@ -49,12 +53,12 @@ MainPage.propTypes = {
 };
 
 MainPage.defaultProps = {
-  title: "UNPKG",
-  description: "The CDN for everything on npm",
+  title: 'UNPKG',
+  description: 'The CDN for everything on npm',
   scripts: [],
   styles: [],
   data: {},
-  content: createHTML("")
+  content: createHTML('')
 };
 
 module.exports = MainPage;

@@ -1,7 +1,7 @@
-const withToken = require("./withToken");
+const withToken = require('./withToken');
 
 function encodeBase64(token) {
-  return Buffer.from(token).toString("base64");
+  return Buffer.from(token).toString('base64');
 }
 
 function withAuthHeader(scopes, done) {

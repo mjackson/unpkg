@@ -1,21 +1,21 @@
-const React = require("react");
-const ReactDOMServer = require("react-dom/server");
-const semver = require("semver");
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const semver = require('semver');
 
-const MainPage = require("../client/MainPage");
-const AutoIndexApp = require("../client/autoIndex/App");
-const createHTML = require("../client/utils/createHTML");
-const renderPage = require("../utils/renderPage");
+const MainPage = require('../client/MainPage');
+const AutoIndexApp = require('../client/autoIndex/App');
+const createHTML = require('../client/utils/createHTML');
+const renderPage = require('../utils/renderPage');
 
 const globalScripts =
-  process.env.NODE_ENV === "production"
+  process.env.NODE_ENV === 'production'
     ? [
-        "/react@16.4.1/umd/react.production.min.js",
-        "/react-dom@16.4.1/umd/react-dom.production.min.js"
+        '/react@16.4.1/umd/react.production.min.js',
+        '/react-dom@16.4.1/umd/react-dom.production.min.js'
       ]
     : [
-        "/react@16.4.1/umd/react.development.js",
-        "/react-dom@16.4.1/umd/react-dom.development.js"
+        '/react@16.4.1/umd/react.development.js',
+        '/react-dom@16.4.1/umd/react-dom.development.js'
       ];
 
 function byVersion(a, b) {
@@ -23,8 +23,8 @@ function byVersion(a, b) {
 }
 
 function serveAutoIndexPage(req, res) {
-  const scripts = globalScripts.concat(req.assets.getScripts("autoIndex"));
-  const styles = req.assets.getStyles("autoIndex");
+  const scripts = globalScripts.concat(req.assets.getScripts('autoIndex'));
+  const styles = req.assets.getStyles('autoIndex');
 
   const props = {
     packageName: req.packageName,
@@ -49,8 +49,8 @@ function serveAutoIndexPage(req, res) {
 
   res
     .set({
-      "Cache-Control": "public,max-age=60", // 1 minute
-      "Cache-Tag": "auto-index"
+      'Cache-Control': 'public,max-age=60', // 1 minute
+      'Cache-Tag': 'auto-index'
     })
     .send(html);
 }

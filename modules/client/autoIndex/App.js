@@ -1,8 +1,8 @@
-require("./App.css");
+require('./App.css');
 
-const React = require("react");
+const React = require('react');
 
-const DirectoryListing = require("./DirectoryListing");
+const DirectoryListing = require('./DirectoryListing');
 
 class App extends React.Component {
   static defaultProps = {
@@ -11,8 +11,8 @@ class App extends React.Component {
 
   handleChange = event => {
     window.location.href = window.location.href.replace(
-      "@" + this.props.packageVersion,
-      "@" + event.target.value
+      '@' + this.props.packageVersion,
+      '@' + event.target.value
     );
   };
 
@@ -26,7 +26,7 @@ class App extends React.Component {
           </h1>
 
           <div className="app-version-selector">
-            Version:{" "}
+            Version:{' '}
             <select
               id="version"
               defaultValue={this.props.packageVersion}
@@ -59,8 +59,8 @@ class App extends React.Component {
   }
 }
 
-if (process.env.NODE_ENV === "development") {
-  const PropTypes = require("prop-types");
+if (process.env.NODE_ENV === 'development') {
+  const PropTypes = require('prop-types');
 
   const entryType = PropTypes.object;
 

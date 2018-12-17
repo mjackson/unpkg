@@ -1,20 +1,20 @@
-require("./DirectoryListing.css");
+require('./DirectoryListing.css');
 
-const React = require("react");
-const formatBytes = require("pretty-bytes");
-const sortBy = require("sort-by");
+const React = require('react');
+const formatBytes = require('pretty-bytes');
+const sortBy = require('sort-by');
 
 function getDirname(name) {
   return (
     name
-      .split("/")
+      .split('/')
       .slice(0, -1)
-      .join("/") || "."
+      .join('/') || '.'
   );
 }
 
 function getMatchingEntries(entry, entries) {
-  const dirname = entry.name || ".";
+  const dirname = entry.name || '.';
 
   return Object.keys(entries)
     .filter(name => entry.name !== name && getDirname(name) === dirname)
@@ -28,7 +28,7 @@ function getRelativeName(base, name) {
 function DirectoryListing({ filename, entry, entries }) {
   const rows = [];
 
-  if (filename !== "/") {
+  if (filename !== '/') {
     rows.push(
       <tr key="..">
         <td>
@@ -46,11 +46,11 @@ function DirectoryListing({ filename, entry, entries }) {
   const matchingEntries = getMatchingEntries(entry, entries);
 
   matchingEntries
-    .filter(({ type }) => type === "directory")
-    .sort(sortBy("name"))
+    .filter(({ type }) => type === 'directory')
+    .sort(sortBy('name'))
     .forEach(({ name }) => {
       const relName = getRelativeName(entry.name, name);
-      const href = relName + "/";
+      const href = relName + '/';
 
       rows.push(
         <tr key={name}>
@@ -67,8 +67,8 @@ function DirectoryListing({ filename, entry, entries }) {
     });
 
   matchingEntries
-    .filter(({ type }) => type === "file")
-    .sort(sortBy("name"))
+    .filter(({ type }) => type === 'file')
+    .sort(sortBy('name'))
     .forEach(({ name, size, contentType, lastModified }) => {
       const relName = getRelativeName(entry.name, name);
 
@@ -100,7 +100,7 @@ function DirectoryListing({ filename, entry, entries }) {
         <tbody>
           {rows.map((row, index) =>
             React.cloneElement(row, {
-              className: index % 2 ? "odd" : "even"
+              className: index % 2 ? 'odd' : 'even'
             })
           )}
         </tbody>
@@ -109,8 +109,8 @@ function DirectoryListing({ filename, entry, entries }) {
   );
 }
 
-if (process.env.NODE_ENV === "development") {
-  const PropTypes = require("prop-types");
+if (process.env.NODE_ENV === 'development') {
+  const PropTypes = require('prop-types');
 
   const entryType = PropTypes.shape({
     name: PropTypes.string.isRequired

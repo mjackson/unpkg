@@ -1,22 +1,22 @@
-const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
-const db = require("./utils/data");
-const secretKey = require("./secretKey");
+const db = require('./utils/data');
+const secretKey = require('./secretKey');
 
 function getCurrentSeconds() {
   return Math.floor(Date.now() / 1000);
 }
 
 function createTokenId() {
-  return crypto.randomBytes(16).toString("hex");
+  return crypto.randomBytes(16).toString('hex');
 }
 
 function createToken(scopes = {}) {
   return new Promise((resolve, reject) => {
     const payload = {
       jti: createTokenId(),
-      iss: "https://unpkg.com",
+      iss: 'https://unpkg.com',
       iat: getCurrentSeconds(),
       scopes
     };
@@ -24,7 +24,7 @@ function createToken(scopes = {}) {
     jwt.sign(
       payload,
       secretKey.private,
-      { algorithm: "RS256" },
+      { algorithm: 'RS256' },
       (error, token) => {
         if (error) {
           reject(error);
@@ -36,11 +36,11 @@ function createToken(scopes = {}) {
   });
 }
 
-const revokedTokensSet = "revoked-tokens";
+const revokedTokensSet = 'revoked-tokens';
 
 function verifyToken(token) {
   return new Promise((resolve, reject) => {
-    const options = { algorithms: ["RS256"] };
+    const options = { algorithms: ['RS256'] };
 
     jwt.verify(token, secretKey.public, options, (error, payload) => {
       if (error) {

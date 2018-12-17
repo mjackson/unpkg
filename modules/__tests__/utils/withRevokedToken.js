@@ -1,5 +1,5 @@
-const withToken = require("./withToken");
-const AuthAPI = require("../../AuthAPI");
+const withToken = require('./withToken');
+const AuthAPI = require('../../AuthAPI');
 
 function withRevokedToken(scopes, done) {
   withToken(scopes, token => {

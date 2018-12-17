@@ -1,24 +1,24 @@
-require("isomorphic-fetch");
-const invariant = require("invariant");
-const gunzip = require("gunzip-maybe");
-const ndjson = require("ndjson");
+require('isomorphic-fetch');
+const invariant = require('invariant');
+const gunzip = require('gunzip-maybe');
+const ndjson = require('ndjson');
 
-const cloudflareURL = "https://api.cloudflare.com/client/v4";
+const cloudflareURL = 'https://api.cloudflare.com/client/v4';
 const cloudflareEmail = process.env.CLOUDFLARE_EMAIL;
 const cloudflareKey = process.env.CLOUDFLARE_KEY;
 
 invariant(
   cloudflareEmail,
-  "Missing the $CLOUDFLARE_EMAIL environment variable"
+  'Missing the $CLOUDFLARE_EMAIL environment variable'
 );
 
-invariant(cloudflareKey, "Missing the $CLOUDFLARE_KEY environment variable");
+invariant(cloudflareKey, 'Missing the $CLOUDFLARE_KEY environment variable');
 
 function get(path, headers) {
   return fetch(`${cloudflareURL}${path}`, {
     headers: Object.assign({}, headers, {
-      "X-Auth-Email": cloudflareEmail,
-      "X-Auth-Key": cloudflareKey
+      'X-Auth-Email': cloudflareEmail,
+      'X-Auth-Key': cloudflareKey
     })
   });
 }
@@ -32,7 +32,7 @@ function getJSON(path, headers) {
       if (!data.success) {
         console.error(`CloudflareAPI.getJSON failed at ${path}`);
         console.error(data);
-        throw new Error("Failed to getJSON from Cloudflare");
+        throw new Error('Failed to getJSON from Cloudflare');
       }
 
       return data.result;
@@ -51,9 +51,9 @@ function reduceResults(target, values) {
   Object.keys(values).forEach(key => {
     const value = values[key];
 
-    if (typeof value === "object" && value) {
+    if (typeof value === 'object' && value) {
       target[key] = reduceResults(target[key] || {}, value);
-    } else if (typeof value === "number") {
+    } else if (typeof value === 'number') {
       target[key] = (target[key] || 0) + values[key];
     }
   });
@@ -75,7 +75,7 @@ function getZoneAnalyticsDashboard(zones, since, until) {
 
 function getJSONStream(path, headers) {
   const gzipHeaders = Object.assign({}, headers, {
-    "Accept-Encoding": "gzip"
+    'Accept-Encoding': 'gzip'
   });
 
   return get(path, gzipHeaders)
@@ -84,7 +84,7 @@ function getJSONStream(path, headers) {
 }
 
 function getLogs(zoneId, startTime, endTime, fieldsArray) {
-  const fields = fieldsArray.join(",");
+  const fields = fieldsArray.join(',');
 
   // console.log(
   //   `https://api.cloudflare.com/client/v4/zones/${zoneId}/logs/received?start=${startTime}&end=${endTime}&fields=${fields}`

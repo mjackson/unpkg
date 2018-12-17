@@ -1,9 +1,9 @@
-const path = require("path");
+const path = require('path');
 
-const addLeadingSlash = require("../utils/addLeadingSlash");
+const addLeadingSlash = require('../utils/addLeadingSlash');
 
 function getMatchingEntries(entry, entries) {
-  const dirname = entry.name || ".";
+  const dirname = entry.name || '.';
 
   return Object.keys(entries)
     .filter(name => entry.name !== name && path.dirname(name) === dirname)
@@ -16,12 +16,12 @@ function getMetadata(entry, entries) {
     type: entry.type
   };
 
-  if (entry.type === "file") {
+  if (entry.type === 'file') {
     metadata.contentType = entry.contentType;
     metadata.integrity = entry.integrity;
     metadata.lastModified = entry.lastModified;
     metadata.size = entry.size;
-  } else if (entry.type === "directory") {
+  } else if (entry.type === 'directory') {
     metadata.files = getMatchingEntries(entry, entries).map(e =>
       getMetadata(e, entries)
     );
@@ -35,8 +35,8 @@ function serveMetadata(req, res) {
 
   res
     .set({
-      "Cache-Control": "public, max-age=31536000, immutable", // 1 year
-      "Cache-Tag": "meta"
+      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Tag': 'meta'
     })
     .send(metadata);
 }

@@ -1,10 +1,10 @@
-const url = require("url");
-const https = require("https");
+const url = require('url');
+const https = require('https');
 
-const serverConfig = require("../serverConfig");
-const bufferStream = require("./bufferStream");
-const agent = require("./registryAgent");
-const logging = require("./logging");
+const serverConfig = require('../serverConfig');
+const bufferStream = require('./bufferStream');
+const agent = require('./registryAgent');
+const logging = require('./logging');
 
 function parseJSON(res) {
   return bufferStream(res).then(JSON.parse);
@@ -13,13 +13,13 @@ function parseJSON(res) {
 function fetchNpmPackageInfo(packageName) {
   return new Promise((resolve, reject) => {
     const encodedPackageName =
-      packageName.charAt(0) === "@"
+      packageName.charAt(0) === '@'
         ? `@${encodeURIComponent(packageName.substring(1))}`
         : encodeURIComponent(packageName);
 
     const infoURL = `${serverConfig.registryURL}/${encodedPackageName}`;
 
-    logging.debug("Fetching package info for %s from %s", packageName, infoURL);
+    logging.debug('Fetching package info for %s from %s', packageName, infoURL);
 
     const { hostname, pathname } = url.parse(infoURL);
     const options = {
@@ -27,7 +27,7 @@ function fetchNpmPackageInfo(packageName) {
       hostname: hostname,
       path: pathname,
       headers: {
-        Accept: "application/json"
+        Accept: 'application/json'
       }
     };
 
@@ -39,7 +39,7 @@ function fetchNpmPackageInfo(packageName) {
           resolve(null);
         } else {
           bufferStream(res).then(data => {
-            const content = data.toString("utf-8");
+            const content = data.toString('utf-8');
             const error = new Error(
               `Failed to fetch info for ${packageName}\nstatus: ${
                 res.statusCode
@@ -50,7 +50,7 @@ function fetchNpmPackageInfo(packageName) {
           });
         }
       })
-      .on("error", reject);
+      .on('error', reject);
   });
 }
 

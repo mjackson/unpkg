@@ -1,4 +1,4 @@
-const parsePackageURL = require("../utils/parsePackageURL");
+const parsePackageURL = require('../utils/parsePackageURL');
 
 /**
  * Parse the URL and add various properties to the request object to

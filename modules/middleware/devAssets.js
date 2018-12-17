@@ -1,6 +1,6 @@
-const invariant = require("invariant");
+const invariant = require('invariant');
 
-const createAssets = require("./utils/createAssets");
+const createAssets = require('./utils/createAssets');
 
 /**
  * An express middleware that sets req.assets from the
@@ -9,15 +9,15 @@ const createAssets = require("./utils/createAssets");
  */
 function devAssets(webpackCompiler) {
   let assets;
-  webpackCompiler.plugin("done", stats => {
+  webpackCompiler.plugin('done', stats => {
     assets = createAssets(stats.toJson());
   });
 
   return (req, res, next) => {
     invariant(
       assets != null,
-      "devAssets middleware needs a running compiler; " +
-        "use webpack-dev-middleware in front of devAssets"
+      'devAssets middleware needs a running compiler; ' +
+        'use webpack-dev-middleware in front of devAssets'
     );
 
     req.assets = assets;

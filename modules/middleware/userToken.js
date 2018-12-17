@@ -1,9 +1,9 @@
-const AuthAPI = require("../AuthAPI");
+const AuthAPI = require('../AuthAPI');
 
 const ReadMethods = { GET: true, HEAD: true };
 
 function decodeBase64(string) {
-  return Buffer.from(string, "base64").toString();
+  return Buffer.from(string, 'base64').toString();
 }
 
 /**
@@ -14,7 +14,7 @@ function userToken(req, res, next) {
     return next();
   }
 
-  const auth = req.get("Authorization");
+  const auth = req.get('Authorization');
   const token = auth
     ? decodeBase64(auth)
     : (ReadMethods[req.method] ? req.query : req.body).token;
@@ -30,7 +30,7 @@ function userToken(req, res, next) {
       next();
     },
     error => {
-      if (error.name === "JsonWebTokenError") {
+      if (error.name === 'JsonWebTokenError') {
         res.status(403).send({
           error: `Bad auth token: ${error.message}`
         });
@@ -38,7 +38,7 @@ function userToken(req, res, next) {
         console.error(error);
 
         res.status(500).send({
-          error: "Unable to verify auth"
+          error: 'Unable to verify auth'
         });
       }
     }

@@ -1,14 +1,14 @@
-require("./Layout.css");
+require('./Layout.css');
 
-const React = require("react");
-const PropTypes = require("prop-types");
-const { Switch, Route, Link, withRouter } = require("react-router-dom");
-const { Motion, spring } = require("react-motion");
+const React = require('react');
+const PropTypes = require('prop-types');
+const { Switch, Route, Link, withRouter } = require('react-router-dom');
+const { Motion, spring } = require('react-motion');
 
-const WindowSize = require("./WindowSize");
-const About = require("./About");
-const Stats = require("./Stats");
-const Home = require("./Home");
+const WindowSize = require('./WindowSize');
+const About = require('./About');
+const Stats = require('./Stats');
+const Home = require('./Home');
 
 class Layout extends React.Component {
   static propTypes = {
@@ -26,18 +26,18 @@ class Layout extends React.Component {
   adjustUnderline = (useSpring = false) => {
     let itemIndex;
     switch (this.props.location.pathname) {
-      case "/stats":
+      case '/stats':
         itemIndex = 1;
         break;
-      case "/about":
+      case '/about':
         itemIndex = 2;
         break;
-      case "/":
+      case '/':
       default:
         itemIndex = 0;
     }
 
-    const itemNodes = this.listNode.querySelectorAll("li");
+    const itemNodes = this.listNode.querySelectorAll('li');
     const currentNode = itemNodes[itemIndex];
 
     this.setState({
@@ -50,7 +50,7 @@ class Layout extends React.Component {
   componentDidMount() {
     this.adjustUnderline();
 
-    fetch("/api/stats?period=last-month")
+    fetch('/api/stats?period=last-month')
       .then(res => res.json())
       .then(stats => this.setState({ stats }));
 

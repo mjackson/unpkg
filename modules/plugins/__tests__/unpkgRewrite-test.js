@@ -1,5 +1,5 @@
-const babel = require("babel-core");
-const unpkgRewrite = require("../unpkgRewrite");
+const babel = require('babel-core');
+const unpkgRewrite = require('../unpkgRewrite');
 
 const testCases = [
   {
@@ -66,13 +66,13 @@ const testCases = [
 ];
 
 const dependencies = {
-  react: "15.6.1",
-  "@angular/router": "4.3.5",
-  "lodash.map": "4.6.0",
-  pn: "1.0.0"
+  react: '15.6.1',
+  '@angular/router': '4.3.5',
+  'lodash.map': '4.6.0',
+  pn: '1.0.0'
 };
 
-describe("Rewriting imports/exports", () => {
+describe('Rewriting imports/exports', () => {
   testCases.forEach(testCase => {
     it(`successfully rewrites '${testCase.before}'`, () => {
       const result = babel.transform(testCase.before, {

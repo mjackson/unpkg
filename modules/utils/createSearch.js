@@ -3,14 +3,14 @@ function createSearch(query) {
   const params = keys.reduce(
     (memo, key) =>
       memo.concat(
-        query[key] === ""
+        query[key] === ''
           ? key // Omit the trailing "=" from key=
           : `${key}=${encodeURIComponent(query[key])}`
       ),
     []
   );
 
-  return params.length ? `?${params.join("&")}` : "";
+  return params.length ? `?${params.join('&')}` : '';
 }
 
 module.exports = createSearch;

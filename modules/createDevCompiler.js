@@ -1,11 +1,11 @@
-const webpack = require("webpack");
+const webpack = require('webpack');
 
 /**
  * Returns a modified copy of the given webpackEntry object with
  * the moduleId in front of all other assets.
  */
 function prependModuleId(webpackEntry, moduleId) {
-  if (typeof webpackEntry === "string") {
+  if (typeof webpackEntry === 'string') {
     return [moduleId, webpackEntry];
   }
 
@@ -13,7 +13,7 @@ function prependModuleId(webpackEntry, moduleId) {
     return [moduleId, ...webpackEntry];
   }
 
-  if (webpackEntry && typeof webpackEntry === "object") {
+  if (webpackEntry && typeof webpackEntry === 'object') {
     const entry = { ...webpackEntry };
 
     for (const chunkName in entry) {
@@ -25,7 +25,7 @@ function prependModuleId(webpackEntry, moduleId) {
     return entry;
   }
 
-  throw new Error("Invalid webpack entry object");
+  throw new Error('Invalid webpack entry object');
 }
 
 /**

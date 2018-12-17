@@ -1,4 +1,4 @@
-const BlacklistAPI = require("../BlacklistAPI");
+const BlacklistAPI = require('../BlacklistAPI');
 
 function checkBlacklist(req, res, next) {
   BlacklistAPI.includesPackage(req.packageName).then(
@@ -7,14 +7,14 @@ function checkBlacklist(req, res, next) {
       if (blacklisted) {
         res
           .status(403)
-          .type("text")
+          .type('text')
           .send(`Package "${req.packageName}" is blacklisted`);
       } else {
         next();
       }
     },
     error => {
-      console.error("Unable to fetch the blacklist: %s", error);
+      console.error('Unable to fetch the blacklist: %s', error);
 
       // Continue anyway.
       next();

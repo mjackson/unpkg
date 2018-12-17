@@ -3,9 +3,9 @@ function bufferStream(stream) {
     const chunks = [];
 
     stream
-      .on("error", reject)
-      .on("data", chunk => chunks.push(chunk))
-      .on("end", () => resolve(Buffer.concat(chunks)));
+      .on('error', reject)
+      .on('data', chunk => chunks.push(chunk))
+      .on('end', () => resolve(Buffer.concat(chunks)));
   });
 }
 

@@ -1,9 +1,9 @@
-require("./About.css");
+require('./About.css');
 
-const React = require("react");
+const React = require('react');
 
-const h = require("../utils/createHTML");
-const markup = require("./About.md");
+const h = require('../utils/createHTML');
+const markup = require('./About.md');
 
 function About() {
   return <div className="wrapper" dangerouslySetInnerHTML={h(markup)} />;

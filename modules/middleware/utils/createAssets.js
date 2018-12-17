@@ -12,7 +12,7 @@ function createAssets(webpackStats) {
   /**
    * Returns an array of URLs to all assets in the given chunks.
    */
-  const getAll = (chunks = ["main"]) =>
+  const getAll = (chunks = ['main']) =>
     (Array.isArray(chunks) ? chunks : [chunks])
       .reduce((memo, chunk) => memo.concat(assetsByChunkName[chunk] || []), [])
       .map(createURL);

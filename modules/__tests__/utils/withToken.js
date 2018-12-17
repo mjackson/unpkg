@@ -1,4 +1,4 @@
-const AuthAPI = require("../../AuthAPI");
+const AuthAPI = require('../../AuthAPI');
 
 function withToken(scopes, done) {
   AuthAPI.createToken(scopes).then(done);

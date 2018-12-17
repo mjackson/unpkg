@@ -1,19 +1,19 @@
-const path = require("path");
+const path = require('path');
 
-const addLeadingSlash = require("../utils/addLeadingSlash");
-const createPackageURL = require("../utils/createPackageURL");
-const createSearch = require("../utils/createSearch");
-const fetchNpmPackage = require("../utils/fetchNpmPackage");
-const getIntegrity = require("../utils/getIntegrity");
-const getContentType = require("../utils/getContentType");
+const addLeadingSlash = require('../utils/addLeadingSlash');
+const createPackageURL = require('../utils/createPackageURL');
+const createSearch = require('../utils/createSearch');
+const fetchNpmPackage = require('../utils/fetchNpmPackage');
+const getIntegrity = require('../utils/getIntegrity');
+const getContentType = require('../utils/getContentType');
 
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
   // resolve correctly.
   res
     .set({
-      "Cache-Control": "public, max-age=31536000, immutable", // 1 year
-      "Cache-Tag": "redirect, index-redirect"
+      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Tag': 'redirect, index-redirect'
     })
     .redirect(
       302,
@@ -27,7 +27,7 @@ function indexRedirect(req, res, entry) {
 }
 
 function stripLeadingSegment(name) {
-  return name.replace(/^[^/]+\/?/, "");
+  return name.replace(/^[^/]+\/?/, '');
 }
 
 function searchEntries(tarballStream, entryName, wantsIndex) {
@@ -35,14 +35,14 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
     const entries = {};
     let foundEntry = null;
 
-    if (entryName === "") {
-      foundEntry = entries[""] = { name: "", type: "directory" };
+    if (entryName === '') {
+      foundEntry = entries[''] = { name: '', type: 'directory' };
     }
 
     tarballStream
-      .on("error", reject)
-      .on("finish", () => resolve({ entries, foundEntry }))
-      .on("entry", (header, stream, next) => {
+      .on('error', reject)
+      .on('finish', () => resolve({ entries, foundEntry }))
+      .on('entry', (header, stream, next) => {
         const entry = {
           // Most packages have header names that look like `package/index.js`
           // so we shorten that to just `index.js` here. A few packages use a
@@ -53,9 +53,9 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
         };
 
         // We are only interested in files that match the entryName.
-        if (entry.type !== "file" || entry.name.indexOf(entryName) !== 0) {
+        if (entry.type !== 'file' || entry.name.indexOf(entryName) !== 0) {
           stream.resume();
-          stream.on("end", next);
+          stream.on('end', next);
           return;
         }
 
@@ -65,8 +65,8 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
         // that are in this file's path. Some tarballs omit these entries
         // for some reason, so this is the brute force method.
         let dirname = path.dirname(entry.name);
-        while (dirname !== ".") {
-          const directoryEntry = { name: dirname, type: "directory" };
+        while (dirname !== '.') {
+          const directoryEntry = { name: dirname, type: 'directory' };
 
           if (!entries[dirname]) {
             entries[dirname] = directoryEntry;
@@ -94,7 +94,7 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
 
         const chunks = [];
 
-        stream.on("data", chunk => chunks.push(chunk)).on("end", () => {
+        stream.on('data', chunk => chunks.push(chunk)).on('end', () => {
           const content = Buffer.concat(chunks);
 
           // Set some extra properties for files that we will
@@ -126,8 +126,8 @@ const trailingSlash = /\/$/;
 function findFile(req, res, next) {
   fetchNpmPackage(req.packageConfig).then(tarballStream => {
     const entryName = req.filename
-      .replace(trailingSlash, "")
-      .replace(leadingSlash, "");
+      .replace(trailingSlash, '')
+      .replace(leadingSlash, '');
     const wantsIndex = trailingSlash.test(req.filename);
 
     searchEntries(tarballStream, entryName, wantsIndex).then(
@@ -135,7 +135,7 @@ function findFile(req, res, next) {
         if (!foundEntry) {
           return res
             .status(404)
-            .type("text")
+            .type('text')
             .send(`Cannot find "${req.filename}" in ${req.packageSpec}`);
         }
 
@@ -144,17 +144,17 @@ function findFile(req, res, next) {
         // inside that directory. This is so our URLs work in a similar way
         // to require("lib") in node where it searches for `lib/index.js`
         // and `lib/index.json` when `lib` is a directory.
-        if (foundEntry.type === "directory" && !wantsIndex) {
+        if (foundEntry.type === 'directory' && !wantsIndex) {
           const indexEntry =
-            entries[path.join(entryName, "index.js")] ||
-            entries[path.join(entryName, "index.json")];
+            entries[path.join(entryName, 'index.js')] ||
+            entries[path.join(entryName, 'index.json')];
 
-          if (indexEntry && indexEntry.type === "file") {
+          if (indexEntry && indexEntry.type === 'file') {
             return indexRedirect(req, res, indexEntry);
           } else {
             return res
               .status(404)
-              .type("text")
+              .type('text')
               .send(
                 `Cannot find an index in "${req.filename}" in ${
                   req.packageSpec

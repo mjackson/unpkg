@@ -1,18 +1,18 @@
-const url = require("url");
-const https = require("https");
-const gunzip = require("gunzip-maybe");
-const tar = require("tar-stream");
+const url = require('url');
+const https = require('https');
+const gunzip = require('gunzip-maybe');
+const tar = require('tar-stream');
 
-const bufferStream = require("./bufferStream");
-const agent = require("./registryAgent");
-const logging = require("./logging");
+const bufferStream = require('./bufferStream');
+const agent = require('./registryAgent');
+const logging = require('./logging');
 
 function fetchNpmPackage(packageConfig) {
   return new Promise((resolve, reject) => {
     const tarballURL = packageConfig.dist.tarball;
 
     logging.debug(
-      "Fetching package for %s from %s",
+      'Fetching package for %s from %s',
       packageConfig.name,
       tarballURL
     );
@@ -31,7 +31,7 @@ function fetchNpmPackage(packageConfig) {
         } else {
           bufferStream(res).then(data => {
             const spec = `${packageConfig.name}@${packageConfig.version}`;
-            const content = data.toString("utf-8");
+            const content = data.toString('utf-8');
             const error = new Error(
               `Failed to fetch tarball for ${spec}\nstatus: ${
                 res.statusCode
@@ -42,7 +42,7 @@ function fetchNpmPackage(packageConfig) {
           });
         }
       })
-      .on("error", reject);
+      .on('error', reject);
   });
 }
 

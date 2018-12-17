@@ -1,5 +1,5 @@
-const cache = require("./cache");
-const fetchNpmPackageInfo = require("./fetchNpmPackageInfo");
+const cache = require('./cache');
+const fetchNpmPackageInfo = require('./fetchNpmPackageInfo');
 
 const notFound = 0;
 

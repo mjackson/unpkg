@@ -4,11 +4,11 @@ function noop() {}
 
 let debug, info, warn;
 
-if (process.env.LOG_LEVEL === "none") {
+if (process.env.LOG_LEVEL === 'none') {
   debug = info = warn = noop;
-} else if (process.env.LOG_LEVEL === "debug") {
+} else if (process.env.LOG_LEVEL === 'debug') {
   debug = info = warn = log;
-} else if (process.env.LOG_LEVEL === "warn") {
+} else if (process.env.LOG_LEVEL === 'warn') {
   debug = info = noop;
   warn = log;
 } else {

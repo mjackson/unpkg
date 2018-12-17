@@ -1,11 +1,11 @@
-const express = require("express");
-const morgan = require("morgan");
-const WebpackDevServer = require("webpack-dev-server");
-const devErrorHandler = require("errorhandler");
+const express = require('express');
+const morgan = require('morgan');
+const WebpackDevServer = require('webpack-dev-server');
+const devErrorHandler = require('errorhandler');
 
-const devAssets = require("./middleware/devAssets");
-const createDevCompiler = require("./createDevCompiler");
-const createRouter = require("./createRouter");
+const devAssets = require('./middleware/devAssets');
+const createDevCompiler = require('./createDevCompiler');
+const createRouter = require('./createRouter');
 
 function createDevServer(publicDir, webpackConfig, devOrigin) {
   const compiler = createDevCompiler(
@@ -33,8 +33,8 @@ function createDevServer(publicDir, webpackConfig, devOrigin) {
     disableHostCheck: true,
     before(app) {
       // This runs before webpack-dev-middleware
-      app.disable("x-powered-by");
-      app.use(morgan("dev"));
+      app.disable('x-powered-by');
+      app.use(morgan('dev'));
     }
   });
 
