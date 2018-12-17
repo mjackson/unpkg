@@ -3,6 +3,26 @@ const fetchNpmPackageInfo = require('./fetchNpmPackageInfo');
 
 const notFound = 0;
 
+function cleanPackageConfig(packageConfig) {
+  return {
+    name: packageConfig.name,
+    version: packageConfig.version,
+    dependencies: packageConfig.dependencies,
+    peerDependencies: packageConfig.peerDependencies,
+    dist: packageConfig.dist
+  };
+}
+
+function cleanPackageInfo(packageInfo) {
+  return {
+    versions: Object.keys(packageInfo.versions).reduce((memo, key) => {
+      memo[key] = cleanPackageConfig(packageInfo.versions[key]);
+      return memo;
+    }, {}),
+    'dist-tags': packageInfo['dist-tags']
+  };
+}
+
 function getNpmPackageInfo(packageName) {
   return new Promise((resolve, reject) => {
     const key = `npmPackageInfo-${packageName}`;
@@ -22,9 +42,11 @@ function getNpmPackageInfo(packageName) {
             cache.setex(key, 300, notFound);
             resolve(null);
           } else {
+            const cachedValue = JSON.stringify(cleanPackageInfo(value));
+
             // Cache valid package info for 1 minute. In the worst case,
             // new versions won't be available for 1 minute.
-            cache.setex(key, 60, JSON.stringify(value));
+            cache.setex(key, 60, cachedValue);
             resolve(value);
           }
         }, reject);
