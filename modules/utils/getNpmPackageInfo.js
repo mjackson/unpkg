@@ -10,7 +10,7 @@ function cleanPackageConfig(packageConfig) {
     unpkg: packageConfig.unpkg,
     main: packageConfig.main,
     module: packageConfig.module,
-    "js:next": packageConfig["js:next"],
+    'js:next': packageConfig['js:next'],
     browser: packageConfig.browser,
     dependencies: Object.assign(
       {},
