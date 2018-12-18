@@ -7,6 +7,7 @@ function cleanPackageConfig(packageConfig) {
   return {
     name: packageConfig.name,
     version: packageConfig.version,
+    main:  packageConfig.unpkg || packageConfig.main,
     dependencies: Object.assign(
       {},
       packageConfig.dependencies,
