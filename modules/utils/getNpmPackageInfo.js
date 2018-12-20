@@ -3,23 +3,10 @@ const fetchNpmPackageInfo = require('./fetchNpmPackageInfo');
 
 const notFound = '';
 
-function cleanPackageConfig(packageConfig) {
-  return {
-    name: packageConfig.name,
-    version: packageConfig.version,
-    dependencies: Object.assign(
-      {},
-      packageConfig.dependencies,
-      packageConfig.peerDependencies
-    ),
-    tarballURL: packageConfig.dist.tarball
-  };
-}
-
 function cleanPackageInfo(packageInfo) {
   return {
     versions: Object.keys(packageInfo.versions).reduce((memo, key) => {
-      memo[key] = cleanPackageConfig(packageInfo.versions[key]);
+      memo[key] = packageInfo.versions[key];
       return memo;
     }, {}),
     'dist-tags': packageInfo['dist-tags']
@@ -32,10 +19,8 @@ function getNpmPackageInfo(packageName) {
     const value = cache.get(key);
 
     if (value != null) {
-      console.log('GOT VALUE');
       resolve(value === notFound ? null : JSON.parse(value));
     } else {
-      console.log('NO VALUE');
       fetchNpmPackageInfo(packageName).then(value => {
         if (value == null) {
           // Cache 404s for 5 minutes. This prevents us from making
