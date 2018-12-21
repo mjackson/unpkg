@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "docker-compose up",
+    "start": "heroku local",
     "build": "NODE_ENV=production webpack -p --json > stats.json",
     "lint": "eslint modules",
     "test": "jest"

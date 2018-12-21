@@ -9,10 +9,6 @@
 
 Please visit [the unpkg website](https://unpkg.com) to learn more about how to use it.
 
-### Development
-
-To boot the development server, first you'll need to [install Docker](https://docs.docker.com/install/). Then, you can get everything running with `docker-compose up`.
-
 ### Sponsors
 
 The project is sponsored by [Cloudflare](https://cloudflare.com) and [Heroku](https://heroku.com).
