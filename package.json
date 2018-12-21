@@ -72,8 +72,5 @@
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.10",
     "whatwg-fetch": "2.0.2"
-  },
-  "engines": {
-    "node": "8"
   }
 }
