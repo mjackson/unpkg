@@ -48,13 +48,13 @@ function semverRedirect(req, res) {
 
 function filenameRedirect(req, res) {
   let filename;
+  const defaultFileName = req.packageConfig.main || "index.js";
   if (req.query.module != null) {
     // See https://github.com/rollup/rollup/wiki/pkg.module
     filename =
       req.packageConfig.module ||
       req.packageConfig["jsnext:main"] ||
-      req.packageConfig.main ||
-      "/index.js";
+      defaultFileName
   } else if (
     req.query.main &&
     req.packageConfig[req.query.main] &&
@@ -86,7 +86,7 @@ function filenameRedirect(req, res) {
     // remove this functionality.
     incrementCounter('package-json-browser-fallback', req.packageSpec, 1);
   } else {
-    filename = req.packageConfig.main || '/index.js';
+    filename = defaultFileName;
   }
 
   // Redirect to the exact filename so relative imports
