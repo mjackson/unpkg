@@ -1,9 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "start": "heroku local",
     "build": "NODE_ENV=production webpack -p --json > stats.json",
+    "clean": "git clean -e '!/secret_key' -e '!/.env' -fdX .",
     "lint": "eslint modules",
+    "start": "heroku local",
     "test": "jest"
   },
   "dependencies": {
@@ -64,13 +65,12 @@
     "jest": "^22.4.4",
     "markdown-loader": "^2.0.1",
     "mini-css-extract-plugin": "^0.4.5",
-    "nodemon": "^1.18.3",
     "style-loader": "0.13.1",
     "supertest": "^3.0.0",
     "url-loader": "^1.1.2",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10",
+    "webpack-dev-server": "^3.1.14",
     "whatwg-fetch": "2.0.2"
   }
 }
