@@ -18,7 +18,7 @@ function serveStaticFile(req, res) {
       'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
       'Last-Modified': req.entry.lastModified,
       ETag: etag(req.entry.content),
-      'Cache-Tag': tags.join(',')
+      'Cache-Tag': tags.join(', ')
     })
     .send(req.entry.content);
 }

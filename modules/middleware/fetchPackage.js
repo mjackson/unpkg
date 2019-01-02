@@ -13,7 +13,7 @@ function tagRedirect(req, res) {
   res
     .set({
       'Cache-Control': 'public, max-age=60',
-      'Cache-Tag': 'redirect,tag-redirect'
+      'Cache-Tag': 'redirect, tag-redirect'
     })
     .redirect(
       302,
@@ -32,7 +32,7 @@ function semverRedirect(req, res) {
     res
       .set({
         'Cache-Control': 'public, max-age=60',
-        'Cache-Tag': 'redirect,semver-redirect'
+        'Cache-Tag': 'redirect, semver-redirect'
       })
       .redirect(
         302,

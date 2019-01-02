@@ -16,7 +16,7 @@ function serveJavaScriptModule(req, res) {
         'Content-Type': getContentTypeHeader(req.entry.contentType),
         'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
         ETag: etag(code),
-        'Cache-Tag': 'file,js-file,js-module'
+        'Cache-Tag': 'file, js-file, js-module'
       })
       .send(code);
   } catch (error) {
