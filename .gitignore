@@ -1,15 +1,12 @@
 .DS_Store
-.env
-
-/node_modules/
-/public/_assets/
-
-/dump.rdb
-/stats.json
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-secret_key
-/tokens
+/.env
+/node_modules/
+/public/_assets/
+/dump.rdb
+/stats.json
+/secret_key
+/tokens/
