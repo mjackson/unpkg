@@ -2,20 +2,13 @@ const url = require('url');
 
 const packageURLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
-function decodeParam(param) {
-  if (param) {
-    try {
-      return decodeURIComponent(param);
-    } catch (error) {
-      // Ignore invalid params.
-    }
-  }
-
-  return '';
-}
-
 function parsePackageURL(originalURL) {
   const { pathname, search, query } = url.parse(originalURL, true);
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch (error) {
+    return null;
+  }
   const match = packageURLFormat.exec(pathname);
 
   // Disallow invalid URL formats.
@@ -24,8 +17,8 @@ function parsePackageURL(originalURL) {
   }
 
   const packageName = match[1];
-  const packageVersion = decodeParam(match[2]) || 'latest';
-  const filename = decodeParam(match[3]);
+  const packageVersion = match[2] || 'latest';
+  const filename = match[3] || '';
 
   return {
     // If the URL is /@scope/name@version/file.js?main=browser:
