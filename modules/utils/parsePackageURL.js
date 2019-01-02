@@ -3,7 +3,7 @@ const url = require('url');
 const packageURLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
 function parsePackageURL(originalURL) {
-  const { pathname, search, query } = url.parse(originalURL, true);
+  let { pathname, search, query } = url.parse(originalURL, true);
   try {
     pathname = decodeURIComponent(pathname);
   } catch (error) {
