@@ -52,8 +52,9 @@ function filenameRedirect(req, res) {
     // See https://github.com/rollup/rollup/wiki/pkg.module
     filename =
       req.packageConfig.module ||
-      req.packageConfig['jsnext:main'] ||
-      '/index.js';
+      req.packageConfig["jsnext:main"] ||
+      req.packageConfig.main ||
+      "/index.js";
   } else if (
     req.query.main &&
     req.packageConfig[req.query.main] &&
