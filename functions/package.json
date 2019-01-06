@@ -30,7 +30,6 @@
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",
     "ndjson": "^1.5.0",
-    "node-forge": "^0.7.6",
     "pretty-bytes": "^5.1.0",
     "prop-types": "^15.6.2",
     "react": "^16.7.0",

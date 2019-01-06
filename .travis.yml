@@ -2,7 +2,13 @@ language: node_js
 node_js: node
 cache: npm
 env:
-  secure: Z/uibhTgn2S4fy12WQs1wopytecb0Eo2O1qkT4FyEuu4xjSM0ZQ5zKP3eRSRAfr7tTZbTro1zRGWjNCQjJSNvm/6Ftyzp7aN8tFd7zVlZSGIJWGGItB1vqz3ls5ynt6EGLk6SRPtsHCiunaIzYUCLl5c1kFyjyqW3Aab77TQL6sNeTEOb2nS9wDi4xEfS1yDcJIT3swupHf4+tHtTHBMqwtvTpqdyRwkoauAaP94qWP2Glz3YnEpgJFLfvI9MHlOG+dMs6iroJ6UTzNfYOeWKq7xXrmtH2DY0u93fa9JOFIe4CrcSEt88fSO4o1BcdnPitLoB5GfgC8G4IanmtPTMl/3lrnjA2LkhqNs4w4ad9Xhd0fMLRKDofKSRarhMmfMxRY8o14K/2AmUWoS6DBjiOoHap7UTwdPxh2RmEhctG9ufvaQOXD6LAT2pewx9I9Jdg/FrEF7pCnuJxV8jFn8CryQw9QFYAqvgesjJNuHhjfoQdtuqNAQZl6RjoD0lg5iTnr/iwxfE6ayPilKPw7bJNw+yPUgNC//0rCj/KGcOS+9Ho2eD48Qh0GWpOOYBHhxVoo9oF2M1evlMpuuMXfM5KT++XZbxUbDZj1L22eYQDKF0Cwaf4NLCJ0/K5Wwcjphshmk7iy2t5c+JL76T5lFTt/aYQMGNdMdqB/Ato8aow8=
+  global:
+  - secure: uKf/ZaQjLXOQE+h/HE2YhabzndG/gYtDU2hfo799hgyb/W1ojgW3NJZyS2H4SJ3ESaGSwc0L6x/CRGc6jn09rx4iDEzt5jeIQhA4IrEIlLEEarnn3amUqrQ4syd2GPpqsFROu7d5aQDK/dZHLk5Hpv1y9Atz392VCWnro5Pbc0tkRkMaCPZLEgs2A6wK0aYzX3X7FACyBXBc/xA+FfzevpAx7SVt10A6pxx8rYbqrmz0hi4NEH8wmynN35imKxRCVWblHv8ty7ZkyfTv7kUaEW0wBfTxJNh/Kio4Y71Jg/DI6lekF0oY2gAqZ+JnReC94po2HEaF15NuC6j35HHv56CtTUQBRl/nKrItPI7PMuPlyCHi5ChuSD3Oc5Hmu2UiRh5le+iNLjHrpXD25tAOPUfSmrgkaLIn0fdqeKnO3D4Be55KTnWhDlSWjyaQFR9POUvIQwWzjdTflIegRQIzNEC6z9fAp+YDpVyCgbpHbWk0xF8lrEqvBRoJ8vOTYTNUiYM/XPWrv552MyC90th8yCaWl+Dhf2Zso1/neIAejbwhGhFXUeXHxkUK+JDYvfDlq4yrg8h4MPuZ0SE3U5sqvFeNxxFbvNLxbbWLOYmaAXfYrdjT3Ns0TEQc49ZUkLz5feGsIkh+CpiqVRUoBVCizrnAU6mzW2E7IsHVES1ILVY=
+  - secure: 2glMrYXCJv0NAtO3MouSWhijwdUDaYPTWuNT+la0A4hxIF+N00j2+kgqjidJAmijpmPICEyeXe5RtdLVER8Wye8Nz6FocagC/bM3TKmGg689033HjUU1f4YDXkrhemywWV+Kdgnd+98bFWmUBUGy0c0m+C2GR+DocYchIVwzHH7NVUwRd+byE5CtW3xSMhrKVPhiQgeCBbMYLCHCrsppAsxRChRYcteYAXsR4DeT9BRyZ2q35FNNxh3NuVOBUoH1jUMEbJJ+te1UwxLM1mZRJ5GpJ1B6349myX0L5I5DxoYZqTMUSbYGFB5Ad1NZjEXxS6WtrlWRlsviX5ER3J8AkfPh4sjVt9IqAinBeMhW3SUeK2qazdWE/7zyb3n5sL4/74epGeLp6Sq4OHVDVTiDMVN1rW+9no0IKknvgzqDVkdp3/ShJnQj0TrZYjXyn2wnmYcfMIHjsqWr+uY0oFbyZDNeIGV9f/KW1Rx8XZt3pqiR2AuxLrvKTpPL/Zffu5GXryM53gpcWFoXFHjpBfFbRP250wLiCqNY+XZSA7okzv6vIsykXsHU6FEu7SYiZZhX2mfJQOSRa/+64wuhKwNllSuLIj1I9n/myaSUNQa5Lor6jzsDz4dbXP/tEnh93mXvdKe3DdS9LG7Ca9V8YfxOWccJhT7gXf7DVFMNI5VNMvw=
+  - secure: rrZwddgjDOdZj81JRQ6Z+PWEGodJG4FcWk+BOkfF7HrMKK30ZAQwjJWAxb33OrhGLrZ2QFVoAD4kbMYlV8oo/OBtiXHgR2Xv1JKW74VF7r+VdKk4MGvuqXuprbauRfJYnR0aAH16H/l0+dKLtma4FL7moD33f7+UYac8xRRKC9dFsT8xxxfznTpqTP2loDZPsBJ+EaCzWGK2n/wTegGirxVHcS/dAj6yN6EIdAr+ekAgzGtqIaRAVYkGW3qRvz8FXA0PRzZopgBrLcAaWpot9yDIaS0K+vrVNF05fWF5CPP8ygOjd7I04DsoGd4S/5aW45yALxIasElZCMWesrcmNL/fCn+BFolJQY/aoZVqiOiL6h3u7/OLL6gOwXeJhLx/qMS3WcaeoudzhpjMg9q6urgA9FrViCdY21CoFcRxw8ZFXi92CFx3c2Tn8QoFLumHHOS9F8ZJ0t+EMC6fJ6kS2P+GWO6Iwvt+ONOeB88ZnzIViyH66y43+i/Zrqzs28KW5i7sTcrx3zFQrEuWCLS6jMhWYsesvi/hsqfWlvMu3c9V6YxNSgZJHtmlpXN4Bq28chS3S5YVr2pV5rmLywSchcfmJgQoPikPwJ8qinm0egnmr/ukOcKELtaSTlPz+tZL/tVjwC6Qkzh4ELzVxmX1wWZGJgERFHEUHuC2LeXnn94=
+before_install:
+- openssl aes-256-cbc -K $encrypted_a35d52d190dd_key -iv $encrypted_a35d52d190dd_iv
+  -in secret_key.enc -out secret_key -d
 script:
 - NODE_ENV=production npm run build
 before_deploy:
@@ -10,11 +16,7 @@ before_deploy:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: $(npm bin -g)/firebase deploy
-    --project unpkg-gcp
-    --message "https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
-    --token $FIREBASE_TOKEN
-    --non-interactive
-    --force
+  script: $(npm bin -g)/firebase deploy --project unpkg-gcp --message "https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+    --token $FIREBASE_TOKEN --non-interactive --force
   on:
     branch: firebase-hosting

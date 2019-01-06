@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
 import data from './data';
-import secretKey from '../secretKey';
+import { secretKey } from '../config';
 
 function getCurrentSeconds() {
   return Math.floor(Date.now() / 1000);
