@@ -1,4 +1,4 @@
-const url = require('url');
+import url from 'url';
 
 const packageURLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
@@ -14,7 +14,7 @@ function decodeParam(param) {
   return '';
 }
 
-function parsePackageURL(originalURL) {
+export default function parsePackageURL(originalURL) {
   const { pathname, search, query } = url.parse(originalURL, true);
   const match = packageURLFormat.exec(pathname);
 
@@ -37,5 +37,3 @@ function parsePackageURL(originalURL) {
     filename // /file.js
   };
 }
-
-module.exports = parsePackageURL;

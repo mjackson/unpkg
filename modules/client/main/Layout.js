@@ -1,14 +1,47 @@
-require('./Layout.css');
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Switch, Route, Link, withRouter } from 'react-router-dom';
+import { Motion, spring } from 'react-motion';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const { Switch, Route, Link, withRouter } = require('react-router-dom');
-const { Motion, spring } = require('react-motion');
+import WindowSize from './WindowSize';
+import About from './About';
+import Stats from './Stats';
+import Home from './Home';
 
-const WindowSize = require('./WindowSize');
-const About = require('./About');
-const Stats = require('./Stats');
-const Home = require('./Home');
+const styles = {
+  title: {
+    margin: 0,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontSize: '5em'
+  },
+  nav: {
+    margin: '0 0 3em'
+  },
+  navList: {
+    margin: 0,
+    padding: 0,
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  navListItem: {
+    flexBasis: 'auto',
+    listStyleType: 'none',
+    display: 'inline-block',
+    fontSize: '1.1em',
+    margin: '0 10px'
+  },
+  navLink: {
+    textDecoration: 'none',
+    color: 'black'
+  },
+  navUnderline: {
+    height: 4,
+    backgroundColor: 'black',
+    position: 'absolute',
+    left: 0
+  }
+};
 
 class Layout extends React.Component {
   static propTypes = {
@@ -66,8 +99,9 @@ class Layout extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.location.pathname !== this.props.location.pathname)
+    if (prevProps.location.pathname !== this.props.location.pathname) {
       this.adjustUnderline(true);
+    }
   }
 
   render() {
@@ -85,20 +119,23 @@ class Layout extends React.Component {
         <WindowSize onChange={this.adjustUnderline} />
         <div className="wrapper">
           <header>
-            <h1 className="layout-title">unpkg</h1>
-            <nav className="layout-nav">
-              <ol
-                className="layout-navList"
-                ref={node => (this.listNode = node)}
-              >
-                <li>
-                  <Link to="/">Home</Link>
+            <h1 style={styles.title}>unpkg</h1>
+            <nav style={styles.nav}>
+              <ol style={styles.navList} ref={node => (this.listNode = node)}>
+                <li style={styles.navListItem}>
+                  <Link to="/" style={styles.navLink}>
+                    Home
+                  </Link>
                 </li>
-                <li>
-                  <Link to="/stats">Stats</Link>
+                <li style={styles.navListItem}>
+                  <Link to="/stats" style={styles.navLink}>
+                    Stats
+                  </Link>
                 </li>
-                <li>
-                  <Link to="/about">About</Link>
+                <li style={styles.navListItem}>
+                  <Link to="/about" style={styles.navLink}>
+                    About
+                  </Link>
                 </li>
               </ol>
               <Motion
@@ -106,8 +143,8 @@ class Layout extends React.Component {
                 style={style}
                 children={style => (
                   <div
-                    className="layout-navUnderline"
                     style={{
+                      ...styles.navUnderline,
                       WebkitTransform: `translate3d(${style.left}px,0,0)`,
                       transform: `translate3d(${style.left}px,0,0)`,
                       width: style.width
@@ -132,4 +169,4 @@ class Layout extends React.Component {
   }
 }
 
-module.exports = withRouter(Layout);
+export default withRouter(Layout);

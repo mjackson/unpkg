@@ -1,10 +1,43 @@
-require('./App.css');
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const React = require('react');
+import DirectoryListing from './DirectoryListing';
 
-const DirectoryListing = require('./DirectoryListing');
+const styles = {
+  wrapper: {
+    maxWidth: 900,
+    margin: '0 auto'
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  versionSelector: {
+    float: 'right',
+    lineHeight: '2.25em'
+  },
+  versionDropdown: {
+    fontSize: '1em'
+  },
+  address: {
+    textAlign: 'right'
+  }
+};
 
-class App extends React.Component {
+const entryType = PropTypes.object;
+
+export default class App extends React.Component {
+  static propTypes = {
+    packageName: PropTypes.string.isRequired,
+    packageVersion: PropTypes.string.isRequired,
+    availableVersions: PropTypes.arrayOf(PropTypes.string),
+    filename: PropTypes.string.isRequired,
+    entry: entryType.isRequired,
+    entries: PropTypes.objectOf(entryType).isRequired
+  };
+
   static defaultProps = {
     availableVersions: []
   };
@@ -18,19 +51,20 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app">
-        <header className="app-header">
+      <div style={styles.wrapper}>
+        <header style={styles.header}>
           <h1>
             Index of /{this.props.packageName}@{this.props.packageVersion}
             {this.props.filename}
           </h1>
 
-          <div className="app-version-selector">
+          <div style={styles.versionSelector}>
             Version:{' '}
             <select
               id="version"
               defaultValue={this.props.packageVersion}
               onChange={this.handleChange}
+              style={styles.versionDropdown}
             >
               {this.props.availableVersions.map(v => (
                 <option key={v} value={v}>
@@ -51,27 +85,10 @@ class App extends React.Component {
 
         <hr />
 
-        <address className="app-address">
+        <address style={styles.address}>
           {this.props.packageName}@{this.props.packageVersion}
         </address>
       </div>
     );
   }
 }
-
-if (process.env.NODE_ENV === 'development') {
-  const PropTypes = require('prop-types');
-
-  const entryType = PropTypes.object;
-
-  App.propTypes = {
-    packageName: PropTypes.string.isRequired,
-    packageVersion: PropTypes.string.isRequired,
-    availableVersions: PropTypes.arrayOf(PropTypes.string),
-    filename: PropTypes.string.isRequired,
-    entry: entryType.isRequired,
-    entries: PropTypes.objectOf(entryType).isRequired
-  };
-}
-
-module.exports = App;

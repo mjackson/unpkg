@@ -1,7 +1,5 @@
-const BlacklistAPI = require('../../BlacklistAPI');
+import { addPackage } from '../../utils/blacklist';
 
-function withBlacklist(blacklist, done) {
-  Promise.all(blacklist.map(BlacklistAPI.addPackage)).then(done);
+export default function withBlacklist(blacklist, done) {
+  Promise.all(blacklist.map(addPackage)).then(done);
 }
-
-module.exports = withBlacklist;

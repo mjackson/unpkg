@@ -1,4 +1,4 @@
-function createSearch(query) {
+export default function createSearch(query) {
   const keys = Object.keys(query).sort();
   const params = keys.reduce(
     (memo, key) =>
@@ -12,5 +12,3 @@ function createSearch(query) {
 
   return params.length ? `?${params.join('&')}` : '';
 }
-
-module.exports = createSearch;

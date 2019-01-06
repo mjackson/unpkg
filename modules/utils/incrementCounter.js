@@ -1,6 +1,6 @@
-const db = require('./data');
+import db from './data';
 
-function incrementCounter(counter, key, by = 1) {
+export default function incrementCounter(counter, key, by = 1) {
   return new Promise((resolve, reject) => {
     db.hincrby(counter, key, by, (error, value) => {
       if (error) {
@@ -11,5 +11,3 @@ function incrementCounter(counter, key, by = 1) {
     });
   });
 }
-
-module.exports = incrementCounter;

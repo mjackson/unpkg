@@ -1,8 +1,8 @@
-const babel = require('babel-core');
+import babel from '@babel/core';
 
-const unpkgRewrite = require('../plugins/unpkgRewrite');
+import unpkgRewrite from '../plugins/unpkgRewrite';
 
-function rewriteBareModuleIdentifiers(code, packageConfig) {
+export default function rewriteBareModuleIdentifiers(code, packageConfig) {
   const dependencies = Object.assign(
     {},
     packageConfig.peerDependencies,
@@ -19,5 +19,3 @@ function rewriteBareModuleIdentifiers(code, packageConfig) {
 
   return babel.transform(code, options).code;
 }
-
-module.exports = rewriteBareModuleIdentifiers;

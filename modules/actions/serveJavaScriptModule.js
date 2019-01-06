@@ -1,9 +1,9 @@
-const etag = require('etag');
+import etag from 'etag';
 
-const getContentTypeHeader = require('../utils/getContentTypeHeader');
-const rewriteBareModuleIdentifiers = require('../utils/rewriteBareModuleIdentifiers');
+import getContentTypeHeader from '../utils/getContentTypeHeader';
+import rewriteBareModuleIdentifiers from '../utils/rewriteBareModuleIdentifiers';
 
-function serveJavaScriptModule(req, res) {
+export default function serveJavaScriptModule(req, res) {
   try {
     const code = rewriteBareModuleIdentifiers(
       req.entry.content.toString('utf8'),
@@ -40,5 +40,3 @@ function serveJavaScriptModule(req, res) {
       );
   }
 }
-
-module.exports = serveJavaScriptModule;

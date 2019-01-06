@@ -1,29 +1,37 @@
-const subDays = require('date-fns/sub_days');
-const startOfDay = require('date-fns/start_of_day');
-const startOfSecond = require('date-fns/start_of_second');
+import { subDays, startOfDay, startOfSecond } from 'date-fns';
 
-const StatsAPI = require('../StatsAPI');
+import { getStats } from '../utils/stats';
 
-function showStats(req, res) {
+export default function showStats(req, res) {
   let since, until;
-  switch (req.query.period) {
-    case 'last-day':
-      until = startOfDay(new Date());
-      since = subDays(until, 1);
-      break;
-    case 'last-week':
-      until = startOfDay(new Date());
-      since = subDays(until, 7);
-      break;
-    case 'last-month':
-      until = startOfDay(new Date());
-      since = subDays(until, 30);
-      break;
-    default:
-      until = req.query.until
-        ? new Date(req.query.until)
-        : startOfSecond(new Date());
-      since = new Date(req.query.since);
+  if (req.query.period) {
+    switch (req.query.period) {
+      case 'last-day':
+        until = startOfDay(new Date());
+        since = subDays(until, 1);
+        break;
+      case 'last-week':
+        until = startOfDay(new Date());
+        since = subDays(until, 7);
+        break;
+      case 'last-month':
+      default:
+        until = startOfDay(new Date());
+        since = subDays(until, 30);
+    }
+  } else {
+    if (!req.query.since) {
+      return res.status(403).send({ error: 'Missing ?since query parameter' });
+    }
+
+    if (!req.query.until) {
+      return res.status(403).send({ error: 'Missing ?until query parameter' });
+    }
+
+    since = new Date(req.query.since);
+    until = req.query.until
+      ? new Date(req.query.until)
+      : startOfSecond(new Date());
   }
 
   if (isNaN(since.getTime())) {
@@ -44,7 +52,7 @@ function showStats(req, res) {
     return res.status(403).send({ error: '?until must be a date in the past' });
   }
 
-  StatsAPI.getStats(since, until).then(
+  getStats(since, until).then(
     stats => {
       res
         .set({
@@ -59,5 +67,3 @@ function showStats(req, res) {
     }
   );
 }
-
-module.exports = showStats;

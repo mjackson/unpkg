@@ -2,7 +2,7 @@
  * Adds the given scope to the array in req.auth if the user has sufficient
  * permissions. Otherwise rejects the request.
  */
-function requireAuth(scope) {
+export default function requireAuth(scope) {
   let checkScopes;
   if (scope.includes('.')) {
     const parts = scope.split('.');
@@ -36,5 +36,3 @@ function requireAuth(scope) {
     next();
   };
 }
-
-module.exports = requireAuth;

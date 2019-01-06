@@ -1,22 +1,22 @@
-const React = require('react');
-const PropTypes = require('prop-types');
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const addEvent = require('../utils/addEvent');
-const removeEvent = require('../utils/removeEvent');
+import { addEvent, removeEvent } from '../utils/dom';
 
 const resizeEvent = 'resize';
 
-class WindowSize extends React.Component {
+export default class WindowSize extends React.Component {
   static propTypes = {
     onChange: PropTypes.func
   };
 
   handleWindowResize = () => {
-    if (this.props.onChange)
+    if (this.props.onChange) {
       this.props.onChange({
         width: window.innerWidth,
         height: window.innerHeight
       });
+    }
   };
 
   componentDidMount() {
@@ -31,5 +31,3 @@ class WindowSize extends React.Component {
     return null;
   }
 }
-
-module.exports = WindowSize;

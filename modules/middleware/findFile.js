@@ -1,11 +1,11 @@
-const path = require('path');
+import path from 'path';
 
-const addLeadingSlash = require('../utils/addLeadingSlash');
-const createPackageURL = require('../utils/createPackageURL');
-const createSearch = require('../utils/createSearch');
-const fetchNpmPackage = require('../utils/fetchNpmPackage');
-const getIntegrity = require('../utils/getIntegrity');
-const getContentType = require('../utils/getContentType');
+import addLeadingSlash from '../utils/addLeadingSlash';
+import createPackageURL from '../utils/createPackageURL';
+import createSearch from '../utils/createSearch';
+import fetchNpmPackage from '../utils/fetchNpmPackage';
+import getIntegrity from '../utils/getIntegrity';
+import getContentType from '../utils/getContentType';
 
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
@@ -124,7 +124,7 @@ const multipleSlash = /\/\/+/;
  * Fetch and search the archive to try and find the requested file.
  * Redirect to the "index" file if a directory was requested.
  */
-function findFile(req, res, next) {
+export default function findFile(req, res, next) {
   fetchNpmPackage(req.packageConfig).then(tarballStream => {
     const entryName = req.filename
       .replace(multipleSlash, '/')
@@ -173,5 +173,3 @@ function findFile(req, res, next) {
     );
   });
 }
-
-module.exports = findFile;

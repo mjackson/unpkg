@@ -1,7 +1,5 @@
-const AuthAPI = require('../../AuthAPI');
+import { createToken } from '../../utils/auth';
 
-function withToken(scopes, done) {
-  AuthAPI.createToken(scopes).then(done);
+export default function withToken(scopes, done) {
+  createToken(scopes).then(done);
 }
-
-module.exports = withToken;

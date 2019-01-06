@@ -1,0 +1,12 @@
+{
+  "public/_assets/main.js": {
+    "bundled": 106742,
+    "minified": 41138,
+    "gzipped": 12988
+  },
+  "public/_assets/autoIndex.js": {
+    "bundled": 44018,
+    "minified": 15077,
+    "gzipped": 5142
+  }
+}

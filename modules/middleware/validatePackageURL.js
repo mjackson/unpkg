@@ -1,10 +1,10 @@
-const parsePackageURL = require('../utils/parsePackageURL');
+import parsePackageURL from '../utils/parsePackageURL';
 
 /**
  * Parse the URL and add various properties to the request object to
  * do with the package/file being requested. Reject invalid URLs.
  */
-function validatePackageURL(req, res, next) {
+export default function validatePackageURL(req, res, next) {
   const url = parsePackageURL(req.url);
 
   if (url == null) {
@@ -21,5 +21,3 @@ function validatePackageURL(req, res, next) {
 
   next();
 }
-
-module.exports = validatePackageURL;

@@ -1,7 +1,5 @@
-const secretKey = require('../secretKey');
+import secretKey from '../secretKey';
 
-function showPublicKey(req, res) {
+export default function showPublicKey(req, res) {
   res.send({ publicKey: secretKey.public });
 }
-
-module.exports = showPublicKey;

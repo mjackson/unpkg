@@ -1,8 +1,8 @@
-const request = require('supertest');
+import request from 'supertest';
 
-const createServer = require('../createServer');
-const withRevokedToken = require('./utils/withRevokedToken');
-const withToken = require('./utils/withToken');
+import createServer from '../createServer';
+import withRevokedToken from './utils/withRevokedToken';
+import withToken from './utils/withToken';
 
 describe('The /_auth endpoint', () => {
   let server;

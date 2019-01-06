@@ -1,14 +1,24 @@
-require('./Stats.css');
+import React from 'react';
+import PropTypes from 'prop-types';
+import formatBytes from 'pretty-bytes';
+import formatDate from 'date-fns/format';
+import parseDate from 'date-fns/parse';
 
-const React = require('react');
-const PropTypes = require('prop-types');
-const formatBytes = require('pretty-bytes');
-const formatDate = require('date-fns/format');
-const parseDate = require('date-fns/parse');
-const { continents, countries } = require('countries-list');
+import { continents, countries } from './countries.json';
 
-const formatNumber = require('../utils/formatNumber');
-const formatPercent = require('../utils/formatPercent');
+import Wrapper from './Wrapper';
+import formatNumber from '../utils/formatNumber';
+import formatPercent from '../utils/formatPercent';
+
+const styles = {
+  tableFilter: {
+    fontSize: '0.8em',
+    textAlign: 'right'
+  },
+  countryName: {
+    paddingLeft: 20
+  }
+};
 
 function getCountriesByContinent(continent) {
   return Object.keys(countries).filter(
@@ -20,17 +30,17 @@ function sumKeyValues(hash, keys) {
   return keys.reduce((n, key) => n + (hash[key] || 0), 0);
 }
 
-function sumValues(hash) {
-  return Object.keys(hash).reduce((memo, key) => memo + hash[key], 0);
-}
+// function sumValues(hash) {
+//   return Object.keys(hash).reduce((memo, key) => memo + hash[key], 0);
+// }
 
-class Stats extends React.Component {
+export default class Stats extends React.Component {
   static propTypes = {
     data: PropTypes.object
   };
 
   state = {
-    minPackageRequests: 1000000,
+    // minPackageRequests: 1000000,
     minCountryRequests: 1000000
   };
 
@@ -46,45 +56,45 @@ class Stats extends React.Component {
     const until = parseDate(totals.until);
 
     // Packages
-    const packageRows = [];
+    // const packageRows = [];
 
-    Object.keys(totals.requests.package)
-      .sort((a, b) => {
-        return totals.requests.package[b] - totals.requests.package[a];
-      })
-      .forEach(packageName => {
-        const requests = totals.requests.package[packageName];
-        const bandwidth = totals.bandwidth.package[packageName];
+    // Object.keys(totals.requests.package)
+    //   .sort((a, b) => {
+    //     return totals.requests.package[b] - totals.requests.package[a];
+    //   })
+    //   .forEach(packageName => {
+    //     const requests = totals.requests.package[packageName];
+    //     const bandwidth = totals.bandwidth.package[packageName];
 
-        if (requests >= this.state.minPackageRequests) {
-          packageRows.push(
-            <tr key={packageName}>
-              <td>
-                <a
-                  href={`https://npmjs.org/package/${packageName}`}
-                  title={`${packageName} on npm`}
-                >
-                  {packageName}
-                </a>
-              </td>
-              <td>
-                {formatNumber(requests)} (
-                {formatPercent(requests / totals.requests.all)}
-                %)
-              </td>
-              {bandwidth ? (
-                <td>
-                  {formatBytes(bandwidth)} (
-                  {formatPercent(bandwidth / totals.bandwidth.all)}
-                  %)
-                </td>
-              ) : (
-                <td>-</td>
-              )}
-            </tr>
-          );
-        }
-      });
+    //     if (requests >= this.state.minPackageRequests) {
+    //       packageRows.push(
+    //         <tr key={packageName}>
+    //           <td>
+    //             <a
+    //               href={`https://npmjs.org/package/${packageName}`}
+    //               title={`${packageName} on npm`}
+    //             >
+    //               {packageName}
+    //             </a>
+    //           </td>
+    //           <td>
+    //             {formatNumber(requests)} (
+    //             {formatPercent(requests / totals.requests.all)}
+    //             %)
+    //           </td>
+    //           {bandwidth ? (
+    //             <td>
+    //               {formatBytes(bandwidth)} (
+    //               {formatPercent(bandwidth / totals.bandwidth.all)}
+    //               %)
+    //             </td>
+    //           ) : (
+    //             <td>-</td>
+    //           )}
+    //         </tr>
+    //       );
+    //     }
+    //   });
 
     // Regions
     const regionRows = [];
@@ -114,7 +124,7 @@ class Stats extends React.Component {
         continentData.bandwidth !== 0
       ) {
         regionRows.push(
-          <tr key={continent} className="continent-row">
+          <tr key={continent}>
             <td>
               <strong>{continentName}</strong>
             </td>
@@ -145,8 +155,8 @@ class Stats extends React.Component {
 
           if (countryRequests > this.state.minCountryRequests) {
             regionRows.push(
-              <tr key={continent + country} className="country-row">
-                <td className="country-name">{countries[country].name}</td>
+              <tr key={continent + country}>
+                <td style={styles.countryName}>{countries[country].name}</td>
                 <td>
                   {formatNumber(countryRequests)} (
                   {formatPercent(countryRequests / totals.requests.all)}
@@ -165,27 +175,27 @@ class Stats extends React.Component {
     });
 
     // Protocols
-    const protocolRows = Object.keys(totals.requests.protocol)
-      .sort((a, b) => {
-        return totals.requests.protocol[b] - totals.requests.protocol[a];
-      })
-      .map(protocol => {
-        const requests = totals.requests.protocol[protocol];
+    // const protocolRows = Object.keys(totals.requests.protocol)
+    //   .sort((a, b) => {
+    //     return totals.requests.protocol[b] - totals.requests.protocol[a];
+    //   })
+    //   .map(protocol => {
+    //     const requests = totals.requests.protocol[protocol];
 
-        return (
-          <tr key={protocol}>
-            <td>{protocol}</td>
-            <td>
-              {formatNumber(requests)} (
-              {formatPercent(requests / sumValues(totals.requests.protocol))}
-              %)
-            </td>
-          </tr>
-        );
-      });
+    //     return (
+    //       <tr key={protocol}>
+    //         <td>{protocol}</td>
+    //         <td>
+    //           {formatNumber(requests)} (
+    //           {formatPercent(requests / sumValues(totals.requests.protocol))}
+    //           %)
+    //         </td>
+    //       </tr>
+    //     );
+    //   });
 
     return (
-      <div className="wrapper">
+      <Wrapper>
         <p>
           From <strong>{formatDate(since, 'MMM D')}</strong> to{' '}
           <strong>{formatDate(until, 'MMM D')}</strong> unpkg served{' '}
@@ -202,13 +212,19 @@ class Stats extends React.Component {
         <h3>Packages</h3>
 
         <p>
+          We recently migrated unpkg to a new backend and are working on getting
+          package-specific data back on the site.
+        </p>
+
+        {/*
+        <p>
           The table below shows the most popular packages served by unpkg from{' '}
           <strong>{formatDate(since, 'MMM D')}</strong> to{' '}
           <strong>{formatDate(until, 'MMM D')}</strong>. Only the top{' '}
           {Object.keys(totals.requests.package).length} packages are shown.
         </p>
 
-        <p className="table-filter">
+        <p style={styles.tableFilter}>
           Include only packages that received at least{' '}
           <select
             value={this.state.minPackageRequests}
@@ -244,6 +260,7 @@ class Stats extends React.Component {
           </thead>
           <tbody>{packageRows}</tbody>
         </table>
+        */}
 
         <h3>Regions</h3>
 
@@ -253,7 +270,7 @@ class Stats extends React.Component {
           <strong>{formatDate(until, 'MMM D')}</strong> by geographic region.
         </p>
 
-        <p className="table-filter">
+        <p style={styles.tableFilter}>
           Include only countries that made at least{' '}
           <select
             value={this.state.minCountryRequests}
@@ -272,12 +289,7 @@ class Stats extends React.Component {
           requests.
         </p>
 
-        <table
-          cellSpacing="0"
-          cellPadding="0"
-          style={{ width: '100%' }}
-          className="regions-table"
-        >
+        <table cellSpacing="0" cellPadding="0" style={{ width: '100%' }}>
           <thead>
             <tr>
               <th>
@@ -294,6 +306,7 @@ class Stats extends React.Component {
           <tbody>{regionRows}</tbody>
         </table>
 
+        {/*
         <h3>Protocols</h3>
 
         <p>
@@ -315,9 +328,8 @@ class Stats extends React.Component {
           </thead>
           <tbody>{protocolRows}</tbody>
         </table>
-      </div>
+        */}
+      </Wrapper>
     );
   }
 }
-
-module.exports = Stats;

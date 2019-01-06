@@ -1,8 +1,7 @@
-require('./DirectoryListing.css');
-
-const React = require('react');
-const formatBytes = require('pretty-bytes');
-const sortBy = require('sort-by');
+import React from 'react';
+import PropTypes from 'prop-types';
+import formatBytes from 'pretty-bytes';
+import sortBy from 'sort-by';
 
 function getDirname(name) {
   return (
@@ -25,20 +24,38 @@ function getRelativeName(base, name) {
   return base.length ? name.substr(base.length + 1) : name;
 }
 
-function DirectoryListing({ filename, entry, entries }) {
+const styles = {
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    font: '0.85em Monaco, monospace'
+  },
+  evenRow: {
+    backgroundColor: '#eee'
+  },
+  tableHead: {
+    textAlign: 'left',
+    padding: '0.5em 1em'
+  },
+  tableCell: {
+    padding: '0.5em 1em'
+  }
+};
+
+export default function DirectoryListing({ filename, entry, entries }) {
   const rows = [];
 
   if (filename !== '/') {
     rows.push(
       <tr key="..">
-        <td>
+        <td style={styles.tableCell}>
           <a title="Parent directory" href="../">
             ..
           </a>
         </td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
+        <td style={styles.tableCell}>-</td>
+        <td style={styles.tableCell}>-</td>
+        <td style={styles.tableCell}>-</td>
       </tr>
     );
   }
@@ -54,14 +71,14 @@ function DirectoryListing({ filename, entry, entries }) {
 
       rows.push(
         <tr key={name}>
-          <td>
+          <td style={styles.tableCell}>
             <a title={relName} href={href}>
               {href}
             </a>
           </td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
+          <td style={styles.tableCell}>-</td>
+          <td style={styles.tableCell}>-</td>
+          <td style={styles.tableCell}>-</td>
         </tr>
       );
     });
@@ -74,33 +91,33 @@ function DirectoryListing({ filename, entry, entries }) {
 
       rows.push(
         <tr key={name}>
-          <td>
+          <td style={styles.tableCell}>
             <a title={relName} href={relName}>
               {relName}
             </a>
           </td>
-          <td>{contentType}</td>
-          <td>{formatBytes(size)}</td>
-          <td>{lastModified}</td>
+          <td style={styles.tableCell}>{contentType}</td>
+          <td style={styles.tableCell}>{formatBytes(size)}</td>
+          <td style={styles.tableCell}>{lastModified}</td>
         </tr>
       );
     });
 
   return (
-    <div className="directory-listing">
-      <table>
+    <div>
+      <table style={styles.table}>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th>Last Modified</th>
+            <th style={styles.tableHead}>Name</th>
+            <th style={styles.tableHead}>Type</th>
+            <th style={styles.tableHead}>Size</th>
+            <th style={styles.tableHead}>Last Modified</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, index) =>
             React.cloneElement(row, {
-              className: index % 2 ? 'odd' : 'even'
+              style: index % 2 ? undefined : styles.evenRow
             })
           )}
         </tbody>
@@ -109,18 +126,12 @@ function DirectoryListing({ filename, entry, entries }) {
   );
 }
 
-if (process.env.NODE_ENV === 'development') {
-  const PropTypes = require('prop-types');
+const entryType = PropTypes.shape({
+  name: PropTypes.string.isRequired
+});
 
-  const entryType = PropTypes.shape({
-    name: PropTypes.string.isRequired
-  });
-
-  DirectoryListing.propTypes = {
-    filename: PropTypes.string.isRequired,
-    entry: entryType.isRequired,
-    entries: PropTypes.objectOf(entryType).isRequired
-  };
-}
-
-module.exports = DirectoryListing;
+DirectoryListing.propTypes = {
+  filename: PropTypes.string.isRequired,
+  entry: entryType.isRequired,
+  entries: PropTypes.objectOf(entryType).isRequired
+};

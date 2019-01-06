@@ -1,17 +1,16 @@
-const url = require('url');
-const https = require('https');
-const gunzip = require('gunzip-maybe');
-const tar = require('tar-stream');
+import url from 'url';
+import https from 'https';
+import gunzip from 'gunzip-maybe';
+import tar from 'tar-stream';
 
-const bufferStream = require('./bufferStream');
-const agent = require('./registryAgent');
-const logging = require('./logging');
+import bufferStream from './bufferStream';
+import agent from './registryAgent';
 
-function fetchNpmPackage(packageConfig) {
+export default function fetchNpmPackage(packageConfig) {
   return new Promise((resolve, reject) => {
     const tarballURL = packageConfig.dist.tarball;
 
-    logging.debug(
+    console.log(
       'Fetching package for %s from %s',
       packageConfig.name,
       tarballURL
@@ -45,5 +44,3 @@ function fetchNpmPackage(packageConfig) {
       .on('error', reject);
   });
 }
-
-module.exports = fetchNpmPackage;

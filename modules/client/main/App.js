@@ -1,7 +1,7 @@
-const React = require('react');
-const { HashRouter } = require('react-router-dom');
+import React from 'react';
+import { HashRouter } from 'react-router-dom';
 
-const Layout = require('./Layout');
+import Layout from './Layout';
 
 function App() {
   return (
@@ -11,4 +11,4 @@ function App() {
   );
 }
 
-module.exports = App;
+export default App;

@@ -1,30 +1,30 @@
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const semver = require('semver');
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import semver from 'semver';
 
-const MainPage = require('../client/MainPage');
-const AutoIndexApp = require('../client/autoIndex/App');
-const createHTML = require('../client/utils/createHTML');
-const renderPage = require('../utils/renderPage');
+import MainPage from '../client/MainPage';
+import AutoIndexApp from '../client/autoIndex/App';
+import createHTML from '../client/utils/createHTML';
+import renderPage from '../utils/renderPage';
 
 const globalScripts =
   process.env.NODE_ENV === 'production'
     ? [
-        '/react@16.4.1/umd/react.production.min.js',
-        '/react-dom@16.4.1/umd/react-dom.production.min.js'
+        '/react@16.7.0/umd/react.production.min.js',
+        '/react-dom@16.7.0/umd/react-dom.production.min.js'
       ]
     : [
-        '/react@16.4.1/umd/react.development.js',
-        '/react-dom@16.4.1/umd/react-dom.development.js'
+        '/react@16.7.0/umd/react.development.js',
+        '/react-dom@16.7.0/umd/react-dom.development.js'
       ];
 
 function byVersion(a, b) {
   return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
 }
 
-function serveAutoIndexPage(req, res) {
-  const scripts = globalScripts.concat(req.assets.getScripts('autoIndex'));
-  const styles = req.assets.getStyles('autoIndex');
+export default function serveAutoIndexPage(req, res) {
+  const scripts = globalScripts.concat('/_assets/autoIndex.js');
+  const styles = ['/autoIndex.css'];
 
   const props = {
     packageName: req.packageName,
@@ -54,5 +54,3 @@ function serveAutoIndexPage(req, res) {
     })
     .send(html);
 }
-
-module.exports = serveAutoIndexPage;

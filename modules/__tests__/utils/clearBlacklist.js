@@ -1,7 +1,5 @@
-const BlacklistAPI = require('../../BlacklistAPI');
+import { removeAllPackages } from '../../utils/blacklist';
 
-function clearBlacklist(done) {
-  BlacklistAPI.removeAllPackages().then(done, done);
+export default function clearBlacklist(done) {
+  removeAllPackages().then(done, done);
 }
-
-module.exports = clearBlacklist;

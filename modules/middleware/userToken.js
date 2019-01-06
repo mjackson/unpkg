@@ -1,6 +1,4 @@
-const AuthAPI = require('../AuthAPI');
-
-const ReadMethods = { GET: true, HEAD: true };
+import { verifyToken } from '../utils/auth';
 
 function decodeBase64(string) {
   return Buffer.from(string, 'base64').toString();
@@ -9,22 +7,20 @@ function decodeBase64(string) {
 /**
  * Sets req.user from the payload in the auth token in the request.
  */
-function userToken(req, res, next) {
-  if (req.user) {
+export default function userToken(req, res, next) {
+  if (req.user !== undefined) {
     return next();
   }
 
   const auth = req.get('Authorization');
-  const token = auth
-    ? decodeBase64(auth)
-    : (ReadMethods[req.method] ? req.query : req.body).token;
+  const token = auth && decodeBase64(auth);
 
   if (!token) {
     req.user = null;
     return next();
   }
 
-  AuthAPI.verifyToken(token).then(
+  verifyToken(token).then(
     payload => {
       req.user = payload;
       next();
@@ -44,5 +40,3 @@ function userToken(req, res, next) {
     }
   );
 }
-
-module.exports = userToken;

@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/api/auth", "function": "serveAuth" },
+      { "source": "/api/public-key", "function": "servePublicKey" },
+      { "source": "/api/stats", "function": "serveStats" },
+      { "source": "**/", "function": "serveAutoIndexPage" },
+      { "source": "**", "function": "serveNpmPackageFile" }
+    ]
+  }
+}

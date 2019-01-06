@@ -1,11 +1,11 @@
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 const doctype = '<!DOCTYPE html>';
 
-function renderPage(page, props) {
-  const element = React.createElement(page, props);
-  return doctype + ReactDOMServer.renderToStaticMarkup(element);
+export default function renderPage(page, props) {
+  return (
+    doctype +
+    ReactDOMServer.renderToStaticMarkup(React.createElement(page, props))
+  );
 }
-
-module.exports = renderPage;

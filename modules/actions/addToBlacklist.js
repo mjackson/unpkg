@@ -1,8 +1,8 @@
-const validateNpmPackageName = require('validate-npm-package-name');
+import validateNpmPackageName from 'validate-npm-package-name';
 
-const BlacklistAPI = require('../BlacklistAPI');
+import { addPackage } from '../utils/blacklist';
 
-function addToBlacklist(req, res) {
+export default function addToBlacklist(req, res) {
   const packageName = req.body.packageName;
 
   if (!packageName) {
@@ -21,7 +21,7 @@ function addToBlacklist(req, res) {
     });
   }
 
-  BlacklistAPI.addPackage(packageName).then(
+  addPackage(packageName).then(
     added => {
       if (added) {
         const userId = req.user.jti;
@@ -45,5 +45,3 @@ function addToBlacklist(req, res) {
     }
   );
 }
-
-module.exports = addToBlacklist;

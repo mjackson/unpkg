@@ -1,8 +1,8 @@
-const request = require('supertest');
+import request from 'supertest';
 
-const createServer = require('../createServer');
-const clearBlacklist = require('./utils/clearBlacklist');
-const withToken = require('./utils/withToken');
+import createServer from '../createServer';
+import clearBlacklist from './utils/clearBlacklist';
+import withToken from './utils/withToken';
 
 describe('The /_blacklist endpoint', () => {
   let server;

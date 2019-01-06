@@ -1,4 +1,4 @@
-function bufferStream(stream) {
+export default function bufferStream(stream) {
   return new Promise((resolve, reject) => {
     const chunks = [];
 
@@ -8,5 +8,3 @@ function bufferStream(stream) {
       .on('end', () => resolve(Buffer.concat(chunks)));
   });
 }
-
-module.exports = bufferStream;

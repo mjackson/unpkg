@@ -1,7 +1,7 @@
-const BlacklistAPI = require('../BlacklistAPI');
+import { getPackages } from '../utils/blacklist';
 
-function showBlacklist(req, res) {
-  BlacklistAPI.getPackages().then(
+export default function showBlacklist(req, res) {
+  getPackages().then(
     blacklist => {
       res.send({ blacklist });
     },
@@ -13,5 +13,3 @@ function showBlacklist(req, res) {
     }
   );
 }
-
-module.exports = showBlacklist;

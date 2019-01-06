@@ -1,4 +1,4 @@
-const parsePackageURL = require('../parsePackageURL');
+import parsePackageURL from '../parsePackageURL';
 
 describe('parsePackageURL', () => {
   it('parses plain packages', () => {

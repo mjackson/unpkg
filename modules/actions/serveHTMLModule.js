@@ -1,10 +1,10 @@
-const etag = require('etag');
-const cheerio = require('cheerio');
+import etag from 'etag';
+import cheerio from 'cheerio';
 
-const getContentTypeHeader = require('../utils/getContentTypeHeader');
-const rewriteBareModuleIdentifiers = require('../utils/rewriteBareModuleIdentifiers');
+import getContentTypeHeader from '../utils/getContentTypeHeader';
+import rewriteBareModuleIdentifiers from '../utils/rewriteBareModuleIdentifiers';
 
-function serveHTMLModule(req, res) {
+export default function serveHTMLModule(req, res) {
   try {
     const $ = cheerio.load(req.entry.content.toString('utf8'));
 
@@ -46,5 +46,3 @@ function serveHTMLModule(req, res) {
       );
   }
 }
-
-module.exports = serveHTMLModule;

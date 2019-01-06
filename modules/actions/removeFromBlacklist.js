@@ -1,8 +1,8 @@
-const validateNpmPackageName = require('validate-npm-package-name');
+import validateNpmPackageName from 'validate-npm-package-name';
 
-const BlacklistAPI = require('../BlacklistAPI');
+import { removePackage } from '../utils/blacklist';
 
-function removeFromBlacklist(req, res) {
+export default function removeFromBlacklist(req, res) {
   // TODO: Remove req.packageName when DELETE
   // /_blacklist/:packageName API is removed
   const packageName = req.body.packageName || req.packageName;
@@ -23,7 +23,7 @@ function removeFromBlacklist(req, res) {
     });
   }
 
-  BlacklistAPI.removePackage(packageName).then(
+  removePackage(packageName).then(
     removed => {
       if (removed) {
         const userId = req.user.jti;
@@ -48,5 +48,3 @@ function removeFromBlacklist(req, res) {
     }
   );
 }
-
-module.exports = removeFromBlacklist;

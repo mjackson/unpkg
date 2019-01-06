@@ -1,6 +1,6 @@
-const path = require('path');
+import path from 'path';
 
-const addLeadingSlash = require('../utils/addLeadingSlash');
+import addLeadingSlash from '../utils/addLeadingSlash';
 
 function getMatchingEntries(entry, entries) {
   const dirname = entry.name || '.';
@@ -30,7 +30,7 @@ function getMetadata(entry, entries) {
   return metadata;
 }
 
-function serveMetadata(req, res) {
+export default function serveMetadata(req, res) {
   const metadata = getMetadata(req.entry, req.entries);
 
   res
@@ -40,5 +40,3 @@ function serveMetadata(req, res) {
     })
     .send(metadata);
 }
-
-module.exports = serveMetadata;

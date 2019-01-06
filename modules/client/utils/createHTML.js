@@ -1,5 +1,3 @@
-function createHTML(code) {
+export default function createHTML(code) {
   return { __html: code };
 }
-
-module.exports = createHTML;

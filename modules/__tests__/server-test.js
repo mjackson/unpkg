@@ -1,9 +1,8 @@
-const request = require('supertest');
+import request from 'supertest';
 
-const createServer = require('../createServer');
-
-const clearBlacklist = require('./utils/clearBlacklist');
-const withBlacklist = require('./utils/withBlacklist');
+import createServer from '../createServer';
+import clearBlacklist from './utils/clearBlacklist';
+import withBlacklist from './utils/withBlacklist';
 
 describe('The server', () => {
   let server;

@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const forge = require('node-forge');
-const invariant = require('invariant');
+import fs from 'fs';
+import path from 'path';
+import forge from 'node-forge';
+import invariant from 'invariant';
 
 let secretKey;
 if (process.env.NODE_ENV === 'production') {
@@ -28,4 +28,4 @@ if (process.env.NODE_ENV === 'production') {
   };
 }
 
-module.exports = secretKey;
+export default secretKey;

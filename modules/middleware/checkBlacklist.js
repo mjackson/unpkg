@@ -1,7 +1,7 @@
-const BlacklistAPI = require('../BlacklistAPI');
+import { includesPackage } from '../utils/blacklist';
 
-function checkBlacklist(req, res, next) {
-  BlacklistAPI.includesPackage(req.packageName).then(
+export default function checkBlacklist(req, res, next) {
+  includesPackage(req.packageName).then(
     blacklisted => {
       // Disallow packages that have been blacklisted.
       if (blacklisted) {
@@ -21,5 +21,3 @@ function checkBlacklist(req, res, next) {
     }
   );
 }
-
-module.exports = checkBlacklist;

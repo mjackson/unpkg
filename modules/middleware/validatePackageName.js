@@ -1,4 +1,4 @@
-const validateNpmPackageName = require('validate-npm-package-name');
+import validateNpmPackageName from 'validate-npm-package-name';
 
 const hexValue = /^[a-f0-9]+$/i;
 
@@ -9,7 +9,7 @@ function isHash(value) {
 /**
  * Reject requests for invalid npm package names.
  */
-function validatePackageName(req, res, next) {
+export default function validatePackageName(req, res, next) {
   if (isHash(req.packageName)) {
     return res
       .status(403)
@@ -30,5 +30,3 @@ function validatePackageName(req, res, next) {
 
   next();
 }
-
-module.exports = validatePackageName;

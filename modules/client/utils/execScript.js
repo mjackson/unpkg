@@ -1,9 +1,7 @@
-const React = require('react');
+import React from 'react';
 
-const h = require('./createHTML');
+import h from './createHTML';
 
-function execScript(code) {
+export default function execScript(code) {
   return <script dangerouslySetInnerHTML={h(code)} />;
 }
-
-module.exports = execScript;

@@ -1,9 +1,9 @@
-const path = require('path');
-const etag = require('etag');
+import path from 'path';
+import etag from 'etag';
 
-const getContentTypeHeader = require('../utils/getContentTypeHeader');
+import getContentTypeHeader from '../utils/getContentTypeHeader';
 
-function serveStaticFile(req, res) {
+export default function serveStaticFile(req, res) {
   const tags = ['file'];
 
   const ext = path.extname(req.entry.name).substr(1);
@@ -22,5 +22,3 @@ function serveStaticFile(req, res) {
     })
     .send(req.entry.content);
 }
-
-module.exports = serveStaticFile;

@@ -1,7 +1,7 @@
-const URL = require('whatwg-url');
-const warning = require('warning');
+import URL from 'whatwg-url';
+import warning from 'warning';
 
-const origin = require('../serverConfig').origin;
+import { origin } from '../config';
 
 const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 
@@ -47,7 +47,7 @@ function rewriteValue(/* StringLiteral */ node, dependencies) {
   }
 }
 
-function unpkgRewrite(dependencies = {}) {
+export default function unpkgRewrite(dependencies = {}) {
   return {
     manipulateOptions(opts, parserOpts) {
       parserOpts.plugins.push(
@@ -88,5 +88,3 @@ function unpkgRewrite(dependencies = {}) {
     }
   };
 }
-
-module.exports = unpkgRewrite;

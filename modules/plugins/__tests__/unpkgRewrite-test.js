@@ -1,5 +1,6 @@
-const babel = require('babel-core');
-const unpkgRewrite = require('../unpkgRewrite');
+import babel from 'babel-core';
+
+import unpkgRewrite from '../unpkgRewrite';
 
 const testCases = [
   {

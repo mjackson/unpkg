@@ -1,17 +1,20 @@
 language: node_js
 node_js: node
 cache: npm
-services:
-- redis-server
+env:
+  secure: Z/uibhTgn2S4fy12WQs1wopytecb0Eo2O1qkT4FyEuu4xjSM0ZQ5zKP3eRSRAfr7tTZbTro1zRGWjNCQjJSNvm/6Ftyzp7aN8tFd7zVlZSGIJWGGItB1vqz3ls5ynt6EGLk6SRPtsHCiunaIzYUCLl5c1kFyjyqW3Aab77TQL6sNeTEOb2nS9wDi4xEfS1yDcJIT3swupHf4+tHtTHBMqwtvTpqdyRwkoauAaP94qWP2Glz3YnEpgJFLfvI9MHlOG+dMs6iroJ6UTzNfYOeWKq7xXrmtH2DY0u93fa9JOFIe4CrcSEt88fSO4o1BcdnPitLoB5GfgC8G4IanmtPTMl/3lrnjA2LkhqNs4w4ad9Xhd0fMLRKDofKSRarhMmfMxRY8o14K/2AmUWoS6DBjiOoHap7UTwdPxh2RmEhctG9ufvaQOXD6LAT2pewx9I9Jdg/FrEF7pCnuJxV8jFn8CryQw9QFYAqvgesjJNuHhjfoQdtuqNAQZl6RjoD0lg5iTnr/iwxfE6ayPilKPw7bJNw+yPUgNC//0rCj/KGcOS+9Ho2eD48Qh0GWpOOYBHhxVoo9oF2M1evlMpuuMXfM5KT++XZbxUbDZj1L22eYQDKF0Cwaf4NLCJ0/K5Wwcjphshmk7iy2t5c+JL76T5lFTt/aYQMGNdMdqB/Ato8aow8=
 script:
-- npm run lint
-- npm test
 - npm run build
+before_deploy:
+- npm install -g firebase-tools
 deploy:
-  provider: heroku
+- provider: script
   skip_cleanup: true
-  app: unpkg
-  api_key:
-    secure: qJTOiZE1hbghS0U7xpqU/38jm1Dga8bycsgDTW2wOSfAxqxtR4rAilW3ffBHY8/VSqt5GLkyPqFzb9R3I+xlcK6oakQyNMFGjQwMAqwdtHjucr45jWYNeqWf6Nbrrj+0LiQiH/uqMB4mKPquGqx2k2JIHW6jy5ndK14lI9a7SP44edyNugjhNW+OOYjwqo6maHvRoFNxL7kxrw7Js90d0gIKXpunBqHmxmr/hlYcGr9qJ+bLUXxmObxpoFWKHE0iTsTw3C3y558wZpHTfa3vXIvhseW2q7ATuRRVBv8StNjYxYSGpeZA+59d48z3EPK/mp7ybZO6cWyaBdcA9yF3thISEXlXcRcCck5KYk4gwzgrcfug59Z1VJUVXCywJTUu42V5ISoyUKJ+DelkkvMpXQH9T9fxm5eWEwb7sb+UTo3R8mlFliBogvXrWOKNXeRFsLQXH3/YmOUWONUUYRJS11K/p+sFOTfTfaH5lS0AFKCAKtvfLjdLUclsmmrITSFQa42/SRsFx88v3RxDL93r2838p51N7U/RqOqTNfQ8JR2iQOWlthMEvnVZMNs3VT9lW5eYIdTd5kpW/ARVtQf2drVVYR5BzNRJlGyw7M4x1riwNO7XhNqH76Iy/zMbeEDGaXqBCfzgq9vsRAjZm/TFKw8eOEy8+EGxLrBKD1U7EuI=
+  script: $(npm bin -g)/firebase deploy
+    --project unpkg-gcp
+    --message "https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+    --token $FIREBASE_TOKEN
+    --non-interactive
+    --force
   on:
-    branch: master
+    branch: firebase-hosting

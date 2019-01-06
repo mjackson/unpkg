@@ -1,25 +1,25 @@
-const url = require('url');
-const https = require('https');
+import url from 'url';
+import https from 'https';
 
-const serverConfig = require('../serverConfig');
-const bufferStream = require('./bufferStream');
-const agent = require('./registryAgent');
-const logging = require('./logging');
+import { npmRegistryURL } from '../config';
+
+import bufferStream from './bufferStream';
+import agent from './registryAgent';
 
 function parseJSON(res) {
   return bufferStream(res).then(JSON.parse);
 }
 
-function fetchNpmPackageInfo(packageName) {
+export default function fetchNpmPackageInfo(packageName) {
   return new Promise((resolve, reject) => {
     const encodedPackageName =
       packageName.charAt(0) === '@'
         ? `@${encodeURIComponent(packageName.substring(1))}`
         : encodeURIComponent(packageName);
 
-    const infoURL = `${serverConfig.registryURL}/${encodedPackageName}`;
+    const infoURL = `${npmRegistryURL}/${encodedPackageName}`;
 
-    logging.debug('Fetching package info for %s from %s', packageName, infoURL);
+    console.log('Fetching package info for %s from %s', packageName, infoURL);
 
     const { hostname, pathname } = url.parse(infoURL);
     const options = {
@@ -53,5 +53,3 @@ function fetchNpmPackageInfo(packageName) {
       .on('error', reject);
   });
 }
-
-module.exports = fetchNpmPackageInfo;
