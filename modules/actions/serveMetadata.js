@@ -35,7 +35,7 @@ function serveMetadata(req, res) {
 
   res
     .set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'meta'
     })
     .send(metadata);

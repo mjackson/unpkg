@@ -92,7 +92,7 @@ function filenameRedirect(req, res) {
   // and URLs resolve correctly.
   res
     .set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, filename-redirect'
     })
     .redirect(
