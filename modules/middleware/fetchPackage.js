@@ -9,10 +9,9 @@ import getNpmPackageInfo from '../utils/getNpmPackageInfo';
 function tagRedirect(req, res) {
   const version = req.packageInfo['dist-tags'][req.packageVersion];
 
-  // Cache tag redirects for 1 minute.
   res
     .set({
-      'Cache-Control': 'public, max-age=60',
+      'Cache-Control': 'public, max-age=300', // 5 minutes
       'Cache-Tag': 'redirect, tag-redirect'
     })
     .redirect(
@@ -28,10 +27,9 @@ function semverRedirect(req, res) {
   );
 
   if (maxVersion) {
-    // Cache semver redirects for 1 minute.
     res
       .set({
-        'Cache-Control': 'public, max-age=60',
+        'Cache-Control': 'public, max-age=300', // 5 minutes
         'Cache-Tag': 'redirect, semver-redirect'
       })
       .redirect(
@@ -92,7 +90,7 @@ function filenameRedirect(req, res) {
   // and URLs resolve correctly.
   res
     .set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, filename-redirect'
     })
     .redirect(

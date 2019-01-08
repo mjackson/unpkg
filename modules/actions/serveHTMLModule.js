@@ -20,7 +20,7 @@ export default function serveHTMLModule(req, res) {
       .set({
         'Content-Length': Buffer.byteLength(code),
         'Content-Type': getContentTypeHeader(req.entry.contentType),
-        'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+        'Cache-Control': 'public, max-age=31536000', // 1 year
         ETag: etag(code),
         'Cache-Tag': 'file, html-file, html-module'
       })

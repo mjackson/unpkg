@@ -15,7 +15,7 @@ export default function serveStaticFile(req, res) {
     .set({
       'Content-Length': req.entry.size,
       'Content-Type': getContentTypeHeader(req.entry.contentType),
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Last-Modified': req.entry.lastModified,
       ETag: etag(req.entry.content),
       'Cache-Tag': tags.join(', ')

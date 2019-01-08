@@ -12,7 +12,7 @@ function indexRedirect(req, res, entry) {
   // resolve correctly.
   res
     .set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, index-redirect'
     })
     .redirect(
@@ -94,24 +94,26 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
 
         const chunks = [];
 
-        stream.on('data', chunk => chunks.push(chunk)).on('end', () => {
-          const content = Buffer.concat(chunks);
+        stream
+          .on('data', chunk => chunks.push(chunk))
+          .on('end', () => {
+            const content = Buffer.concat(chunks);
 
-          // Set some extra properties for files that we will
-          // need to serve them and for ?meta listings.
-          entry.contentType = getContentType(entry.name);
-          entry.integrity = getIntegrity(content);
-          entry.lastModified = header.mtime.toUTCString();
-          entry.size = content.length;
+            // Set some extra properties for files that we will
+            // need to serve them and for ?meta listings.
+            entry.contentType = getContentType(entry.name);
+            entry.integrity = getIntegrity(content);
+            entry.lastModified = header.mtime.toUTCString();
+            entry.size = content.length;
 
-          // Set the content only for the foundEntry and
-          // discard the buffer for all others.
-          if (entry === foundEntry) {
-            entry.content = content;
-          }
+            // Set the content only for the foundEntry and
+            // discard the buffer for all others.
+            if (entry === foundEntry) {
+              entry.content = content;
+            }
 
-          next();
-        });
+            next();
+          });
       });
   });
 }
