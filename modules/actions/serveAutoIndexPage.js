@@ -49,7 +49,7 @@ function serveAutoIndexPage(req, res) {
 
   res
     .set({
-      'Cache-Control': 'public,max-age=60', // 1 minute
+      'Cache-Control': 'public, max-age=600', // 10 minutes
       'Cache-Tag': 'auto-index'
     })
     .send(html);

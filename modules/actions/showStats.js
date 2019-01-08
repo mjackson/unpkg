@@ -48,7 +48,7 @@ function showStats(req, res) {
     stats => {
       res
         .set({
-          'Cache-Control': 'public, max-age=60',
+          'Cache-Control': 'public, max-age=3600', // 1 hour
           'Cache-Tag': 'stats'
         })
         .send(stats);

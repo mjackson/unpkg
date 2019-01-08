@@ -11,7 +11,7 @@ function tagRedirect(req, res) {
 
   res
     .set({
-      'Cache-Control': 'public, max-age=300', // 5 minutes
+      'Cache-Control': 'public, max-age=600', // 10 minutes
       'Cache-Tag': 'redirect, tag-redirect'
     })
     .redirect(
@@ -29,7 +29,7 @@ function semverRedirect(req, res) {
   if (maxVersion) {
     res
       .set({
-        'Cache-Control': 'public, max-age=300', // 5 minutes
+        'Cache-Control': 'public, max-age=600', // 10 minutes
         'Cache-Tag': 'redirect, semver-redirect'
       })
       .redirect(
