@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter } from 'react-router-dom';
 import { Global, css } from '@emotion/core';
 
 import App from './main/App';
@@ -72,11 +71,9 @@ const globalStyles = css`
 `;
 
 ReactDOM.render(
-  <HashRouter>
-    <div>
-      <Global styles={globalStyles} />
-      <App />
-    </div>
-  </HashRouter>,
+  <div>
+    <Global styles={globalStyles} />
+    <App />
+  </div>,
   document.getElementById('root')
 );
