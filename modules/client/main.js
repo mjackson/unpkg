@@ -27,46 +27,14 @@ const globalStyles = css`
     color: rebeccapurple;
   }
 
-  h1 {
-    font-size: 2em;
-  }
-  h2 {
-    font-size: 1.8em;
-  }
   h3 {
     font-size: 1.6em;
   }
 
+  dd,
   ul {
+    margin-left: 0;
     padding-left: 25px;
-  }
-
-  dd {
-    margin-left: 25px;
-  }
-
-  table {
-    border: 1px solid black;
-    border: 0;
-  }
-  th {
-    text-align: left;
-    background-color: #eee;
-  }
-  th,
-  td {
-    padding: 5px;
-  }
-  th {
-    vertical-align: bottom;
-  }
-  td {
-    vertical-align: top;
-  }
-
-  .wrapper {
-    max-width: 700px;
-    margin: 0 auto;
   }
 `;
 

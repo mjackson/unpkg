@@ -25,20 +25,15 @@ function getRelativeName(base, name) {
 }
 
 const styles = {
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    font: '0.85em Monaco, monospace'
-  },
-  evenRow: {
-    backgroundColor: '#eee'
-  },
   tableHead: {
     textAlign: 'left',
     padding: '0.5em 1em'
   },
   tableCell: {
     padding: '0.5em 1em'
+  },
+  evenRow: {
+    backgroundColor: '#eee'
   }
 };
 
@@ -48,14 +43,14 @@ export default function DirectoryListing({ filename, entry, entries }) {
   if (filename !== '/') {
     rows.push(
       <tr key="..">
-        <td style={styles.tableCell}>
+        <td css={styles.tableCell}>
           <a title="Parent directory" href="../">
             ..
           </a>
         </td>
-        <td style={styles.tableCell}>-</td>
-        <td style={styles.tableCell}>-</td>
-        <td style={styles.tableCell}>-</td>
+        <td css={styles.tableCell}>-</td>
+        <td css={styles.tableCell}>-</td>
+        <td css={styles.tableCell}>-</td>
       </tr>
     );
   }
@@ -71,14 +66,14 @@ export default function DirectoryListing({ filename, entry, entries }) {
 
       rows.push(
         <tr key={name}>
-          <td style={styles.tableCell}>
+          <td css={styles.tableCell}>
             <a title={relName} href={href}>
               {href}
             </a>
           </td>
-          <td style={styles.tableCell}>-</td>
-          <td style={styles.tableCell}>-</td>
-          <td style={styles.tableCell}>-</td>
+          <td css={styles.tableCell}>-</td>
+          <td css={styles.tableCell}>-</td>
+          <td css={styles.tableCell}>-</td>
         </tr>
       );
     });
@@ -91,27 +86,33 @@ export default function DirectoryListing({ filename, entry, entries }) {
 
       rows.push(
         <tr key={name}>
-          <td style={styles.tableCell}>
+          <td css={styles.tableCell}>
             <a title={relName} href={relName}>
               {relName}
             </a>
           </td>
-          <td style={styles.tableCell}>{contentType}</td>
-          <td style={styles.tableCell}>{formatBytes(size)}</td>
-          <td style={styles.tableCell}>{lastModified}</td>
+          <td css={styles.tableCell}>{contentType}</td>
+          <td css={styles.tableCell}>{formatBytes(size)}</td>
+          <td css={styles.tableCell}>{lastModified}</td>
         </tr>
       );
     });
 
   return (
     <div>
-      <table style={styles.table}>
+      <table
+        css={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          font: '0.85em Monaco, monospace'
+        }}
+      >
         <thead>
           <tr>
-            <th style={styles.tableHead}>Name</th>
-            <th style={styles.tableHead}>Type</th>
-            <th style={styles.tableHead}>Size</th>
-            <th style={styles.tableHead}>Last Modified</th>
+            <th css={styles.tableHead}>Name</th>
+            <th css={styles.tableHead}>Type</th>
+            <th css={styles.tableHead}>Size</th>
+            <th css={styles.tableHead}>Last Modified</th>
           </tr>
         </thead>
         <tbody>

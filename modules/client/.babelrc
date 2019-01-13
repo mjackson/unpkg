@@ -1,7 +1,8 @@
 {
   "presets": [
-    ["@babel/env", { "loose": true }],
-    "@babel/react"
+    ["@babel/preset-env", { "loose": true }],
+    "@babel/preset-react",
+    "@emotion/babel-preset-css-prop"
   ],
   "plugins": [
     ["@babel/plugin-proposal-class-properties", { "loose": true }]

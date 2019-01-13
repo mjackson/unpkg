@@ -3,29 +3,6 @@ import PropTypes from 'prop-types';
 
 import DirectoryListing from './DirectoryListing';
 
-const styles = {
-  wrapper: {
-    maxWidth: 900,
-    margin: '0 auto'
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  versionSelector: {
-    float: 'right',
-    lineHeight: '2.25em'
-  },
-  versionDropdown: {
-    fontSize: '1em'
-  },
-  address: {
-    textAlign: 'right'
-  }
-};
-
 export default class App extends React.Component {
   static defaultProps = {
     availableVersions: []
@@ -40,20 +17,27 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div style={styles.wrapper}>
-        <header style={styles.header}>
+      <div css={{ maxWidth: 900, margin: '0 auto' }}>
+        <header
+          css={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
           <h1>
             Index of /{this.props.packageName}@{this.props.packageVersion}
             {this.props.filename}
           </h1>
 
-          <div style={styles.versionSelector}>
+          <div css={{ float: 'right', lineHeight: '2.25em' }}>
             Version:{' '}
             <select
               id="version"
               defaultValue={this.props.packageVersion}
               onChange={this.handleChange}
-              style={styles.versionDropdown}
+              css={{ fontSize: '1em' }}
             >
               {this.props.availableVersions.map(v => (
                 <option key={v} value={v}>
@@ -74,7 +58,7 @@ export default class App extends React.Component {
 
         <hr />
 
-        <address style={styles.address}>
+        <address css={{ textAlign: 'right' }}>
           {this.props.packageName}@{this.props.packageVersion}
         </address>
       </div>

@@ -15,7 +15,6 @@ export default function MainTemplate({
   favicon,
   data,
   content,
-  globalScripts,
   entryPoints
 }) {
   return (
@@ -37,11 +36,6 @@ export default function MainTemplate({
       </head>
       <body>
         <div id="root" dangerouslySetInnerHTML={content} />
-
-        {globalScripts.map(src => (
-          <script key={src} src={src} />
-        ))}
-
         {entryPoints.module &&
           x(`
           import('${entryPoints.module}');
@@ -67,8 +61,7 @@ MainTemplate.defaultProps = {
   title: 'UNPKG',
   description: 'The CDN for everything on npm',
   favicon: '/favicon.ico',
-  content: createHTML(''),
-  globalScripts: []
+  content: createHTML('')
 };
 
 if (process.env.NODE_ENV !== 'production') {
@@ -82,7 +75,6 @@ if (process.env.NODE_ENV !== 'production') {
     favicon: PropTypes.string,
     data: PropTypes.any,
     content: htmlType,
-    globalScripts: PropTypes.arrayOf(PropTypes.string),
     entryPoints: PropTypes.shape({
       module: PropTypes.string,
       nomodule: PropTypes.string

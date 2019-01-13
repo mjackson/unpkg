@@ -10,66 +10,16 @@ import formatPercent from '../utils/formatPercent';
 import cloudflareLogo from './CloudflareLogo.png';
 import herokuLogo from './HerokuLogo.png';
 
-const styles = {
-  title: {
-    margin: 0,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    fontSize: '5em'
-  },
-  nav: {
-    margin: '0 0 3em'
-  },
-  navList: {
-    margin: 0,
-    padding: 0,
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  navListItem: {
-    flexBasis: 'auto',
-    listStyleType: 'none',
-    display: 'inline-block',
-    fontSize: '1.1em',
-    margin: '0 10px'
-  },
-  navLink: {
-    textDecoration: 'none',
-    color: 'black'
-  },
-  navUnderline: {
-    height: 4,
-    backgroundColor: 'black',
-    position: 'absolute',
-    left: 0
-  },
-  example: {
-    textAlign: 'center',
-    backgroundColor: '#eee',
-    margin: '2em 0',
-    padding: '5px 0'
-  },
-  logoList: {
-    margin: '2em 0',
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  logo: {
-    textAlign: 'center',
-    flex: '1',
-    maxWidth: '80%'
-  },
-  logoImage: {
-    maxWidth: '60%'
-  }
-};
-
 function AboutLogo({ children }) {
-  return <div style={styles.logo}>{children}</div>;
+  return (
+    <div css={{ textAlign: 'center', flex: '1', maxWidth: '80%' }}>
+      {children}
+    </div>
+  );
 }
 
 function AboutLogoImage(props) {
-  return <img {...props} style={styles.logoImage} />;
+  return <img {...props} css={{ maxWidth: '60%' }} />;
 }
 
 function Stats({ data }) {
@@ -115,9 +65,18 @@ export default class App extends React.Component {
     const { stats } = this.state;
 
     return (
-      <div className="wrapper">
+      <div css={{ maxWidth: 700, margin: '0 auto' }}>
         <header>
-          <h1 style={styles.title}>unpkg</h1>
+          <h1
+            css={{
+              margin: 0,
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              fontSize: '5em'
+            }}
+          >
+            unpkg
+          </h1>
 
           <p>
             unpkg is a fast, global{' '}
@@ -129,12 +88,21 @@ export default class App extends React.Component {
             like:
           </p>
 
-          <div style={styles.example}>unpkg.com/:package@:version/:file</div>
+          <div
+            css={{
+              textAlign: 'center',
+              backgroundColor: '#eee',
+              margin: '2em 0',
+              padding: '5px 0'
+            }}
+          >
+            unpkg.com/:package@:version/:file
+          </div>
 
           {stats && <Stats data={stats} />}
         </header>
 
-        <h3>Examples</h3>
+        <h3 id="examples">Examples</h3>
 
         <p>Using a fixed version:</p>
 
@@ -267,7 +235,13 @@ export default class App extends React.Component {
           <a href="https://www.heroku.com">Heroku</a>.
         </p>
 
-        <div style={styles.logoList}>
+        <div
+          css={{
+            margin: '2em 0',
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        >
           <AboutLogo>
             <a href="https://www.cloudflare.com">
               <AboutLogoImage src={cloudflareLogo} />
