@@ -35,10 +35,6 @@ function sumKeyValues(hash, keys) {
 // }
 
 export default class Stats extends React.Component {
-  static propTypes = {
-    data: PropTypes.object
-  };
-
   state = {
     // minPackageRequests: 1000000,
     minCountryRequests: 1000000
@@ -332,4 +328,10 @@ export default class Stats extends React.Component {
       </Wrapper>
     );
   }
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  Stats.propTypes = {
+    data: PropTypes.object
+  };
 }

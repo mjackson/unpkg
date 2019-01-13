@@ -7,7 +7,7 @@ npm-debug.log*
 /functions/*.js
 /functions/node_modules/
 /node_modules/
-/public/_assets/
+/public/_client/
 /manifest.json
 /secret_key
 /tokens/

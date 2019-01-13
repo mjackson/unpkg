@@ -26,18 +26,7 @@ const styles = {
   }
 };
 
-const entryType = PropTypes.object;
-
 export default class App extends React.Component {
-  static propTypes = {
-    packageName: PropTypes.string.isRequired,
-    packageVersion: PropTypes.string.isRequired,
-    availableVersions: PropTypes.arrayOf(PropTypes.string),
-    filename: PropTypes.string.isRequired,
-    entry: entryType.isRequired,
-    entries: PropTypes.objectOf(entryType).isRequired
-  };
-
   static defaultProps = {
     availableVersions: []
   };
@@ -91,4 +80,17 @@ export default class App extends React.Component {
       </div>
     );
   }
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  const entryType = PropTypes.object;
+
+  App.propTypes = {
+    packageName: PropTypes.string.isRequired,
+    packageVersion: PropTypes.string.isRequired,
+    availableVersions: PropTypes.arrayOf(PropTypes.string),
+    filename: PropTypes.string.isRequired,
+    entry: entryType.isRequired,
+    entries: PropTypes.objectOf(entryType).isRequired
+  };
 }

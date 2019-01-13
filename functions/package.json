@@ -42,7 +42,6 @@
     "warning": "^4.0.2",
     "whatwg-url": "^7.0.0"
   },
-  "devDependencies": {},
   "engines": {
     "node": "8"
   }

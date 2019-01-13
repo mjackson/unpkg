@@ -6,10 +6,6 @@ import { addEvent, removeEvent } from '../utils/dom';
 const resizeEvent = 'resize';
 
 export default class WindowSize extends React.Component {
-  static propTypes = {
-    onChange: PropTypes.func
-  };
-
   handleWindowResize = () => {
     if (this.props.onChange) {
       this.props.onChange({
@@ -30,4 +26,10 @@ export default class WindowSize extends React.Component {
   render() {
     return null;
   }
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  WindowSize.propTypes = {
+    onChange: PropTypes.func
+  };
 }

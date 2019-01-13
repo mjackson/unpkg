@@ -126,12 +126,14 @@ export default function DirectoryListing({ filename, entry, entries }) {
   );
 }
 
-const entryType = PropTypes.shape({
-  name: PropTypes.string.isRequired
-});
+if (process.env.NODE_ENV !== 'production') {
+  const entryType = PropTypes.shape({
+    name: PropTypes.string.isRequired
+  });
 
-DirectoryListing.propTypes = {
-  filename: PropTypes.string.isRequired,
-  entry: entryType.isRequired,
-  entries: PropTypes.objectOf(entryType).isRequired
-};
+  DirectoryListing.propTypes = {
+    filename: PropTypes.string.isRequired,
+    entry: entryType.isRequired,
+    entries: PropTypes.objectOf(entryType).isRequired
+  };
+}

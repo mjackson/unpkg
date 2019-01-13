@@ -6,6 +6,7 @@
       { "source": "/api/auth", "function": "serveAuth" },
       { "source": "/api/public-key", "function": "servePublicKey" },
       { "source": "/api/stats", "function": "serveStats" },
+      { "source": "/", "function": "serveMainPage" },
       { "source": "**/", "function": "serveAutoIndexPage" },
       { "source": "**", "function": "serveNpmPackageFile" }
     ]
