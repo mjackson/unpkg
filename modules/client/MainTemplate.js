@@ -71,19 +71,21 @@ MainTemplate.defaultProps = {
   globalScripts: []
 };
 
-const htmlType = PropTypes.shape({
-  __html: PropTypes.string
-});
+if (process.env.NODE_ENV !== 'production') {
+  const htmlType = PropTypes.shape({
+    __html: PropTypes.string
+  });
 
-MainTemplate.propTypes = {
-  title: PropTypes.string,
-  description: PropTypes.string,
-  favicon: PropTypes.string,
-  data: PropTypes.any,
-  content: htmlType,
-  globalScripts: PropTypes.arrayOf(PropTypes.string),
-  entryPoints: PropTypes.shape({
-    module: PropTypes.string,
-    nomodule: PropTypes.string
-  }).isRequired
-};
+  MainTemplate.propTypes = {
+    title: PropTypes.string,
+    description: PropTypes.string,
+    favicon: PropTypes.string,
+    data: PropTypes.any,
+    content: htmlType,
+    globalScripts: PropTypes.arrayOf(PropTypes.string),
+    entryPoints: PropTypes.shape({
+      module: PropTypes.string,
+      nomodule: PropTypes.string
+    }).isRequired
+  };
+}

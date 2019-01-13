@@ -102,17 +102,7 @@ const functions = [
         babel({ exclude: /node_modules/ }),
         json(),
         resolve(),
-        commonjs({
-          // namedExports: {
-          //   'node_modules/react/index.js': [
-          //     'createContext',
-          //     'createElement',
-          //     'forwardRef',
-          //     'Component',
-          //     'Fragment'
-          //   ]
-          // }
-        }),
+        commonjs(),
         url({
           limit: 5 * 1024,
           publicPath: '/_client/',
