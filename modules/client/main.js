@@ -27,10 +27,6 @@ const globalStyles = css`
     color: rebeccapurple;
   }
 
-  h3 {
-    font-size: 1.6em;
-  }
-
   dd,
   ul {
     margin-left: 0;

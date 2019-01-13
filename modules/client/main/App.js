@@ -10,6 +10,24 @@ import formatPercent from '../utils/formatPercent';
 import cloudflareLogo from './CloudflareLogo.png';
 import herokuLogo from './HerokuLogo.png';
 
+const styles = {
+  heading: {
+    margin: 0,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontSize: '5em'
+  },
+  subheading: {
+    fontSize: '1.6em'
+  },
+  example: {
+    textAlign: 'center',
+    backgroundColor: '#eee',
+    margin: '2em 0',
+    padding: '5px 0'
+  }
+};
+
 function AboutLogo({ children }) {
   return (
     <div css={{ textAlign: 'center', flex: '1', maxWidth: '80%' }}>
@@ -67,16 +85,7 @@ export default class App extends React.Component {
     return (
       <div css={{ maxWidth: 700, margin: '0 auto' }}>
         <header>
-          <h1
-            css={{
-              margin: 0,
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              fontSize: '5em'
-            }}
-          >
-            unpkg
-          </h1>
+          <h1 css={styles.heading}>unpkg</h1>
 
           <p>
             unpkg is a fast, global{' '}
@@ -88,21 +97,14 @@ export default class App extends React.Component {
             like:
           </p>
 
-          <div
-            css={{
-              textAlign: 'center',
-              backgroundColor: '#eee',
-              margin: '2em 0',
-              padding: '5px 0'
-            }}
-          >
-            unpkg.com/:package@:version/:file
-          </div>
+          <div css={styles.example}>unpkg.com/:package@:version/:file</div>
 
           {stats && <Stats data={stats} />}
         </header>
 
-        <h3 id="examples">Examples</h3>
+        <h3 css={styles.subheading} id="examples">
+          Examples
+        </h3>
 
         <p>Using a fixed version:</p>
 
@@ -173,7 +175,9 @@ export default class App extends React.Component {
           </li>
         </ul>
 
-        <h3 id="query-params">Query Parameters</h3>
+        <h3 css={styles.subheading} id="query-params">
+          Query Parameters
+        </h3>
 
         <dl>
           <dt>
@@ -197,7 +201,9 @@ export default class App extends React.Component {
           </dd>
         </dl>
 
-        <h3 id="cache-behavior">Cache Behavior</h3>
+        <h3 css={styles.subheading} id="cache-behavior">
+          Cache Behavior
+        </h3>
 
         <p>
           The CDN caches files based on their permanent URL, which includes the
@@ -217,7 +223,9 @@ export default class App extends React.Component {
           cache assets for 1 year.
         </p>
 
-        <h3 id="about">About</h3>
+        <h3 css={styles.subheading} id="about">
+          About
+        </h3>
 
         <p>
           unpkg is an <a href="https://github.com/unpkg">open source</a> project
@@ -254,7 +262,9 @@ export default class App extends React.Component {
           </AboutLogo>
         </div>
 
-        <h3 id="workflow">Workflow</h3>
+        <h3 css={styles.subheading} id="workflow">
+          Workflow
+        </h3>
 
         <p>
           For npm package authors, unpkg relieves the burden of publishing your
