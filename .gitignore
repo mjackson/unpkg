@@ -8,6 +8,5 @@ npm-debug.log*
 /functions/node_modules/
 /node_modules/
 /public/_client/
-/manifest.json
 /secret_key
 /tokens/
