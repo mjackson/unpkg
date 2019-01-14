@@ -184,9 +184,6 @@ export default class App extends React.Component {
 
         <ul>
           <li>
-            <a href="/d3">unpkg.com/d3</a>
-          </li>
-          <li>
             <a href="/jquery">unpkg.com/jquery</a>
           </li>
           <li>
