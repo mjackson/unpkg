@@ -1,7 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Global, css } from '@emotion/core';
 
 import DirectoryListing from './DirectoryListing';
+
+const globalStyles = css`
+  body {
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Helvetica, Arial, sans-serif;
+    line-height: 1.7;
+    padding: 0px 10px 5px;
+    color: #000000;
+  }
+`;
 
 export default class App extends React.Component {
   static defaultProps = {
@@ -18,6 +30,8 @@ export default class App extends React.Component {
   render() {
     return (
       <div css={{ maxWidth: 900, margin: '0 auto' }}>
+        <Global styles={globalStyles} />
+
         <header
           css={{
             display: 'flex',

@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import { renderToString } from 'react-dom/server';
 
 import MainTemplate from '../client/MainTemplate';
 import MainApp from '../client/main/App';
@@ -8,9 +8,7 @@ import getEntryPoints from '../utils/getEntryPoints';
 import renderTemplate from '../utils/renderTemplate';
 
 export default function serveMainPage(req, res) {
-  const content = createHTML(
-    ReactDOMServer.renderToString(React.createElement(MainApp))
-  );
+  const content = createHTML(renderToString(React.createElement(MainApp)));
 
   const entryPoints = getEntryPoints('main', {
     es: 'module',

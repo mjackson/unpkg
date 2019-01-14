@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Global, css } from '@emotion/core';
 import formatBytes from 'pretty-bytes';
 import formatDate from 'date-fns/format';
 import parseDate from 'date-fns/parse';
@@ -9,6 +10,36 @@ import formatPercent from '../utils/formatPercent';
 
 import cloudflareLogo from './CloudflareLogo.png';
 import herokuLogo from './HerokuLogo.png';
+
+const globalStyles = css`
+  body {
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Helvetica, Arial, sans-serif;
+    line-height: 1.7;
+    padding: 5px 20px;
+    color: #000000;
+  }
+
+  @media (min-width: 800px) {
+    body {
+      padding: 40px 20px 120px;
+    }
+  }
+
+  a:link {
+    color: blue;
+  }
+  a:visited {
+    color: rebeccapurple;
+  }
+
+  dd,
+  ul {
+    margin-left: 0;
+    padding-left: 25px;
+  }
+`;
 
 const styles = {
   heading: {
@@ -84,6 +115,8 @@ export default class App extends React.Component {
 
     return (
       <div css={{ maxWidth: 700, margin: '0 auto' }}>
+        <Global styles={globalStyles} />
+
         <header>
           <h1 css={styles.heading}>unpkg</h1>
 
