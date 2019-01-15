@@ -10,10 +10,17 @@ before_install:
 - openssl aes-256-cbc -K $encrypted_a35d52d190dd_key -iv $encrypted_a35d52d190dd_iv
   -in secret_key.enc -out secret_key -d
 script:
-- NODE_ENV=production npm run build
+- npm run lint
+- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") npm run build
 before_deploy:
 - npm install -g firebase-tools
 deploy:
+- provider: script
+  skip_cleanup: true
+  script: $(npm bin -g)/firebase deploy --project unpkg-staging --message "https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+    --token $FIREBASE_TOKEN --non-interactive --force
+  on:
+    branch: staging
 - provider: script
   skip_cleanup: true
   script: $(npm bin -g)/firebase deploy --project unpkg-gcp --message "https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
