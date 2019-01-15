@@ -54,8 +54,8 @@ function entryManifest() {
     },
 
     /**
-     * A Rollup plugin that provides the entry manifest to another bundle
-     * via a virtual module id.
+     * A Rollup plugin that provides the current entry manifest via a
+     * virtual module id.
      */
     inject(options = {}) {
       const virtualId = options.virtualId || 'entry-manifest';
@@ -79,31 +79,6 @@ function entryManifest() {
             this.addWatchFile(watchfile);
           }
           return null;
-        }
-      };
-    },
-
-    /**
-     * A Rollup plugin that writes the entry manifest to the filesystem.
-     */
-    write(options = {}) {
-      const outputFile = options.outputFile || 'entry-manifest.json';
-
-      return {
-        name: 'entry-manifest-write',
-        buildStart() {
-          this.addWatchFile(watchfile);
-        },
-        generateBundle(options, bundle, isWrite) {
-          if (manifest == null) {
-            throw new Error(
-              'Manifest has not been recorded; use manifest.record() in your client bundle'
-            );
-          }
-
-          if (isWrite) {
-            writeFile(outputFile, JSON.stringify(manifest, null, 2) + '\n');
-          }
         }
       };
     }
