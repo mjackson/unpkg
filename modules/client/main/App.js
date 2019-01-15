@@ -29,6 +29,7 @@ const globalStyles = css`
 
   a:link {
     color: blue;
+    text-decoration: none;
   }
   a:visited {
     color: rebeccapurple;
