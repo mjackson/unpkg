@@ -41,7 +41,7 @@ export default function serveAutoIndexPage(req, res) {
 
   res
     .set({
-      'Cache-Control': 'public, max-age=14400', // 4 hours
+      'Cache-Control': 'no-cache, no-store, must-revalidate', // do not cache
       'Cache-Tag': 'auto-index'
     })
     .send(html);
