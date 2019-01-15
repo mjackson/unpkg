@@ -1,17 +1,17 @@
 // import data from './data';
 import * as cloudflare from './cloudflare';
 
-// export function createDayKey(date) {
-//   return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
-// }
+export function createDayKey(date) {
+  return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
+}
 
-// export function createHourKey(date) {
-//   return `${createDayKey(date)}-${date.getUTCHours()}`;
-// }
+export function createHourKey(date) {
+  return `${createDayKey(date)}-${date.getUTCHours()}`;
+}
 
-// export function createMinuteKey(date) {
-//   return `${createHourKey(date)}-${date.getUTCMinutes()}`;
-// }
+export function createMinuteKey(date) {
+  return `${createHourKey(date)}-${date.getUTCMinutes()}`;
+}
 
 // function createScoresMap(array) {
 //   const map = {};

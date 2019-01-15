@@ -313,7 +313,7 @@ export default class App extends React.Component {
         <p>
           The unpkg CDN is powered by{' '}
           <a href="https://www.cloudflare.com">Cloudflare</a>, one of the
-          world's largest and fastest cloud network platforms.{' '}
+          world&apos;s largest and fastest cloud network platforms.{' '}
           {hasStats && (
             <span>
               In the past month, Cloudflare served over{' '}
