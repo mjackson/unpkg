@@ -45,7 +45,7 @@ const globalStyles = css`
 
 const styles = {
   heading: {
-    margin: 0,
+    margin: '0.8em 0',
     textTransform: 'uppercase',
     textAlign: 'center',
     fontSize: '5em'
