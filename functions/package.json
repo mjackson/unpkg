@@ -29,6 +29,7 @@
     "jsonwebtoken": "^8.4.0",
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",
+    "morgan": "^1.9.1",
     "ndjson": "^1.5.0",
     "pretty-bytes": "^5.1.0",
     "prop-types": "^15.6.2",
