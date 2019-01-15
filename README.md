@@ -11,4 +11,4 @@ Please visit [the unpkg website](https://unpkg.com) to learn more about how to u
 
 ### Sponsors
 
-The project is sponsored by [Cloudflare](https://cloudflare.com) and [Heroku](https://heroku.com).
+unpkg is made possible by generous donations from [Cloudflare](https://cloudflare.com) and [Angular](https://angular.io).
