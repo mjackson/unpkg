@@ -4,7 +4,6 @@ import addLeadingSlash from '../utils/addLeadingSlash';
 import createPackageURL from '../utils/createPackageURL';
 import createSearch from '../utils/createSearch';
 import getNpmPackageInfo from '../utils/getNpmPackageInfo';
-// import incrementCounter from '../utils/incrementCounter';
 
 function tagRedirect(req, res) {
   const version = req.packageInfo['dist-tags'][req.packageVersion];
@@ -59,14 +58,6 @@ function filenameRedirect(req, res) {
   ) {
     // Deprecated, see #63
     filename = req.packageConfig[req.query.main];
-
-    // Count which packages are using this so we can warn them when we
-    // remove this functionality.
-    // incrementCounter(
-    //   'package-json-custom-main',
-    //   req.packageSpec + '?main=' + req.query.main,
-    //   1
-    // );
   } else if (
     req.packageConfig.unpkg &&
     typeof req.packageConfig.unpkg === 'string'
@@ -78,10 +69,6 @@ function filenameRedirect(req, res) {
   ) {
     // Deprecated, see #63
     filename = req.packageConfig.browser;
-
-    // Count which packages are using this so we can warn them when we
-    // remove this functionality.
-    // incrementCounter('package-json-browser-fallback', req.packageSpec, 1);
   } else {
     filename = req.packageConfig.main || '/index.js';
   }
