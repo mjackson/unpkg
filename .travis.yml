@@ -19,4 +19,4 @@ deploy:
   script: $(npm bin -g)/firebase deploy --project unpkg-gcp --message "https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
     --token $FIREBASE_TOKEN --non-interactive --force
   on:
-    branch: firebase-hosting
+    branch: master
