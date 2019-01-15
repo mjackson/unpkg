@@ -115,6 +115,7 @@ const functions = [
           'process.env.CLOUDFLARE_KEY': JSON.stringify(
             process.env.CLOUDFLARE_KEY
           ),
+          'process.env.ORIGIN': JSON.stringify(process.env.ORIGIN),
           'process.env.SECRET_KEY': JSON.stringify(secretKey)
         })
       ]
