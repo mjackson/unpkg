@@ -3,9 +3,7 @@ import cors from 'cors';
 
 import showPublicKey from '../actions/showPublicKey';
 
-const app = express();
-
-app.disable('x-powered-by');
+const app = express.Router();
 
 app.use(cors());
 app.use(showPublicKey);

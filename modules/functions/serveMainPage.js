@@ -2,9 +2,8 @@ import express from 'express';
 
 import serveMainPage from '../actions/serveMainPage';
 
-const app = express();
+const app = express.Router();
 
-app.disable('x-powered-by');
 app.use(serveMainPage);
 
 export default app;

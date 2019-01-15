@@ -10,9 +10,7 @@ import validatePackageName from '../middleware/validatePackageName';
 import validateQuery from '../middleware/validateQuery';
 import serveFile from '../actions/serveFile';
 
-const app = express();
-
-app.disable('x-powered-by');
+const app = express.Router();
 
 app.use(cors());
 app.use(redirectLegacyURLs);

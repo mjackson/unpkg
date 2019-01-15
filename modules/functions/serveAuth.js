@@ -4,9 +4,7 @@ import cors from 'cors';
 import userToken from '../middleware/userToken';
 import showAuth from '../actions/showAuth';
 
-const app = express();
-
-app.disable('x-powered-by');
+const app = express.Router();
 
 app.use(cors());
 app.use(userToken);

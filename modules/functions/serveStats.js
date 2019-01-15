@@ -3,9 +3,7 @@ import cors from 'cors';
 
 import showStats from '../actions/showStats';
 
-const app = express();
-
-app.disable('x-powered-by');
+const app = express.Router();
 
 app.use(cors());
 app.use(showStats);
