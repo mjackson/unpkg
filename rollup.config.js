@@ -87,7 +87,6 @@ const functions = [
 ].concat(
   [
     // 'serveAuth',
-    'serveAutoIndexPage',
     'serveMainPage',
     'serveNpmPackageFile',
     'servePublicKey',
