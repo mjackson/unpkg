@@ -93,22 +93,29 @@ function Stats({ data }) {
 }
 
 export default class App extends React.Component {
-  state = { stats: null };
+  constructor(props) {
+    super(props);
+
+    this.state = { stats: null };
+
+    if (typeof window === 'object' && window.localStorage) {
+      const savedStats = window.localStorage.savedStats;
+
+      if (savedStats) {
+        this.state.stats = JSON.parse(savedStats);
+      }
+
+      window.onbeforeunload = () => {
+        window.localStorage.savedStats = JSON.stringify(this.state.stats);
+      };
+    }
+  }
 
   componentDidMount() {
+    // Refresh latest stats.
     fetch('/api/stats?period=last-month')
       .then(res => res.json())
       .then(stats => this.setState({ stats }));
-
-    if (window.localStorage) {
-      const savedStats = window.localStorage.savedStats;
-
-      if (savedStats) this.setState({ stats: JSON.parse(savedStats) });
-
-      window.onbeforeunload = () => {
-        localStorage.savedStats = JSON.stringify(this.state.stats);
-      };
-    }
   }
 
   render() {
