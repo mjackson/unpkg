@@ -347,7 +347,7 @@ export default class App extends React.Component {
 
         <div
           css={{
-            margin: '4em 0 2em',
+            margin: '4em 0 0',
             display: 'flex',
             justifyContent: 'center'
           }}
