@@ -19,7 +19,7 @@ export default function serveMainPage(req, res) {
 
   res
     .set({
-      'Cache-Control': 'public, max-age=14400', // 4 hours
+      'Cache-Control': 'public, max-age=0, must-revalidate', // do not cache
       'Cache-Tag': 'main'
     })
     .send(html);
