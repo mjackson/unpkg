@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 
-// import checkBlacklist from '../middleware/checkBlacklist';
 import fetchPackage from '../middleware/fetchPackage';
 import findFile from '../middleware/findFile';
 import redirectLegacyURLs from '../middleware/redirectLegacyURLs';
@@ -17,7 +16,6 @@ app.use(redirectLegacyURLs);
 app.use(validatePackageURL);
 app.use(validatePackageName);
 app.use(validateQuery);
-// app.use(checkBlacklist);
 app.use(fetchPackage);
 app.use(findFile);
 app.use(serveFile);

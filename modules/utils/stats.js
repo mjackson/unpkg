@@ -1,18 +1,5 @@
 // import data from './data';
 import * as cloudflare from './cloudflare';
-// import * as blacklist from './blacklist';
-
-// function prunePackages(packagesMap) {
-//   return Promise.all(
-//     Object.keys(packagesMap).map(packageName =>
-//       blacklist.includesPackage(packageName).then(blacklisted => {
-//         if (blacklisted) {
-//           delete packagesMap[packageName];
-//         }
-//       })
-//     )
-//   ).then(() => packagesMap);
-// }
 
 // export function createDayKey(date) {
 //   return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
@@ -49,15 +36,11 @@ import * as cloudflare from './cloudflare';
 // }
 
 // function getPackageRequests(date, n = 100) {
-//   return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n).then(
-//     prunePackages
-//   );
+//   return getScoresMap(`stats-packageRequests-${createDayKey(date)}`, n);
 // }
 
 // function getPackageBandwidth(date, n = 100) {
-//   return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n).then(
-//     prunePackages
-//   );
+//   return getScoresMap(`stats-packageBytes-${createDayKey(date)}`, n);
 // }
 
 // function getProtocolRequests(date) {

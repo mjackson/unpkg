@@ -1,10 +1,6 @@
 import { createToken } from '../utils/auth';
 
-const defaultScopes = {
-  blacklist: {
-    read: true
-  }
-};
+const defaultScopes = {};
 
 export default function createAuth(req, res) {
   createToken(defaultScopes).then(

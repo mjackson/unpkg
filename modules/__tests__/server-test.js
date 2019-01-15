@@ -1,8 +1,6 @@
 import request from 'supertest';
 
 import createServer from '../createServer';
-import clearBlacklist from './utils/clearBlacklist';
-import withBlacklist from './utils/withBlacklist';
 
 describe('The server', () => {
   let server;
@@ -47,20 +45,5 @@ describe('The server', () => {
         expect(res.statusCode).toBe(403);
         done();
       });
-  });
-
-  describe('blacklisted packages', () => {
-    afterEach(clearBlacklist);
-
-    it('does not serve blacklisted packages', done => {
-      withBlacklist(['bad-package'], () => {
-        request(server)
-          .get('/bad-package/index.js')
-          .end((err, res) => {
-            expect(res.statusCode).toBe(403);
-            done();
-          });
-      });
-    });
   });
 });
