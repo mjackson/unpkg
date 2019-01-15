@@ -342,7 +342,9 @@ export default class App extends React.Component {
           The origin servers for unpkg are powered by{' '}
           <a href="https://cloud.google.com/">Google Cloud</a> and made possible
           by a generous donation from the{' '}
-          <a href="https://angular.io">Angular web framework</a>.
+          <a href="https://angular.io">Angular web framework</a>, one of the
+          world&apos;s most popular libraries for building incredible user
+          experiences on both desktop and mobile.
         </p>
 
         <div
