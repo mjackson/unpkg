@@ -9,7 +9,8 @@ import formatNumber from '../utils/formatNumber';
 import formatPercent from '../utils/formatPercent';
 
 import cloudflareLogo from './CloudflareLogo.png';
-import herokuLogo from './HerokuLogo.png';
+import angularLogo from './AngularLogo.png';
+import googleCloudLogo from './GoogleCloudLogo.png';
 
 const globalStyles = css`
   body {
@@ -61,15 +62,11 @@ const styles = {
 };
 
 function AboutLogo({ children }) {
-  return (
-    <div css={{ textAlign: 'center', flex: '1', maxWidth: '80%' }}>
-      {children}
-    </div>
-  );
+  return <div css={{ textAlign: 'center', flex: '1' }}>{children}</div>;
 }
 
 function AboutLogoImage(props) {
-  return <img {...props} css={{ maxWidth: '60%' }} />;
+  return <img {...props} css={{ maxWidth: '90%' }} />;
 }
 
 function Stats({ data }) {
@@ -120,6 +117,7 @@ export default class App extends React.Component {
 
   render() {
     const { stats } = this.state;
+    const hasStats = !!(stats && !stats.error);
 
     return (
       <div css={{ maxWidth: 700, margin: '0 auto' }}>
@@ -140,7 +138,7 @@ export default class App extends React.Component {
 
           <div css={styles.example}>unpkg.com/:package@:version/:file</div>
 
-          {stats && <Stats data={stats} />}
+          {hasStats && <Stats data={stats} />}
         </header>
 
         <h3 css={styles.subheading} id="examples">
@@ -261,45 +259,6 @@ export default class App extends React.Component {
           cache assets for 1 year.
         </p>
 
-        <h3 css={styles.subheading} id="about">
-          About
-        </h3>
-
-        <p>
-          unpkg is an <a href="https://github.com/unpkg">open source</a> project
-          built and maintained by{' '}
-          <a href="https://twitter.com/mjackson">Michael Jackson</a>. unpkg is
-          not affiliated with or supported by npm, Inc. in any way. Please do
-          not contact npm for help with unpkg. Instead, please reach out to{' '}
-          <a href="https://twitter.com/unpkg">@unpkg</a> with any questions or
-          concerns.
-        </p>
-
-        <p>
-          The fast, global infrastructure that powers unpkg is generously
-          donated by <a href="https://www.cloudflare.com">Cloudflare</a> and{' '}
-          <a href="https://www.heroku.com">Heroku</a>.
-        </p>
-
-        <div
-          css={{
-            margin: '2em 0',
-            display: 'flex',
-            justifyContent: 'center'
-          }}
-        >
-          <AboutLogo>
-            <a href="https://www.cloudflare.com">
-              <AboutLogoImage src={cloudflareLogo} />
-            </a>
-          </AboutLogo>
-          <AboutLogo>
-            <a href="https://www.heroku.com">
-              <AboutLogoImage src={herokuLogo} />
-            </a>
-          </AboutLogo>
-        </div>
-
         <h3 css={styles.subheading} id="workflow">
           Workflow
         </h3>
@@ -336,6 +295,92 @@ export default class App extends React.Component {
           That&apos;s it! Now when you <code>npm publish</code> you&apos;ll have
           a version available on unpkg as well.
         </p>
+
+        <h3 css={styles.subheading} id="about">
+          About
+        </h3>
+
+        <p>
+          unpkg is an <a href="https://github.com/unpkg">open source</a> project
+          built and maintained by{' '}
+          <a href="https://twitter.com/mjackson">Michael Jackson</a>. unpkg is
+          not affiliated with or supported by npm, Inc. in any way. Please do
+          not contact npm for help with unpkg. Instead, please reach out to{' '}
+          <a href="https://twitter.com/unpkg">@unpkg</a> with any questions or
+          concerns.
+        </p>
+
+        <p>
+          The unpkg CDN is powered by{' '}
+          <a href="https://www.cloudflare.com">Cloudflare</a>, one of the
+          world's largest and fastest cloud network platforms.{' '}
+          {hasStats && (
+            <span>
+              In the past month, Cloudflare served over{' '}
+              <strong>{formatBytes(stats.totals.bandwidth.all)}</strong> to{' '}
+              <strong>{formatNumber(stats.totals.uniques.all)}</strong> unique
+              unpkg users all over the world.
+            </span>
+          )}
+        </p>
+
+        <div
+          css={{
+            margin: '4em 0',
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        >
+          <AboutLogo>
+            <a href="https://www.cloudflare.com">
+              <AboutLogoImage src={cloudflareLogo} height="100" />
+            </a>
+          </AboutLogo>
+        </div>
+
+        <p>
+          The origin servers for unpkg are powered by{' '}
+          <a href="https://cloud.google.com/">Google Cloud</a> and made possible
+          by a generous donation from the{' '}
+          <a href="https://angular.io">Angular web framework</a>.
+        </p>
+
+        <div
+          css={{
+            margin: '4em 0 2em',
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        >
+          <AboutLogo>
+            <a href="https://angular.io">
+              <AboutLogoImage src={angularLogo} width="200" />
+            </a>
+          </AboutLogo>
+        </div>
+
+        <footer
+          css={{
+            marginTop: '10em',
+            color: '#aaa'
+          }}
+        >
+          <p css={{ textAlign: 'center' }}>
+            &copy; {new Date().getFullYear()} unpkg &nbsp;&mdash;&nbsp; powered
+            by{' '}
+            <a href="https://cloud.google.com/">
+              <img
+                src={googleCloudLogo}
+                height="32"
+                css={{
+                  verticalAlign: 'middle',
+                  marginTop: -2,
+                  marginLeft: -10
+                }}
+              />
+            </a>
+          </p>
+        </footer>
       </div>
     );
   }
