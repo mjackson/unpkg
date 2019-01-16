@@ -3,6 +3,7 @@ import https from 'https';
 
 import { npmRegistryURL } from '../config';
 
+import debug from './debug';
 import bufferStream from './bufferStream';
 import agent from './registryAgent';
 
@@ -19,7 +20,7 @@ export default function fetchNpmPackageInfo(packageName) {
 
     const infoURL = `${npmRegistryURL}/${encodedPackageName}`;
 
-    console.log('Fetching package info for %s from %s', packageName, infoURL);
+    debug('Fetching package info for %s from %s', packageName, infoURL);
 
     const { hostname, pathname } = url.parse(infoURL);
     const options = {

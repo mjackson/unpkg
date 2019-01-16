@@ -3,6 +3,7 @@ import https from 'https';
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
+import debug from './debug';
 import bufferStream from './bufferStream';
 import agent from './registryAgent';
 
@@ -10,11 +11,7 @@ export default function fetchNpmPackage(packageConfig) {
   return new Promise((resolve, reject) => {
     const tarballURL = packageConfig.dist.tarball;
 
-    console.log(
-      'Fetching package for %s from %s',
-      packageConfig.name,
-      tarballURL
-    );
+    debug('Fetching package for %s from %s', packageConfig.name, tarballURL);
 
     const { hostname, pathname } = url.parse(tarballURL);
     const options = {
