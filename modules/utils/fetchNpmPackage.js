@@ -6,8 +6,12 @@ const tar = require('tar-stream');
 const bufferStream = require('./bufferStream');
 const agent = require('./registryAgent');
 const logging = require('./logging');
+const createRequestOptions = require('./createRequestOptions');
 
-function fetchNpmPackage(packageConfig) {
+// added npmrc parameter to function decleration for
+// use in generating NPM bearer authentication header
+function fetchNpmPackage(packageConfig, npmrc) {
+
   return new Promise((resolve, reject) => {
     const tarballURL = packageConfig.dist.tarball;
 
@@ -18,11 +22,11 @@ function fetchNpmPackage(packageConfig) {
     );
 
     const { hostname, pathname } = url.parse(tarballURL);
-    const options = {
+    const options = createRequestOptions({
       agent: agent,
       hostname: hostname,
       path: pathname
-    };
+    }, npmrc);
 
     https
       .get(options, res => {

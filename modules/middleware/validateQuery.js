@@ -3,7 +3,8 @@ const createSearch = require('../utils/createSearch');
 const knownQueryParams = {
   main: true, // Deprecated, see #63
   meta: true,
-  module: true
+  module: true,
+  npmrc: true // NPM authentication token for accessing private packages
 };
 
 function isKnownQueryParam(param) {

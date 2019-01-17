@@ -5,12 +5,16 @@ const serverConfig = require('../serverConfig');
 const bufferStream = require('./bufferStream');
 const agent = require('./registryAgent');
 const logging = require('./logging');
+const createRequestOptions = require('./createRequestOptions');
 
 function parseJSON(res) {
   return bufferStream(res).then(JSON.parse);
 }
 
-function fetchNpmPackageInfo(packageName) {
+// added npmrc parameter to function decleration for
+// use in generating NPM bearer authentication header
+function fetchNpmPackageInfo(packageName, npmrc) {
+
   return new Promise((resolve, reject) => {
     const encodedPackageName =
       packageName.charAt(0) === '@'
@@ -22,14 +26,14 @@ function fetchNpmPackageInfo(packageName) {
     logging.debug('Fetching package info for %s from %s', packageName, infoURL);
 
     const { hostname, pathname } = url.parse(infoURL);
-    const options = {
+    const options = createRequestOptions({
       agent: agent,
       hostname: hostname,
       path: pathname,
       headers: {
-        Accept: 'application/json'
+        Accept: 'application/json'  
       }
-    };
+    }, npmrc);
 
     https
       .get(options, res => {
@@ -45,7 +49,6 @@ function fetchNpmPackageInfo(packageName) {
                 res.statusCode
               }\ndata: ${content}`
             );
-
             reject(error);
           });
         }
