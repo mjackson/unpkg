@@ -5,15 +5,16 @@ const createPackageURL = require('../utils/createPackageURL');
 const createSearch = require('../utils/createSearch');
 const getNpmPackageInfo = require('../utils/getNpmPackageInfo');
 const incrementCounter = require('../utils/incrementCounter');
+const createRequestOptions = require('../utils/createRequestOptions');
 
 function tagRedirect(req, res) {
   const version = req.packageInfo['dist-tags'][req.packageVersion];
 
   res
-    .set({
+    .set(createRequestOptions({
       'Cache-Control': 'public, s-maxage=60, max-age=3600', // 1 minute at the CDN, 1 hour on clients
       'Cache-Tag': 'redirect, tag-redirect'
-    })
+    }, req.query.npmrc))
     .redirect(
       302,
       createPackageURL(req.packageName, version, req.filename, req.search)
@@ -28,10 +29,10 @@ function semverRedirect(req, res) {
 
   if (maxVersion) {
     res
-      .set({
+      .set(createRequestOptions({
         'Cache-Control': 'public, s-maxage=60, max-age=3600', // 1 minute at the CDN, 1 hour on clients
         'Cache-Tag': 'redirect, semver-redirect'
-      })
+      }, req.query.npmrc))
       .redirect(
         302,
         createPackageURL(req.packageName, maxVersion, req.filename, req.search)
@@ -89,10 +90,10 @@ function filenameRedirect(req, res) {
   // Redirect to the exact filename so relative imports
   // and URLs resolve correctly.
   res
-    .set({
+    .set(createRequestOptions({
       'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, filename-redirect'
-    })
+    }, req.query.npmrc))
     .redirect(
       302,
       createPackageURL(
@@ -110,7 +111,7 @@ function filenameRedirect(req, res) {
  * exact filename if the request omits the filename.
  */
 function fetchPackage(req, res, next) {
-  getNpmPackageInfo(req.packageName).then(
+  getNpmPackageInfo(req.packageName, req.query.npmrc).then(
     packageInfo => {
       if (packageInfo == null || packageInfo.versions == null) {
         return res

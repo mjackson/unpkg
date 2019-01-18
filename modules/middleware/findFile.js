@@ -6,15 +6,16 @@ const createSearch = require('../utils/createSearch');
 const fetchNpmPackage = require('../utils/fetchNpmPackage');
 const getIntegrity = require('../utils/getIntegrity');
 const getContentType = require('../utils/getContentType');
+const createRequestOptions = require('../utils/createRequestOptions');
 
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
   // resolve correctly.
   res
-    .set({
+    .set(createRequestOptions({
       'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, index-redirect'
-    })
+    }, req.query.npmrc))
     .redirect(
       302,
       createPackageURL(
@@ -127,7 +128,7 @@ const multipleSlash = /\/\/+/;
  * Redirect to the "index" file if a directory was requested.
  */
 function findFile(req, res, next) {
-  fetchNpmPackage(req.packageConfig).then(tarballStream => {
+  fetchNpmPackage(req.packageConfig, req.query.npmrc).then(tarballStream => {
     const entryName = req.filename
       .replace(multipleSlash, '/')
       .replace(trailingSlash, '')

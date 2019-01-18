@@ -13,15 +13,23 @@ function cleanPackageInfo(packageInfo) {
   };
 }
 
-function getNpmPackageInfo(packageName) {
+// added npmrc parameter to function decleration for
+// use in generating NPM bearer authentication header
+function getNpmPackageInfo(packageName, npmrc) {
   return new Promise((resolve, reject) => {
+
+    // Don't cache private packages or try to retrieve them from cache.
+    // Caching can be re-enabled if needed; however, some additional
+    // adjustements to the caching scheme will need to be made in order
+    // to handle the complexities around access, etc.
+
     const key = `npmPackageInfo-${packageName}`;
-    const value = cache.get(key);
+    const value = (npmrc) ? null : cache.get(key);
 
     if (value != null) {
       resolve(value === notFound ? null : JSON.parse(value));
     } else {
-      fetchNpmPackageInfo(packageName).then(value => {
+      fetchNpmPackageInfo(packageName, npmrc).then(value => {
         if (value == null) {
           // Cache 404s for 5 minutes. This prevents us from making
           // unnecessary requests to the registry for bad package names.
@@ -34,7 +42,9 @@ function getNpmPackageInfo(packageName) {
 
           // Cache valid package info for 1 minute. In the worst case,
           // new versions won't be available for 1 minute.
-          cache.setex(key, 60, JSON.stringify(value));
+          if (!npmrc) {
+            cache.setex(key, 60, JSON.stringify(value));
+          }
           resolve(value);
         }
       }, reject);
