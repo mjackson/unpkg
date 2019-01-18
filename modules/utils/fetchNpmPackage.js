@@ -11,7 +11,6 @@ const createRequestOptions = require('./createRequestOptions');
 // added npmrc parameter to function decleration for
 // use in generating NPM bearer authentication header
 function fetchNpmPackage(packageConfig, npmrc) {
-
   return new Promise((resolve, reject) => {
     const tarballURL = packageConfig.dist.tarball;
 

@@ -14,7 +14,6 @@ function parseJSON(res) {
 // added npmrc parameter to function decleration for
 // use in generating NPM bearer authentication header
 function fetchNpmPackageInfo(packageName, npmrc) {
-
   return new Promise((resolve, reject) => {
     const encodedPackageName =
       packageName.charAt(0) === '@'
@@ -49,6 +48,7 @@ function fetchNpmPackageInfo(packageName, npmrc) {
                 res.statusCode
               }\ndata: ${content}`
             );
+            
             reject(error);
           });
         }

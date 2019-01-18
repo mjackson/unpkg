@@ -34,7 +34,7 @@ function parsePackageURL(originalURL) {
     query, // { main: 'browser' }
     packageName, // @scope/name
     packageVersion, // version
-    filename, // /file.js
+    filename // /file.js
   };
 }
 

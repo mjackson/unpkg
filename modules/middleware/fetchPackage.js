@@ -87,7 +87,6 @@ function filenameRedirect(req, res) {
     filename = req.packageConfig.main || '/index.js';
   }
 
-
   // Redirect to the exact filename so relative imports
   // and URLs resolve correctly.
   res
