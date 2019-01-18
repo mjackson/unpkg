@@ -13,7 +13,7 @@ function tagRedirect(req, res) {
   res
     .set(createRequestOptions({
       'Cache-Control': 'public, s-maxage=60, max-age=3600', // 1 minute at the CDN, 1 hour on clients
-      'Cache-Tag': 'redirect, tag-redirect',
+      'Cache-Tag': 'redirect, tag-redirect'
     }, req.query.npmrc))
     .redirect(
       302,

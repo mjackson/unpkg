@@ -30,7 +30,7 @@ function fetchNpmPackageInfo(packageName, npmrc) {
       hostname: hostname,
       path: pathname,
       headers: {
-        Accept: 'application/json'  
+        Accept: 'application/json'
       }
     }, npmrc);
 
@@ -48,7 +48,7 @@ function fetchNpmPackageInfo(packageName, npmrc) {
                 res.statusCode
               }\ndata: ${content}`
             );
-            
+
             reject(error);
           });
         }
