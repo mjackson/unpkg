@@ -1,5 +1,6 @@
 import babel from '@babel/core';
 
+import { origin } from '../config';
 import unpkgRewrite from '../plugins/unpkgRewrite';
 
 export default function rewriteBareModuleIdentifiers(code, packageConfig) {
@@ -14,7 +15,7 @@ export default function rewriteBareModuleIdentifiers(code, packageConfig) {
     // because we haven't installed dependencies so
     // we can't load plugins; see #84
     babelrc: false,
-    plugins: [unpkgRewrite(dependencies)]
+    plugins: [unpkgRewrite(origin, dependencies)]
   };
 
   return babel.transform(code, options).code;

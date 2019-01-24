@@ -1,8 +1,6 @@
 import URL from 'whatwg-url';
 import warning from 'warning';
 
-import { origin } from '../config';
-
 const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 
 function isValidURL(value) {
@@ -21,7 +19,7 @@ function isBareIdentifier(value) {
   return value.charAt(0) !== '.' && value.charAt(0) !== '/';
 }
 
-function rewriteValue(/* StringLiteral */ node, dependencies) {
+function rewriteValue(/* StringLiteral */ node, origin, dependencies) {
   if (isAbsoluteURL(node.value)) {
     return;
   }
@@ -47,7 +45,7 @@ function rewriteValue(/* StringLiteral */ node, dependencies) {
   }
 }
 
-export default function unpkgRewrite(dependencies = {}) {
+export default function unpkgRewrite(origin, dependencies = {}) {
   return {
     manipulateOptions(opts, parserOpts) {
       parserOpts.plugins.push(
@@ -65,10 +63,10 @@ export default function unpkgRewrite(dependencies = {}) {
           return;
         }
 
-        rewriteValue(path.node.arguments[0], dependencies);
+        rewriteValue(path.node.arguments[0], origin, dependencies);
       },
       ExportAllDeclaration(path) {
-        return rewriteValue(path.node.source, dependencies);
+        rewriteValue(path.node.source, origin, dependencies);
       },
       ExportNamedDeclaration(path) {
         if (!path.node.source) {
@@ -80,10 +78,10 @@ export default function unpkgRewrite(dependencies = {}) {
           return;
         }
 
-        rewriteValue(path.node.source, dependencies);
+        rewriteValue(path.node.source, origin, dependencies);
       },
       ImportDeclaration(path) {
-        return rewriteValue(path.node.source, dependencies);
+        rewriteValue(path.node.source, origin, dependencies);
       }
     }
   };
