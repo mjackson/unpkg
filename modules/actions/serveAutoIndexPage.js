@@ -1,13 +1,16 @@
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import semver from 'semver';
 
-import MainTemplate from '../client/MainTemplate';
 import AutoIndexApp from '../client/autoIndex/App';
-import createHTML from '../client/utils/createHTML';
-import getScripts from '../utils/getScripts';
-import renderTemplate from '../utils/renderTemplate';
 
+import createElement from './utils/createElement';
+import createHTML from './utils/createHTML';
+import createScript from './utils/createScript';
+import getEntryPoint from './utils/getEntryPoint';
+import getGlobalScripts from './utils/getGlobalScripts';
+import MainTemplate from './utils/MainTemplate';
+
+const doctype = '<!DOCTYPE html>';
 const globalURLs =
   process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
     ? {
@@ -34,24 +37,27 @@ export default function serveAutoIndexPage(req, res) {
     entry: req.entry,
     entries: req.entries
   };
-
-  const content = createHTML(
-    ReactDOMServer.renderToString(React.createElement(AutoIndexApp, data))
+  const content = createHTML(renderToString(createElement(AutoIndexApp, data)));
+  const entryPoint = getEntryPoint('autoIndex', 'iife');
+  const elements = getGlobalScripts(entryPoint, globalURLs).concat(
+    createScript(entryPoint.code)
   );
 
-  const scripts = getScripts('autoIndex', globalURLs);
-
-  const html = renderTemplate(MainTemplate, {
-    title: `UNPKG - ${req.packageName}`,
-    description: `The CDN for ${req.packageName}`,
-    data,
-    content,
-    scripts
-  });
+  const html =
+    doctype +
+    renderToStaticMarkup(
+      createElement(MainTemplate, {
+        title: `UNPKG - ${req.packageName}`,
+        description: `The CDN for ${req.packageName}`,
+        data,
+        content,
+        elements
+      })
+    );
 
   res
     .set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate', // do not cache
+      'Cache-Control': 'public, max-age=14400', // 4 hours
       'Cache-Tag': 'auto-index'
     })
     .send(html);

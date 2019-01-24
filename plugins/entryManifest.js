@@ -49,7 +49,8 @@ function entryManifest() {
             entryPoints.push({
               format: options.format,
               globalImports: globalImports,
-              url: publicPath + fileName
+              url: publicPath + fileName,
+              code: info.code
             });
           });
 

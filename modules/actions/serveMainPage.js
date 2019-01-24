@@ -1,12 +1,15 @@
-import React from 'react';
-import { renderToString } from 'react-dom/server';
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 
-import MainTemplate from '../client/MainTemplate';
 import MainApp from '../client/main/App';
-import createHTML from '../client/utils/createHTML';
-import getScripts from '../utils/getScripts';
-import renderTemplate from '../utils/renderTemplate';
 
+import createElement from './utils/createElement';
+import createHTML from './utils/createHTML';
+import createScript from './utils/createScript';
+import getEntryPoint from './utils/getEntryPoint';
+import getGlobalScripts from './utils/getGlobalScripts';
+import MainTemplate from './utils/MainTemplate';
+
+const doctype = '<!DOCTYPE html>';
 const globalURLs =
   process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
     ? {
@@ -21,13 +24,19 @@ const globalURLs =
       };
 
 export default function serveMainPage(req, res) {
-  const content = createHTML(renderToString(React.createElement(MainApp)));
-  const scripts = getScripts('main', globalURLs);
-  const html = renderTemplate(MainTemplate, { content, scripts });
+  const content = createHTML(renderToString(createElement(MainApp)));
+  const entryPoint = getEntryPoint('main', 'iife');
+  const elements = getGlobalScripts(entryPoint, globalURLs).concat(
+    createScript(entryPoint.code)
+  );
+
+  const html =
+    doctype +
+    renderToStaticMarkup(createElement(MainTemplate, { content, elements }));
 
   res
     .set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate', // do not cache
+      'Cache-Control': 'public, max-age=14400', // 4 hours
       'Cache-Tag': 'main'
     })
     .send(html);
