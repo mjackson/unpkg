@@ -8,7 +8,7 @@ import getScripts from '../utils/getScripts';
 import renderTemplate from '../utils/renderTemplate';
 
 const globalURLs =
-  process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
     ? {
         '@emotion/core': '/@emotion/core@10.0.6/dist/core.umd.min.js',
         react: '/react@16.7.0/umd/react.production.min.js',

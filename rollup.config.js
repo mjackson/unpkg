@@ -58,50 +58,6 @@ const client = ['main', 'autoIndex'].map(entryName => {
   };
 });
 
-// const client = {
-//   input: ['modules/client/main.js', 'modules/client/autoIndex.js'],
-//   output: [
-//     {
-//       // ESM version for modern browsers
-//       format: 'esm',
-//       dir: 'public/_client',
-//       entryFileNames: '[name]-[hash].js',
-//       chunkFileNames: '[name]-[hash].js'
-//     },
-//     {
-//       // SystemJS version for older browsers
-//       format: 'system',
-//       dir: 'public/_client',
-//       entryFileNames: '[name]-[hash].system.js',
-//       chunkFileNames: '[name]-[hash].system.js'
-//     }
-//   ],
-//   plugins: [
-//     manifest.record({ publicPath: '/_client/' }),
-//     babel({ exclude: /node_modules/ }),
-//     json(),
-//     resolve(),
-//     commonjs({
-//       namedExports: {
-//         'node_modules/react/index.js': [
-//           'createContext',
-//           'createElement',
-//           'forwardRef',
-//           'Component',
-//           'Fragment'
-//         ]
-//       }
-//     }),
-//     replace({
-//       'process.env.NODE_ENV': JSON.stringify(env)
-//     }),
-//     url({
-//       limit: 5 * 1024,
-//       publicPath: '/_client/'
-//     })
-//   ]
-// };
-
 const secretKey = require('./secretKey');
 const fnsPkg = require('./functions/package.json');
 
