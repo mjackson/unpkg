@@ -1,5 +1,7 @@
+/** @jsx jsx */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { jsx } from '@emotion/core';
 import formatBytes from 'pretty-bytes';
 import sortBy from 'sort-by';
 

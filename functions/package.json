@@ -15,6 +15,7 @@
     "@babel/plugin-syntax-export-default-from": "^7.2.0",
     "@babel/plugin-syntax-export-namespace-from": "^7.2.0",
     "@babel/plugin-syntax-import-meta": "^7.2.0",
+    "@emotion/core": "^10.0.6",
     "cheerio": "^1.0.0-rc.2",
     "cors": "^2.8.5",
     "date-fns": "^1.30.1",

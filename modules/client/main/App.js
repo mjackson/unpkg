@@ -1,6 +1,7 @@
+/** @jsx jsx */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Global, css } from '@emotion/core';
+import { Global, css, jsx } from '@emotion/core';
 import formatBytes from 'pretty-bytes';
 import formatDate from 'date-fns/format';
 import parseDate from 'date-fns/parse';
@@ -19,7 +20,7 @@ const globalStyles = css`
       Helvetica, Arial, sans-serif;
     line-height: 1.7;
     padding: 5px 20px;
-    color: #000000;
+    color: black;
   }
 
   @media (min-width: 800px) {

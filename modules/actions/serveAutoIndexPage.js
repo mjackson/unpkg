@@ -5,8 +5,21 @@ import semver from 'semver';
 import MainTemplate from '../client/MainTemplate';
 import AutoIndexApp from '../client/autoIndex/App';
 import createHTML from '../client/utils/createHTML';
-import getEntryPoints from '../utils/getEntryPoints';
+import getScripts from '../utils/getScripts';
 import renderTemplate from '../utils/renderTemplate';
+
+const globalURLs =
+  process.env.NODE_ENV === 'production'
+    ? {
+        '@emotion/core': '/@emotion/core@10.0.6/dist/core.umd.min.js',
+        react: '/react@16.7.0/umd/react.production.min.js',
+        'react-dom': '/react-dom@16.7.0/umd/react-dom.production.min.js'
+      }
+    : {
+        '@emotion/core': '/@emotion/core@10.0.6/dist/core.umd.min.js',
+        react: '/react@16.7.0/umd/react.development.js',
+        'react-dom': '/react-dom@16.7.0/umd/react-dom.development.js'
+      };
 
 function byVersion(a, b) {
   return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
@@ -26,17 +39,14 @@ export default function serveAutoIndexPage(req, res) {
     ReactDOMServer.renderToString(React.createElement(AutoIndexApp, data))
   );
 
-  const entryPoints = getEntryPoints('autoIndex', {
-    es: 'module',
-    system: 'nomodule'
-  });
+  const scripts = getScripts('autoIndex', globalURLs);
 
   const html = renderTemplate(MainTemplate, {
     title: `UNPKG - ${req.packageName}`,
     description: `The CDN for ${req.packageName}`,
     data,
     content,
-    entryPoints
+    scripts
   });
 
   res

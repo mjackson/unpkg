@@ -6,7 +6,7 @@ function updateWatchfile(watchfile) {
 }
 
 function entryManifest() {
-  let manifest = null;
+  let manifests = [];
 
   const watchfile = tempy.file();
   updateWatchfile(watchfile);
@@ -19,10 +19,15 @@ function entryManifest() {
     record(options = {}) {
       const publicPath = (options.publicPath || '/').replace(/\/*$/, '/');
 
+      let manifest = Object.create(null);
+      manifests.push(manifest);
+
       return {
         name: 'entry-manifest-record',
         buildStart() {
-          manifest = {};
+          for (const key in manifest) {
+            delete manifest[key];
+          }
         },
         generateBundle(options, bundle) {
           Object.keys(bundle).forEach(fileName => {
@@ -70,7 +75,8 @@ function entryManifest() {
         },
         load(id) {
           if (id === virtualId) {
-            return 'export default ' + JSON.stringify(manifest);
+            const value = manifests.length === 1 ? manifests[0] : manifests;
+            return 'export default ' + JSON.stringify(value);
           }
           return null;
         },

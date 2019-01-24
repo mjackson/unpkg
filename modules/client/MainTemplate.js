@@ -15,7 +15,7 @@ export default function MainTemplate({
   favicon,
   data,
   content,
-  entryPoints
+  scripts
 }) {
   return (
     <html lang="en">
@@ -36,22 +36,9 @@ export default function MainTemplate({
       </head>
       <body>
         <div id="root" dangerouslySetInnerHTML={content} />
-        {entryPoints.module &&
-          x(`
-          import('${entryPoints.module}');
-          window.supportsDynamicImport = true;
-        `)}
-        {entryPoints.nomodule &&
-          x(`
-          if (!window.supportsDynamicImport) {
-            var s = document.createElement('script');
-            s.src = '/systemjs@2.0.0/dist/s.min.js';
-            s.addEventListener('load', function() {
-              System.import('${entryPoints.nomodule}');
-            });
-            document.head.appendChild(s);
-          }
-        `)}
+        {scripts.map(src => (
+          <script key={src} src={src} />
+        ))}
       </body>
     </html>
   );
@@ -61,7 +48,8 @@ MainTemplate.defaultProps = {
   title: 'UNPKG',
   description: 'The CDN for everything on npm',
   favicon: '/favicon.ico',
-  content: createHTML('')
+  content: createHTML(''),
+  scripts: []
 };
 
 if (process.env.NODE_ENV !== 'production') {
@@ -75,9 +63,6 @@ if (process.env.NODE_ENV !== 'production') {
     favicon: PropTypes.string,
     data: PropTypes.any,
     content: htmlType,
-    entryPoints: PropTypes.shape({
-      module: PropTypes.string,
-      nomodule: PropTypes.string
-    }).isRequired
+    scripts: PropTypes.arrayOf(PropTypes.string)
   };
 }

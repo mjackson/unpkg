@@ -12,7 +12,6 @@
     "watch": "rollup -c -w"
   },
   "dependencies": {
-    "@emotion/babel-preset-css-prop": "^10.0.6",
     "@emotion/core": "^10.0.6",
     "date-fns": "^1.30.1",
     "pretty-bytes": "^5.1.0",
