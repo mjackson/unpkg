@@ -1,11 +1,12 @@
 import url from 'url';
 import https from 'https';
 
-import { npmRegistryURL } from '../config';
-
 import debug from './debug';
 import bufferStream from './bufferStream';
 import agent from './registryAgent';
+
+const npmRegistryURL =
+  process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org';
 
 function parseJSON(res) {
   return bufferStream(res).then(JSON.parse);

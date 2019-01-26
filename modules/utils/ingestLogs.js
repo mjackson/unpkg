@@ -1,11 +1,11 @@
 import url from 'url';
 import { startOfDay, addDays } from 'date-fns';
 
-import data from '../utils/data';
-import isValidPackageName from '../utils/isValidPackageName';
-import parsePackageURL from '../utils/parsePackageURL';
-import * as cloudflare from '../utils/cloudflare';
-import * as stats from '../utils/stats';
+import data from './data';
+import isValidPackageName from './isValidPackageName';
+import parsePackageURL from './parsePackageURL';
+import * as cloudflare from './cloudflare';
+import * as stats from './stats';
 
 /**
  * Domains we want to analyze.

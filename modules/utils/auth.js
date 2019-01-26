@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
 import data from './data';
-import { secretKey } from '../config';
+import { privateKey, publicKey } from './secret';
 
 function getCurrentSeconds() {
   return Math.floor(Date.now() / 1000);
@@ -21,18 +21,13 @@ export function createToken(scopes = {}) {
       scopes
     };
 
-    jwt.sign(
-      payload,
-      secretKey.private,
-      { algorithm: 'RS256' },
-      (error, token) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(token);
-        }
+    jwt.sign(payload, privateKey, { algorithm: 'RS256' }, (error, token) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(token);
       }
-    );
+    });
   });
 }
 
@@ -42,7 +37,7 @@ export function verifyToken(token) {
   return new Promise((resolve, reject) => {
     const options = { algorithms: ['RS256'] };
 
-    jwt.verify(token, secretKey.public, options, (error, payload) => {
+    jwt.verify(token, publicKey, options, (error, payload) => {
       if (error) {
         reject(error);
       } else {

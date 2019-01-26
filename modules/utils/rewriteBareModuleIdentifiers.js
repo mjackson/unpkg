@@ -1,7 +1,8 @@
 import babel from '@babel/core';
 
-import { origin } from '../config';
 import unpkgRewrite from '../plugins/unpkgRewrite';
+
+const origin = process.env.ORIGIN || 'https://unpkg.com';
 
 export default function rewriteBareModuleIdentifiers(code, packageConfig) {
   const dependencies = Object.assign(

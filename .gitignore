@@ -4,9 +4,8 @@ firebase-debug.log*
 npm-debug.log*
 
 /.env
-/functions/*.js
-/functions/node_modules/
 /node_modules/
 /public/_client/
 /secret_key
+/server.js
 /tokens/
