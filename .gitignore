@@ -7,6 +7,7 @@ npm-debug.log*
 /client-secret-staging.json
 /node_modules/
 /public/_client/
+/secrets.tar
 /secret_key
 /server.js
 /tokens/
