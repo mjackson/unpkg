@@ -4,6 +4,7 @@ firebase-debug.log*
 npm-debug.log*
 
 /.env
+/client-secret-staging.json
 /node_modules/
 /public/_client/
 /secret_key

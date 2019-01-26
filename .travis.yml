@@ -8,13 +8,20 @@ env:
   - secure: rrZwddgjDOdZj81JRQ6Z+PWEGodJG4FcWk+BOkfF7HrMKK30ZAQwjJWAxb33OrhGLrZ2QFVoAD4kbMYlV8oo/OBtiXHgR2Xv1JKW74VF7r+VdKk4MGvuqXuprbauRfJYnR0aAH16H/l0+dKLtma4FL7moD33f7+UYac8xRRKC9dFsT8xxxfznTpqTP2loDZPsBJ+EaCzWGK2n/wTegGirxVHcS/dAj6yN6EIdAr+ekAgzGtqIaRAVYkGW3qRvz8FXA0PRzZopgBrLcAaWpot9yDIaS0K+vrVNF05fWF5CPP8ygOjd7I04DsoGd4S/5aW45yALxIasElZCMWesrcmNL/fCn+BFolJQY/aoZVqiOiL6h3u7/OLL6gOwXeJhLx/qMS3WcaeoudzhpjMg9q6urgA9FrViCdY21CoFcRxw8ZFXi92CFx3c2Tn8QoFLumHHOS9F8ZJ0t+EMC6fJ6kS2P+GWO6Iwvt+ONOeB88ZnzIViyH66y43+i/Zrqzs28KW5i7sTcrx3zFQrEuWCLS6jMhWYsesvi/hsqfWlvMu3c9V6YxNSgZJHtmlpXN4Bq28chS3S5YVr2pV5rmLywSchcfmJgQoPikPwJ8qinm0egnmr/ukOcKELtaSTlPz+tZL/tVjwC6Qkzh4ELzVxmX1wWZGJgERFHEUHuC2LeXnn94=
 before_install:
 - openssl aes-256-cbc -K $encrypted_a35d52d190dd_key -iv $encrypted_a35d52d190dd_iv
+  -in client-secret-staging.json.enc -out client-secret-staging.json -d
+- openssl aes-256-cbc -K $encrypted_a35d52d190dd_key -iv $encrypted_a35d52d190dd_iv
   -in secret_key.enc -out secret_key -d
 script:
 - npm run lint
-- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") npm run build
-before_deploy:
-- npm install -g firebase-tools
+- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging")
+  npm run build
 deploy:
+- provider: gae
+  skip_cleanup: true
+  project: unpkg-staging
+  keyfile: client-secret-staging.json
+  on:
+    branch: gae-staging
 - provider: script
   skip_cleanup: true
   script: $(npm bin -g)/firebase deploy --project unpkg-staging --message "https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
