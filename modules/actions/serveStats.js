@@ -2,7 +2,7 @@ import { subDays, startOfDay, startOfSecond } from 'date-fns';
 
 import { getStats } from '../utils/stats';
 
-export default function showStats(req, res) {
+export default function serveStats(req, res) {
   let since, until;
   if (req.query.period) {
     switch (req.query.period) {

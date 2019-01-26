@@ -1,8 +1,8 @@
 import serveAutoIndexPage from './serveAutoIndexPage';
 import serveHTMLModule from './serveHTMLModule';
 import serveJavaScriptModule from './serveJavaScriptModule';
-import serveStaticFile from './serveStaticFile';
 import serveMetadata from './serveMetadata';
+import serveStaticFile from './serveStaticFile';
 
 /**
  * Send the file, JSON metadata, or HTML directory listing.

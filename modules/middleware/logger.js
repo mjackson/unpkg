@@ -1,6 +1,6 @@
 import morgan from 'morgan';
 
-const logging = morgan(
+const logger = morgan(
   process.env.NODE_ENV === 'development'
     ? 'dev'
     : ':date[clf] - :method :url :status :res[content-length] - :response-time ms',
@@ -12,4 +12,4 @@ const logging = morgan(
   }
 );
 
-export default logging;
+export default logger;
