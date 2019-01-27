@@ -12,15 +12,21 @@ before_install:
 - tar xvf secrets.tar
 script:
 - npm run lint
-- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging")
+- NODE_ENV=$(([ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_BRANCH" == "gae" ]) && echo "production" || echo "staging")
   npm run build
 deploy:
 - provider: gae
   skip_cleanup: true
-  keyfile: client-secret-staging.json
+  keyfile: service-account-staging.json
   project: unpkg-staging
   on:
     branch: gae-staging
+- provider: gae
+  skip_cleanup: true
+  keyfile: service-account.json
+  project: unpkg-gcp
+  on:
+    branch: gae
 - provider: script
   skip_cleanup: true
   script: $(npm bin -g)/firebase deploy --project unpkg-staging --message "https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
