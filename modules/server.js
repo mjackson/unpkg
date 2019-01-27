@@ -24,6 +24,7 @@ const port = process.env.PORT || '8080';
 const app = express();
 
 app.disable('x-powered-by');
+app.enable('trust proxy');
 
 app.use(logger);
 app.use(staticFiles);
