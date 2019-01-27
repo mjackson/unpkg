@@ -19,12 +19,14 @@ deploy:
   skip_cleanup: true
   keyfile: service-account-staging.json
   project: unpkg-staging
+  config: app-staging.yaml
   on:
     branch: gae-staging
 - provider: gae
   skip_cleanup: true
   keyfile: service-account.json
   project: unpkg-gcp
+  config: app.yaml
   on:
     branch: gae
 - provider: script
