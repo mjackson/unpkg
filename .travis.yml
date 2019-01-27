@@ -12,8 +12,8 @@ before_install:
 - tar xvf secrets.tar
 script:
 - npm run lint
-- NODE_ENV=$(([ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_BRANCH" == "gae" ]) && echo "production" || echo "staging")
-  npm run build
+- NODE_ENV=$(([ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_BRANCH" == "gae" ]) &&
+  echo "production" || echo "staging") npm run build
 deploy:
 - provider: gae
   skip_cleanup: true
