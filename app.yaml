@@ -3,8 +3,12 @@ env: flex
 
 resources:
   cpu: 1
-  memory_gb: 0.5
+  memory_gb: 1
   disk_size_gb: 10
 
-health_check:
-  enable_health_check: False
+liveness_check:
+  path: "/"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
