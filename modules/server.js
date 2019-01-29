@@ -29,6 +29,12 @@ app.enable('trust proxy');
 app.use(logger);
 app.use(staticFiles);
 
+// Special startup request from App Engine
+// https://cloud.google.com/appengine/docs/standard/nodejs/how-instances-are-managed
+app.get('/_ah/start', (req, res) => {
+  res.status(200).end();
+});
+
 app.get('/', serveMainPage);
 
 app.use(redirectLegacyURLs);

@@ -67,6 +67,6 @@
     "tempy": "^0.2.1"
   },
   "engines": {
-    "node": "10.x"
+    "node": "10.x.x"
   }
 }
