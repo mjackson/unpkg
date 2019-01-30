@@ -27,6 +27,7 @@ app.disable('x-powered-by');
 app.enable('trust proxy');
 
 app.use(logger);
+app.use(cors);
 app.use(staticFiles);
 
 // Special startup request from App Engine
@@ -38,7 +39,6 @@ app.get('/_ah/start', (req, res) => {
 app.get('/', serveMainPage);
 
 app.use(redirectLegacyURLs);
-app.use(cors);
 
 app.use(
   '/api',
