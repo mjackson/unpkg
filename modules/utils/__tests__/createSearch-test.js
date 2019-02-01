@@ -1,4 +1,4 @@
-const createSearch = require('../createSearch');
+import createSearch from '../createSearch';
 
 describe('createSearch', () => {
   it('omits the trailing = for empty string values', () => {

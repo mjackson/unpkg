@@ -1,9 +1,7 @@
-require('./autoIndex.css');
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-const React = require('react');
-const ReactDOM = require('react-dom');
-
-const App = require('./autoIndex/App');
+import App from './autoIndex/App';
 
 const props = window.__DATA__ || {};
 

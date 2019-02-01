@@ -1,7 +1,5 @@
-const data = require('../../utils/data');
+import data from '../../utils/data';
 
-function closeDatabase() {
+export default function closeDatabase() {
   data.quit();
 }
-
-module.exports = closeDatabase;

@@ -1,32 +1,35 @@
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const semver = require('semver');
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
+import semver from 'semver';
 
-const MainPage = require('../client/MainPage');
-const AutoIndexApp = require('../client/autoIndex/App');
-const createHTML = require('../client/utils/createHTML');
-const renderPage = require('../utils/renderPage');
+import AutoIndexApp from '../client/autoIndex/App';
 
-const globalScripts =
-  process.env.NODE_ENV === 'production'
-    ? [
-        '/react@16.4.1/umd/react.production.min.js',
-        '/react-dom@16.4.1/umd/react-dom.production.min.js'
-      ]
-    : [
-        '/react@16.4.1/umd/react.development.js',
-        '/react-dom@16.4.1/umd/react-dom.development.js'
-      ];
+import createElement from './utils/createElement';
+import createHTML from './utils/createHTML';
+import createScript from './utils/createScript';
+import getEntryPoint from './utils/getEntryPoint';
+import getGlobalScripts from './utils/getGlobalScripts';
+import MainTemplate from './utils/MainTemplate';
+
+const doctype = '<!DOCTYPE html>';
+const globalURLs =
+  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
+    ? {
+        '@emotion/core': '/@emotion/core@10.0.6/dist/core.umd.min.js',
+        react: '/react@16.7.0/umd/react.production.min.js',
+        'react-dom': '/react-dom@16.7.0/umd/react-dom.production.min.js'
+      }
+    : {
+        '@emotion/core': '/@emotion/core@10.0.6/dist/core.umd.min.js',
+        react: '/react@16.7.0/umd/react.development.js',
+        'react-dom': '/react-dom@16.7.0/umd/react-dom.development.js'
+      };
 
 function byVersion(a, b) {
   return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
 }
 
-function serveAutoIndexPage(req, res) {
-  const scripts = globalScripts.concat(req.assets.getScripts('autoIndex'));
-  const styles = req.assets.getStyles('autoIndex');
-
-  const props = {
+export default function serveAutoIndexPage(req, res) {
+  const data = {
     packageName: req.packageName,
     packageVersion: req.packageVersion,
     availableVersions: Object.keys(req.packageInfo.versions).sort(byVersion),
@@ -34,25 +37,28 @@ function serveAutoIndexPage(req, res) {
     entry: req.entry,
     entries: req.entries
   };
-  const content = createHTML(
-    ReactDOMServer.renderToString(React.createElement(AutoIndexApp, props))
+  const content = createHTML(renderToString(createElement(AutoIndexApp, data)));
+  const entryPoint = getEntryPoint('autoIndex', 'iife');
+  const elements = getGlobalScripts(entryPoint, globalURLs).concat(
+    createScript(entryPoint.code)
   );
 
-  const html = renderPage(MainPage, {
-    title: `UNPKG - ${req.packageName}`,
-    description: `The CDN for ${req.packageName}`,
-    scripts: scripts,
-    styles: styles,
-    data: props,
-    content: content
-  });
+  const html =
+    doctype +
+    renderToStaticMarkup(
+      createElement(MainTemplate, {
+        title: `UNPKG - ${req.packageName}`,
+        description: `The CDN for ${req.packageName}`,
+        data,
+        content,
+        elements
+      })
+    );
 
   res
     .set({
-      'Cache-Control': 'public,max-age=60', // 1 minute
+      'Cache-Control': 'public, max-age=14400', // 4 hours
       'Cache-Tag': 'auto-index'
     })
     .send(html);
 }
-
-module.exports = serveAutoIndexPage;

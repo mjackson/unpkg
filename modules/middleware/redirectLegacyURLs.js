@@ -1,9 +1,9 @@
-const createSearch = require('../utils/createSearch');
+import createSearch from '../utils/createSearch';
 
 /**
  * Redirect old URLs that we no longer support.
  */
-function redirectLegacyURLs(req, res, next) {
+export default function redirectLegacyURLs(req, res, next) {
   // Permanently redirect /_meta/path to /path?meta.
   if (req.path.match(/^\/_meta\//)) {
     req.query.meta = '';
@@ -19,5 +19,3 @@ function redirectLegacyURLs(req, res, next) {
 
   next();
 }
-
-module.exports = redirectLegacyURLs;

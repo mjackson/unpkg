@@ -1,4 +1,9 @@
-function createPackageURL(packageName, version, pathname, search) {
+export default function createPackageURL(
+  packageName,
+  version,
+  pathname,
+  search
+) {
   let url = `/${packageName}`;
 
   if (version != null) url += `@${version}`;
@@ -7,5 +12,3 @@ function createPackageURL(packageName, version, pathname, search) {
 
   return url;
 }
-
-module.exports = createPackageURL;

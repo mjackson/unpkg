@@ -1,14 +1,15 @@
-const url = require('url');
+import url from 'url';
 
 const packageURLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
-function parsePackageURL(originalURL) {
+export default function parsePackageURL(originalURL) {
   let { pathname, search, query } = url.parse(originalURL, true);
   try {
     pathname = decodeURIComponent(pathname);
   } catch (error) {
     return null;
   }
+
   const match = packageURLFormat.exec(pathname);
 
   // Disallow invalid URL formats.
@@ -30,5 +31,3 @@ function parsePackageURL(originalURL) {
     filename // /file.js
   };
 }
-
-module.exports = parsePackageURL;

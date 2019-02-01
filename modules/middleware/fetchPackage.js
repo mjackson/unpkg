@@ -1,18 +1,16 @@
-const semver = require('semver');
+import semver from 'semver';
 
-const addLeadingSlash = require('../utils/addLeadingSlash');
-const createPackageURL = require('../utils/createPackageURL');
-const createSearch = require('../utils/createSearch');
-const getNpmPackageInfo = require('../utils/getNpmPackageInfo');
-const incrementCounter = require('../utils/incrementCounter');
+import addLeadingSlash from '../utils/addLeadingSlash';
+import createPackageURL from '../utils/createPackageURL';
+import createSearch from '../utils/createSearch';
+import getNpmPackageInfo from '../utils/getNpmPackageInfo';
 
 function tagRedirect(req, res) {
   const version = req.packageInfo['dist-tags'][req.packageVersion];
 
-  // Cache tag redirects for 1 minute.
   res
     .set({
-      'Cache-Control': 'public, max-age=60',
+      'Cache-Control': 'public, s-maxage=14400, max-age=3600', // 4 hours on CDN, 1 hour on clients
       'Cache-Tag': 'redirect, tag-redirect'
     })
     .redirect(
@@ -28,10 +26,9 @@ function semverRedirect(req, res) {
   );
 
   if (maxVersion) {
-    // Cache semver redirects for 1 minute.
     res
       .set({
-        'Cache-Control': 'public, max-age=60',
+        'Cache-Control': 'public, s-maxage=14400, max-age=3600', // 4 hours on CDN, 1 hour on clients
         'Cache-Tag': 'redirect, semver-redirect'
       })
       .redirect(
@@ -61,14 +58,6 @@ function filenameRedirect(req, res) {
   ) {
     // Deprecated, see #63
     filename = req.packageConfig[req.query.main];
-
-    // Count which packages are using this so we can warn them when we
-    // remove this functionality.
-    incrementCounter(
-      'package-json-custom-main',
-      req.packageSpec + '?main=' + req.query.main,
-      1
-    );
   } else if (
     req.packageConfig.unpkg &&
     typeof req.packageConfig.unpkg === 'string'
@@ -80,10 +69,6 @@ function filenameRedirect(req, res) {
   ) {
     // Deprecated, see #63
     filename = req.packageConfig.browser;
-
-    // Count which packages are using this so we can warn them when we
-    // remove this functionality.
-    incrementCounter('package-json-browser-fallback', req.packageSpec, 1);
   } else {
     filename = req.packageConfig.main || '/index.js';
   }
@@ -92,7 +77,7 @@ function filenameRedirect(req, res) {
   // and URLs resolve correctly.
   res
     .set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, filename-redirect'
     })
     .redirect(
@@ -111,7 +96,7 @@ function filenameRedirect(req, res) {
  * version if the request targets a tag or uses a semver version, or to the
  * exact filename if the request omits the filename.
  */
-function fetchPackage(req, res, next) {
+export default function fetchPackage(req, res, next) {
   getNpmPackageInfo(req.packageName).then(
     packageInfo => {
       if (packageInfo == null || packageInfo.versions == null) {
@@ -149,5 +134,3 @@ function fetchPackage(req, res, next) {
     }
   );
 }
-
-module.exports = fetchPackage;

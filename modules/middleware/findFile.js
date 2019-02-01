@@ -1,18 +1,18 @@
-const path = require('path');
+import path from 'path';
 
-const addLeadingSlash = require('../utils/addLeadingSlash');
-const createPackageURL = require('../utils/createPackageURL');
-const createSearch = require('../utils/createSearch');
-const fetchNpmPackage = require('../utils/fetchNpmPackage');
-const getIntegrity = require('../utils/getIntegrity');
-const getContentType = require('../utils/getContentType');
+import addLeadingSlash from '../utils/addLeadingSlash';
+import createPackageURL from '../utils/createPackageURL';
+import createSearch from '../utils/createSearch';
+import fetchNpmPackage from '../utils/fetchNpmPackage';
+import getIntegrity from '../utils/getIntegrity';
+import getContentType from '../utils/getContentType';
 
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
   // resolve correctly.
   res
     .set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+      'Cache-Control': 'public, max-age=31536000', // 1 year
       'Cache-Tag': 'redirect, index-redirect'
     })
     .redirect(
@@ -124,7 +124,7 @@ const multipleSlash = /\/\/+/;
  * Fetch and search the archive to try and find the requested file.
  * Redirect to the "index" file if a directory was requested.
  */
-function findFile(req, res, next) {
+export default function findFile(req, res, next) {
   fetchNpmPackage(req.packageConfig).then(tarballStream => {
     const entryName = req.filename
       .replace(multipleSlash, '/')
@@ -137,6 +137,10 @@ function findFile(req, res, next) {
         if (!foundEntry) {
           return res
             .status(404)
+            .set({
+              'Cache-Control': 'public, max-age=31536000', // 1 year
+              'Cache-Tag': 'missing, missing-entry'
+            })
             .type('text')
             .send(`Cannot find "${req.filename}" in ${req.packageSpec}`);
         }
@@ -156,6 +160,10 @@ function findFile(req, res, next) {
           } else {
             return res
               .status(404)
+              .set({
+                'Cache-Control': 'public, max-age=31536000', // 1 year
+                'Cache-Tag': 'missing, missing-index'
+              })
               .type('text')
               .send(
                 `Cannot find an index in "${req.filename}" in ${
@@ -173,5 +181,3 @@ function findFile(req, res, next) {
     );
   });
 }
-
-module.exports = findFile;

@@ -1,10 +1,22 @@
-require('./App.css');
+/** @jsx jsx */
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Global, css, jsx } from '@emotion/core';
 
-const React = require('react');
+import DirectoryListing from './DirectoryListing';
 
-const DirectoryListing = require('./DirectoryListing');
+const globalStyles = css`
+  body {
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Helvetica, Arial, sans-serif;
+    line-height: 1.7;
+    padding: 0px 10px 5px;
+    color: #000000;
+  }
+`;
 
-class App extends React.Component {
+export default class App extends React.Component {
   static defaultProps = {
     availableVersions: []
   };
@@ -18,19 +30,29 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="app">
-        <header className="app-header">
+      <div css={{ maxWidth: 900, margin: '0 auto' }}>
+        <Global styles={globalStyles} />
+
+        <header
+          css={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
           <h1>
             Index of /{this.props.packageName}@{this.props.packageVersion}
             {this.props.filename}
           </h1>
 
-          <div className="app-version-selector">
+          <div css={{ float: 'right', lineHeight: '2.25em' }}>
             Version:{' '}
             <select
               id="version"
               defaultValue={this.props.packageVersion}
               onChange={this.handleChange}
+              css={{ fontSize: '1em' }}
             >
               {this.props.availableVersions.map(v => (
                 <option key={v} value={v}>
@@ -51,7 +73,7 @@ class App extends React.Component {
 
         <hr />
 
-        <address className="app-address">
+        <address css={{ textAlign: 'right' }}>
           {this.props.packageName}@{this.props.packageVersion}
         </address>
       </div>
@@ -59,9 +81,7 @@ class App extends React.Component {
   }
 }
 
-if (process.env.NODE_ENV === 'development') {
-  const PropTypes = require('prop-types');
-
+if (process.env.NODE_ENV !== 'production') {
   const entryType = PropTypes.object;
 
   App.propTypes = {
@@ -73,5 +93,3 @@ if (process.env.NODE_ENV === 'development') {
     entries: PropTypes.objectOf(entryType).isRequired
   };
 }
-
-module.exports = App;

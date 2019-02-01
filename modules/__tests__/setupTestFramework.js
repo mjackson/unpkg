@@ -1,3 +1,3 @@
-const closeDatabase = require('./utils/closeDatabase');
+import closeDatabase from './utils/closeDatabase';
 
 afterAll(closeDatabase);

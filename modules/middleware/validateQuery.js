@@ -1,4 +1,4 @@
-const createSearch = require('../utils/createSearch');
+import createSearch from '../utils/createSearch';
 
 const knownQueryParams = {
   main: true, // Deprecated, see #63
@@ -23,12 +23,10 @@ function sanitizeQuery(originalQuery) {
 /**
  * Reject URLs with invalid query parameters to increase cache hit rates.
  */
-function validateQuery(req, res, next) {
+export default function validateQuery(req, res, next) {
   if (!Object.keys(req.query).every(isKnownQueryParam)) {
     return res.redirect(302, req.path + createSearch(sanitizeQuery(req.query)));
   }
 
   next();
 }
-
-module.exports = validateQuery;

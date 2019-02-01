@@ -1,13 +1,9 @@
-const AuthAPI = require('../AuthAPI');
+import { createToken } from '../utils/auth';
 
-const defaultScopes = {
-  blacklist: {
-    read: true
-  }
-};
+const defaultScopes = {};
 
-function createAuth(req, res) {
-  AuthAPI.createToken(defaultScopes).then(
+export default function createAuth(req, res) {
+  createToken(defaultScopes).then(
     token => {
       res.send({ token });
     },
@@ -20,5 +16,3 @@ function createAuth(req, res) {
     }
   );
 }
-
-module.exports = createAuth;

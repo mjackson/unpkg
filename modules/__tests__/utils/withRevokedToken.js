@@ -1,12 +1,10 @@
-const withToken = require('./withToken');
-const AuthAPI = require('../../AuthAPI');
+import { revokeToken } from '../../utils/auth';
+import withToken from './withToken';
 
-function withRevokedToken(scopes, done) {
+export default function withRevokedToken(scopes, done) {
   withToken(scopes, token => {
-    AuthAPI.revokeToken(token).then(() => {
+    revokeToken(token).then(() => {
       done(token);
     });
   });
 }
-
-module.exports = withRevokedToken;

@@ -1,7 +1,5 @@
-const validateNpmPackageName = require('validate-npm-package-name');
+import validateNpmPackageName from 'validate-npm-package-name';
 
-function isValidPackageName(packageName) {
+export default function isValidPackageName(packageName) {
   return validateNpmPackageName(packageName).errors == null;
 }
-
-module.exports = isValidPackageName;

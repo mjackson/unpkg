@@ -1,13 +1,13 @@
-const serveAutoIndexPage = require('./serveAutoIndexPage');
-const serveHTMLModule = require('./serveHTMLModule');
-const serveJavaScriptModule = require('./serveJavaScriptModule');
-const serveStaticFile = require('./serveStaticFile');
-const serveMetadata = require('./serveMetadata');
+import serveAutoIndexPage from './serveAutoIndexPage';
+import serveHTMLModule from './serveHTMLModule';
+import serveJavaScriptModule from './serveJavaScriptModule';
+import serveMetadata from './serveMetadata';
+import serveStaticFile from './serveStaticFile';
 
 /**
  * Send the file, JSON metadata, or HTML directory listing.
  */
-function serveFile(req, res) {
+export default function serveFile(req, res) {
   if (req.query.meta != null) {
     return serveMetadata(req, res);
   }
@@ -33,5 +33,3 @@ function serveFile(req, res) {
 
   serveStaticFile(req, res);
 }
-
-module.exports = serveFile;

@@ -1,17 +1,29 @@
 language: node_js
 node_js: node
 cache: npm
-services:
-- redis-server
+env:
+  global:
+  - secure: uKf/ZaQjLXOQE+h/HE2YhabzndG/gYtDU2hfo799hgyb/W1ojgW3NJZyS2H4SJ3ESaGSwc0L6x/CRGc6jn09rx4iDEzt5jeIQhA4IrEIlLEEarnn3amUqrQ4syd2GPpqsFROu7d5aQDK/dZHLk5Hpv1y9Atz392VCWnro5Pbc0tkRkMaCPZLEgs2A6wK0aYzX3X7FACyBXBc/xA+FfzevpAx7SVt10A6pxx8rYbqrmz0hi4NEH8wmynN35imKxRCVWblHv8ty7ZkyfTv7kUaEW0wBfTxJNh/Kio4Y71Jg/DI6lekF0oY2gAqZ+JnReC94po2HEaF15NuC6j35HHv56CtTUQBRl/nKrItPI7PMuPlyCHi5ChuSD3Oc5Hmu2UiRh5le+iNLjHrpXD25tAOPUfSmrgkaLIn0fdqeKnO3D4Be55KTnWhDlSWjyaQFR9POUvIQwWzjdTflIegRQIzNEC6z9fAp+YDpVyCgbpHbWk0xF8lrEqvBRoJ8vOTYTNUiYM/XPWrv552MyC90th8yCaWl+Dhf2Zso1/neIAejbwhGhFXUeXHxkUK+JDYvfDlq4yrg8h4MPuZ0SE3U5sqvFeNxxFbvNLxbbWLOYmaAXfYrdjT3Ns0TEQc49ZUkLz5feGsIkh+CpiqVRUoBVCizrnAU6mzW2E7IsHVES1ILVY=
+  - secure: 2glMrYXCJv0NAtO3MouSWhijwdUDaYPTWuNT+la0A4hxIF+N00j2+kgqjidJAmijpmPICEyeXe5RtdLVER8Wye8Nz6FocagC/bM3TKmGg689033HjUU1f4YDXkrhemywWV+Kdgnd+98bFWmUBUGy0c0m+C2GR+DocYchIVwzHH7NVUwRd+byE5CtW3xSMhrKVPhiQgeCBbMYLCHCrsppAsxRChRYcteYAXsR4DeT9BRyZ2q35FNNxh3NuVOBUoH1jUMEbJJ+te1UwxLM1mZRJ5GpJ1B6349myX0L5I5DxoYZqTMUSbYGFB5Ad1NZjEXxS6WtrlWRlsviX5ER3J8AkfPh4sjVt9IqAinBeMhW3SUeK2qazdWE/7zyb3n5sL4/74epGeLp6Sq4OHVDVTiDMVN1rW+9no0IKknvgzqDVkdp3/ShJnQj0TrZYjXyn2wnmYcfMIHjsqWr+uY0oFbyZDNeIGV9f/KW1Rx8XZt3pqiR2AuxLrvKTpPL/Zffu5GXryM53gpcWFoXFHjpBfFbRP250wLiCqNY+XZSA7okzv6vIsykXsHU6FEu7SYiZZhX2mfJQOSRa/+64wuhKwNllSuLIj1I9n/myaSUNQa5Lor6jzsDz4dbXP/tEnh93mXvdKe3DdS9LG7Ca9V8YfxOWccJhT7gXf7DVFMNI5VNMvw=
+before_install:
+- openssl aes-256-cbc -K $encrypted_a35d52d190dd_key -iv $encrypted_a35d52d190dd_iv
+  -in secrets.tar.enc -out secrets.tar -d
+- tar xvf secrets.tar
 script:
 - npm run lint
-- npm test
-- npm run build
+- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") npm run build
 deploy:
-  provider: heroku
+- provider: gae
   skip_cleanup: true
-  app: unpkg
-  api_key:
-    secure: qJTOiZE1hbghS0U7xpqU/38jm1Dga8bycsgDTW2wOSfAxqxtR4rAilW3ffBHY8/VSqt5GLkyPqFzb9R3I+xlcK6oakQyNMFGjQwMAqwdtHjucr45jWYNeqWf6Nbrrj+0LiQiH/uqMB4mKPquGqx2k2JIHW6jy5ndK14lI9a7SP44edyNugjhNW+OOYjwqo6maHvRoFNxL7kxrw7Js90d0gIKXpunBqHmxmr/hlYcGr9qJ+bLUXxmObxpoFWKHE0iTsTw3C3y558wZpHTfa3vXIvhseW2q7ATuRRVBv8StNjYxYSGpeZA+59d48z3EPK/mp7ybZO6cWyaBdcA9yF3thISEXlXcRcCck5KYk4gwzgrcfug59Z1VJUVXCywJTUu42V5ISoyUKJ+DelkkvMpXQH9T9fxm5eWEwb7sb+UTo3R8mlFliBogvXrWOKNXeRFsLQXH3/YmOUWONUUYRJS11K/p+sFOTfTfaH5lS0AFKCAKtvfLjdLUclsmmrITSFQa42/SRsFx88v3RxDL93r2838p51N7U/RqOqTNfQ8JR2iQOWlthMEvnVZMNs3VT9lW5eYIdTd5kpW/ARVtQf2drVVYR5BzNRJlGyw7M4x1riwNO7XhNqH76Iy/zMbeEDGaXqBCfzgq9vsRAjZm/TFKw8eOEy8+EGxLrBKD1U7EuI=
+  keyfile: service-account-staging.json
+  project: unpkg-staging
+  config: app-staging.yaml
+  on:
+    branch: staging
+- provider: gae
+  skip_cleanup: true
+  keyfile: service-account.json
+  project: unpkg-gcp
+  config: app.yaml
   on:
     branch: master

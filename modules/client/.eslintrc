@@ -9,6 +9,8 @@
     "plugin:react/recommended"
   ],
   "rules": {
-    "react/no-children-prop": 0
+    "import/no-unresolved": 0,
+    "react/no-children-prop": 0,
+    "react/prop-types": 0
   }
 }

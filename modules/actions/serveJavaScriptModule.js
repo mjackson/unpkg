@@ -1,9 +1,9 @@
-const etag = require('etag');
+import etag from 'etag';
 
-const getContentTypeHeader = require('../utils/getContentTypeHeader');
-const rewriteBareModuleIdentifiers = require('../utils/rewriteBareModuleIdentifiers');
+import getContentTypeHeader from '../utils/getContentTypeHeader';
+import rewriteBareModuleIdentifiers from '../utils/rewriteBareModuleIdentifiers';
 
-function serveJavaScriptModule(req, res) {
+export default function serveJavaScriptModule(req, res) {
   try {
     const code = rewriteBareModuleIdentifiers(
       req.entry.content.toString('utf8'),
@@ -14,7 +14,7 @@ function serveJavaScriptModule(req, res) {
       .set({
         'Content-Length': Buffer.byteLength(code),
         'Content-Type': getContentTypeHeader(req.entry.contentType),
-        'Cache-Control': 'public, max-age=31536000, immutable', // 1 year
+        'Cache-Control': 'public, max-age=31536000', // 1 year
         ETag: etag(code),
         'Cache-Tag': 'file, js-file, js-module'
       })
@@ -40,5 +40,3 @@ function serveJavaScriptModule(req, res) {
       );
   }
 }
-
-module.exports = serveJavaScriptModule;

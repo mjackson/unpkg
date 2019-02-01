@@ -1,4 +1,4 @@
-function formatNumber(n) {
+export default function formatNumber(n) {
   const digits = String(n).split('');
   const groups = [];
 
@@ -8,5 +8,3 @@ function formatNumber(n) {
 
   return groups.join(',');
 }
-
-module.exports = formatNumber;

@@ -1,8 +1,10 @@
-const babel = require('babel-core');
+import babel from '@babel/core';
 
-const unpkgRewrite = require('../plugins/unpkgRewrite');
+import unpkgRewrite from '../plugins/unpkgRewrite';
 
-function rewriteBareModuleIdentifiers(code, packageConfig) {
+const origin = process.env.ORIGIN || 'https://unpkg.com';
+
+export default function rewriteBareModuleIdentifiers(code, packageConfig) {
   const dependencies = Object.assign(
     {},
     packageConfig.peerDependencies,
@@ -14,10 +16,8 @@ function rewriteBareModuleIdentifiers(code, packageConfig) {
     // because we haven't installed dependencies so
     // we can't load plugins; see #84
     babelrc: false,
-    plugins: [unpkgRewrite(dependencies)]
+    plugins: [unpkgRewrite(origin, dependencies)]
   };
 
   return babel.transform(code, options).code;
 }
-
-module.exports = rewriteBareModuleIdentifiers;
