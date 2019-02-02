@@ -3,11 +3,9 @@ import semver from 'semver';
 import addLeadingSlash from '../utils/addLeadingSlash';
 import createPackageURL from '../utils/createPackageURL';
 import createSearch from '../utils/createSearch';
-import getNpmPackageInfo from '../utils/getNpmPackageInfo';
+import { getConfig, getTags, getVersions } from '../utils/npm';
 
-function tagRedirect(req, res) {
-  const version = req.packageInfo['dist-tags'][req.packageVersion];
-
+function tagRedirect(req, res, version) {
   res
     .set({
       'Cache-Control': 'public, s-maxage=14400, max-age=3600', // 4 hours on CDN, 1 hour on clients
@@ -19,28 +17,16 @@ function tagRedirect(req, res) {
     );
 }
 
-function semverRedirect(req, res) {
-  const maxVersion = semver.maxSatisfying(
-    Object.keys(req.packageInfo.versions),
-    req.packageVersion
-  );
-
-  if (maxVersion) {
-    res
-      .set({
-        'Cache-Control': 'public, s-maxage=14400, max-age=3600', // 4 hours on CDN, 1 hour on clients
-        'Cache-Tag': 'redirect, semver-redirect'
-      })
-      .redirect(
-        302,
-        createPackageURL(req.packageName, maxVersion, req.filename, req.search)
-      );
-  } else {
-    res
-      .status(404)
-      .type('text')
-      .send(`Cannot find package ${req.packageSpec}`);
-  }
+function semverRedirect(req, res, version) {
+  res
+    .set({
+      'Cache-Control': 'public, s-maxage=14400, max-age=3600', // 4 hours on CDN, 1 hour on clients
+      'Cache-Tag': 'redirect, semver-redirect'
+    })
+    .redirect(
+      302,
+      createPackageURL(req.packageName, version, req.filename, req.search)
+    );
 }
 
 function filenameRedirect(req, res) {
@@ -97,40 +83,66 @@ function filenameRedirect(req, res) {
  * exact filename if the request omits the filename.
  */
 export default function fetchPackage(req, res, next) {
-  getNpmPackageInfo(req.packageName).then(
-    packageInfo => {
-      if (packageInfo == null || packageInfo.versions == null) {
-        return res
-          .status(404)
-          .type('text')
-          .send(`Cannot find package "${req.packageName}"`);
+  getConfig(req.packageName, req.packageVersion).then(
+    config => {
+      if (config) {
+        req.packageConfig = config;
+        return req.filename ? next() : filenameRedirect(req, res);
       }
 
-      req.packageInfo = packageInfo;
-      req.packageConfig = req.packageInfo.versions[req.packageVersion];
+      getTags(req.packageName).then(
+        tags => {
+          if (req.packageVersion in tags) {
+            return tagRedirect(req, res, tags[req.packageVersion]);
+          }
 
-      if (!req.packageConfig) {
-        // Redirect to a fully-resolved version.
-        if (req.packageVersion in req.packageInfo['dist-tags']) {
-          return tagRedirect(req, res);
-        } else {
-          return semverRedirect(req, res);
+          getVersions(req.packageName).then(
+            versions => {
+              const maxVersion = semver.maxSatisfying(
+                versions,
+                req.packageVersion
+              );
+
+              if (maxVersion) {
+                return semverRedirect(req, res, maxVersion);
+              }
+
+              res
+                .status(404)
+                .type('text')
+                .send(
+                  `Cannot find matching version for package "${
+                    req.packageName
+                  }" at version "${req.packageVersion}"`
+                );
+            },
+            error => {
+              console.error(error);
+
+              res
+                .status(500)
+                .type('text')
+                .send(`Cannot get versions for package "${req.packageName}"`);
+            }
+          );
+        },
+        error => {
+          console.error(error);
+
+          res
+            .status(500)
+            .type('text')
+            .send(`Cannot get tags for package "${req.packageName}"`);
         }
-      }
-
-      if (!req.filename) {
-        return filenameRedirect(req, res);
-      }
-
-      next();
+      );
     },
     error => {
       console.error(error);
 
-      return res
+      res
         .status(500)
         .type('text')
-        .send(`Cannot get info for package "${req.packageName}"`);
+        .send(`Cannot get config for package "${req.packageSpec}"`);
     }
   );
 }

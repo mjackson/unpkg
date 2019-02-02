@@ -1,7 +1,8 @@
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
-import semver from 'semver';
 
 import AutoIndexApp from '../client/autoIndex/App';
+
+import { getVersions } from '../utils/npm';
 
 import createElement from './utils/createElement';
 import createHTML from './utils/createHTML';
@@ -24,41 +25,51 @@ const globalURLs =
         'react-dom': '/react-dom@16.7.0/umd/react-dom.development.js'
       };
 
-function byVersion(a, b) {
-  return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
-}
-
 export default function serveAutoIndexPage(req, res) {
-  const data = {
-    packageName: req.packageName,
-    packageVersion: req.packageVersion,
-    availableVersions: Object.keys(req.packageInfo.versions).sort(byVersion),
-    filename: req.filename,
-    entry: req.entry,
-    entries: req.entries
-  };
-  const content = createHTML(renderToString(createElement(AutoIndexApp, data)));
-  const entryPoint = getEntryPoint('autoIndex', 'iife');
-  const elements = getGlobalScripts(entryPoint, globalURLs).concat(
-    createScript(entryPoint.code)
+  getVersions(req.packageName).then(
+    versions => {
+      const data = {
+        packageName: req.packageName,
+        packageVersion: req.packageVersion,
+        availableVersions: versions,
+        filename: req.filename,
+        entry: req.entry,
+        entries: req.entries
+      };
+      const content = createHTML(
+        renderToString(createElement(AutoIndexApp, data))
+      );
+      const entryPoint = getEntryPoint('autoIndex', 'iife');
+      const elements = getGlobalScripts(entryPoint, globalURLs).concat(
+        createScript(entryPoint.code)
+      );
+
+      const html =
+        doctype +
+        renderToStaticMarkup(
+          createElement(MainTemplate, {
+            title: `UNPKG - ${req.packageName}`,
+            description: `The CDN for ${req.packageName}`,
+            data,
+            content,
+            elements
+          })
+        );
+
+      res
+        .set({
+          'Cache-Control': 'public, max-age=14400', // 4 hours
+          'Cache-Tag': 'auto-index'
+        })
+        .send(html);
+    },
+    error => {
+      console.error(error);
+
+      res
+        .status(500)
+        .type('text')
+        .send(`Cannot get versions for package "${req.packageVersion}"`);
+    }
   );
-
-  const html =
-    doctype +
-    renderToStaticMarkup(
-      createElement(MainTemplate, {
-        title: `UNPKG - ${req.packageName}`,
-        description: `The CDN for ${req.packageName}`,
-        data,
-        content,
-        elements
-      })
-    );
-
-  res
-    .set({
-      'Cache-Control': 'public, max-age=14400', // 4 hours
-      'Cache-Tag': 'auto-index'
-    })
-    .send(html);
 }

@@ -3,7 +3,7 @@ import path from 'path';
 import addLeadingSlash from '../utils/addLeadingSlash';
 import createPackageURL from '../utils/createPackageURL';
 import createSearch from '../utils/createSearch';
-import fetchNpmPackage from '../utils/fetchNpmPackage';
+import { fetchPackage } from '../utils/npm';
 import getIntegrity from '../utils/getIntegrity';
 import getContentType from '../utils/getContentType';
 
@@ -125,7 +125,7 @@ const multipleSlash = /\/\/+/;
  * Redirect to the "index" file if a directory was requested.
  */
 export default function findFile(req, res, next) {
-  fetchNpmPackage(req.packageConfig).then(tarballStream => {
+  fetchPackage(req.packageConfig).then(tarballStream => {
     const entryName = req.filename
       .replace(multipleSlash, '/')
       .replace(trailingSlash, '')
