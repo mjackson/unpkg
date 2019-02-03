@@ -3,7 +3,7 @@ env: standard
 instance_class: F4
 automatic_scaling:
   min_instances: 2
-  max_instances: 12
-  max_concurrent_requests: 20
-  target_throughput_utilization: 0.6
-  max_idle_instances: 2
+  max_instances: 0
+  target_cpu_utilization: 0.7
+  max_concurrent_requests: 10
+  target_throughput_utilization: 0.8
