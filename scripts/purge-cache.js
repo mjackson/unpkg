@@ -37,19 +37,24 @@ getFiles(packageName, version)
       )
     );
 
+    let urls = files.map(
+      file => `https://unpkg.com/${packageName}@${version}${file.path}`
+    );
+
+    if (version === 'latest') {
+      // Purge the URL w/out the "@latest" too.
+      urls = urls.concat(
+        files.map(file => `https://unpkg.com/${packageName}${file.path}`)
+      );
+    }
+
     return getZone('unpkg.com').then(zone => {
       let promise = Promise.resolve();
 
-      groupBy(files, 30).forEach(group => {
+      groupBy(urls, 30).forEach(group => {
         promise = promise.then(() => {
-          const urls = group.map(
-            file => `https://unpkg.com/${packageName}@${version}${file.path}`
-          );
-
-          return purgeFiles(zone.id, urls).then(data => {
-            group.forEach(file =>
-              console.log(chalk.green(`Purged ${file.path}`))
-            );
+          return purgeFiles(zone.id, group).then(data => {
+            group.forEach(url => console.log(chalk.green(`Purged ${url}`)));
           });
         });
       });
