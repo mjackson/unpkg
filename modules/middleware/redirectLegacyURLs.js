@@ -1,20 +1,15 @@
-import createSearch from '../utils/createSearch';
-
 /**
  * Redirect old URLs that we no longer support.
  */
 export default function redirectLegacyURLs(req, res, next) {
-  // Permanently redirect /_meta/path to /path?meta.
+  // Permanently redirect /_meta/path to /_metadata/path
   if (req.path.match(/^\/_meta\//)) {
-    req.query.meta = '';
-    return res.redirect(301, req.path.substr(6) + createSearch(req.query));
+    return res.redirect(301, '/_metadata' + req.path.substr(6));
   }
 
   // Permanently redirect /path?json => /path?meta
   if (req.query.json != null) {
-    delete req.query.json;
-    req.query.meta = '';
-    return res.redirect(301, req.path + createSearch(req.query));
+    return res.redirect(301, '/_metadata' + req.path);
   }
 
   next();

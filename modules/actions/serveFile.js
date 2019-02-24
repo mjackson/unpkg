@@ -1,13 +1,13 @@
 import serveAutoIndexPage from './serveAutoIndexPage';
-import serveHTMLModule from './serveHTMLModule';
-import serveJavaScriptModule from './serveJavaScriptModule';
 import serveMetadata from './serveMetadata';
+import serveModule from './serveModule';
 import serveStaticFile from './serveStaticFile';
 
 /**
  * Send the file, JSON metadata, or HTML directory listing.
  */
 export default function serveFile(req, res) {
+  // Deprecated.
   if (req.query.meta != null) {
     return serveMetadata(req, res);
   }
@@ -16,19 +16,9 @@ export default function serveFile(req, res) {
     return serveAutoIndexPage(req, res);
   }
 
+  // Deprecated.
   if (req.query.module != null) {
-    if (req.entry.contentType === 'application/javascript') {
-      return serveJavaScriptModule(req, res);
-    }
-
-    if (req.entry.contentType === 'text/html') {
-      return serveHTMLModule(req, res);
-    }
-
-    return res
-      .status(403)
-      .type('text')
-      .send('?module mode is available only for JavaScript and HTML files');
+    return serveModule(req, res);
   }
 
   serveStaticFile(req, res);
