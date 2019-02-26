@@ -83,7 +83,7 @@ function Stats({ data }) {
       of <strong>{formatBytes(totals.bandwidth.all)}</strong> of data to{' '}
       <strong>{formatNumber(totals.uniques.all)}</strong> unique visitors,{' '}
       <strong>
-        {formatPercent(totals.requests.cached / totals.requests.all, 0)}%
+        {formatPercent(totals.requests.cached / totals.requests.all, 2)}%
       </strong>{' '}
       of which were served from the cache.
     </p>
