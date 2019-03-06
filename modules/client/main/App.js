@@ -283,7 +283,7 @@ export default class App extends React.Component {
             <a href="https://docs.npmjs.com/files/package.json#files">
               files array
             </a>{' '}
-            in
+            in{' '}
             <code>package.json</code>
           </li>
           <li>
