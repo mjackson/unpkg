@@ -96,15 +96,18 @@ export default class App extends React.Component {
 
     this.state = { stats: null };
 
-    if (typeof window === 'object' && window.localStorage) {
+    try {
       const savedStats = window.localStorage.savedStats;
-
       if (savedStats) {
         this.state.stats = JSON.parse(savedStats);
       }
+    } catch (e) {}
 
+    if (this.state.stats) {
       window.onbeforeunload = () => {
-        window.localStorage.savedStats = JSON.stringify(this.state.stats);
+        try {
+          window.localStorage.savedStats = JSON.stringify(this.state.stats);
+        } catch (e) {}
       };
     }
   }
