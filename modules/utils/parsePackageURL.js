@@ -2,20 +2,14 @@ import url from 'url';
 
 const packageURLFormat = /^\/((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(\/.*)?$/;
 
-function decodeParam(param) {
-  if (param) {
-    try {
-      return decodeURIComponent(param);
-    } catch (error) {
-      // Ignore invalid params.
-    }
+export default function parsePackageURL(originalURL) {
+  let { pathname, search, query } = url.parse(originalURL, true);
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch (error) {
+    return null;
   }
 
-  return '';
-}
-
-export default function parsePackageURL(originalURL) {
-  const { pathname, search, query } = url.parse(originalURL, true);
   const match = packageURLFormat.exec(pathname);
 
   // Disallow invalid URL formats.
@@ -24,8 +18,8 @@ export default function parsePackageURL(originalURL) {
   }
 
   const packageName = match[1];
-  const packageVersion = decodeParam(match[2]) || 'latest';
-  const filename = decodeParam(match[3]);
+  const packageVersion = match[2] || 'latest';
+  const filename = match[3] || '';
 
   return {
     // If the URL is /@scope/name@version/file.js?main=browser:
