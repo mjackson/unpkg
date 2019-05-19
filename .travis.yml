@@ -1,6 +1,6 @@
 language: node_js
 node_js: node
-cache: npm
+cache: yarn
 env:
   global:
   - secure: uKf/ZaQjLXOQE+h/HE2YhabzndG/gYtDU2hfo799hgyb/W1ojgW3NJZyS2H4SJ3ESaGSwc0L6x/CRGc6jn09rx4iDEzt5jeIQhA4IrEIlLEEarnn3amUqrQ4syd2GPpqsFROu7d5aQDK/dZHLk5Hpv1y9Atz392VCWnro5Pbc0tkRkMaCPZLEgs2A6wK0aYzX3X7FACyBXBc/xA+FfzevpAx7SVt10A6pxx8rYbqrmz0hi4NEH8wmynN35imKxRCVWblHv8ty7ZkyfTv7kUaEW0wBfTxJNh/Kio4Y71Jg/DI6lekF0oY2gAqZ+JnReC94po2HEaF15NuC6j35HHv56CtTUQBRl/nKrItPI7PMuPlyCHi5ChuSD3Oc5Hmu2UiRh5le+iNLjHrpXD25tAOPUfSmrgkaLIn0fdqeKnO3D4Be55KTnWhDlSWjyaQFR9POUvIQwWzjdTflIegRQIzNEC6z9fAp+YDpVyCgbpHbWk0xF8lrEqvBRoJ8vOTYTNUiYM/XPWrv552MyC90th8yCaWl+Dhf2Zso1/neIAejbwhGhFXUeXHxkUK+JDYvfDlq4yrg8h4MPuZ0SE3U5sqvFeNxxFbvNLxbbWLOYmaAXfYrdjT3Ns0TEQc49ZUkLz5feGsIkh+CpiqVRUoBVCizrnAU6mzW2E7IsHVES1ILVY=
@@ -10,8 +10,8 @@ before_install:
   -in secrets.tar.enc -out secrets.tar -d
 - tar xvf secrets.tar
 script:
-- npm run lint
-- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") npm run build
+- yarn lint
+- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") yarn build
 deploy:
 - provider: gae
   skip_cleanup: true
