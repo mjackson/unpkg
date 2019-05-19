@@ -7,7 +7,6 @@ import serveStaticFile from './serveStaticFile';
  * Send the file, JSON metadata, or HTML directory listing.
  */
 export default function serveFile(req, res) {
-  // Deprecated.
   if (req.query.meta != null) {
     return serveMetadata(req, res);
   }
@@ -16,7 +15,6 @@ export default function serveFile(req, res) {
     return serveAutoIndexPage(req, res);
   }
 
-  // Deprecated.
   if (req.query.module != null) {
     return serveModule(req, res);
   }

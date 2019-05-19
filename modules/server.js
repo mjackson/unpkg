@@ -3,8 +3,6 @@ import express from 'express';
 // import serveAuth from './actions/serveAuth';
 import serveFile from './actions/serveFile';
 import serveMainPage from './actions/serveMainPage';
-import serveMetadata from './actions/serveMetadata';
-import serveModule from './actions/serveModule';
 import servePublicKey from './actions/servePublicKey';
 import serveStats from './actions/serveStats';
 
@@ -48,36 +46,6 @@ app.use(
     // app.get('/auth', userToken, serveAuth);
     app.get('/public-key', servePublicKey);
     app.get('/stats', serveStats);
-  })
-);
-
-app.use(
-  '/_metadata',
-  createRouter(app => {
-    app.get(
-      '*',
-      validatePackageURL,
-      validatePackageName,
-      validateQuery,
-      fetchPackage,
-      findFile,
-      serveMetadata
-    );
-  })
-);
-
-app.use(
-  '/_module',
-  createRouter(app => {
-    app.get(
-      '*',
-      validatePackageURL,
-      validatePackageName,
-      validateQuery,
-      fetchPackage,
-      findFile,
-      serveModule
-    );
   })
 );
 

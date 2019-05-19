@@ -2,8 +2,8 @@ import createSearch from '../utils/createSearch';
 
 const knownQueryParams = {
   main: true, // Deprecated, see #63
-  meta: true, // Deprecated
-  module: true // Deprecated
+  meta: true,
+  module: true
 };
 
 function isKnownQueryParam(param) {
