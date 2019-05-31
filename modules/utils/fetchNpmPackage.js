@@ -1,4 +1,5 @@
 import url from 'url';
+import http from 'http';
 import https from 'https';
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
@@ -13,14 +14,15 @@ export default function fetchNpmPackage(packageConfig) {
 
     debug('Fetching package for %s from %s', packageConfig.name, tarballURL);
 
-    const { hostname, pathname } = url.parse(tarballURL);
+    const { protocol, hostname, port, pathname } = url.parse(tarballURL);
     const options = {
-      agent: agent,
+      agent: agent[protocol],
       hostname: hostname,
+      port: port,
       path: pathname
     };
 
-    https
+    ((protocol === 'http:') ? http : https)
       .get(options, res => {
         if (res.statusCode === 200) {
           resolve(res.pipe(gunzip()).pipe(tar.extract()));

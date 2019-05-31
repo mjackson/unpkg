@@ -1,12 +1,14 @@
 import url from 'url';
+import http from 'http';
 import https from 'https';
-
 import debug from './debug';
 import bufferStream from './bufferStream';
 import agent from './registryAgent';
 
 const npmRegistryURL =
   process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org';
+
+const registryGet = ((npmRegistryURL.startsWith('http://')) ? http : https).get
 
 function parseJSON(res) {
   return bufferStream(res).then(JSON.parse);
@@ -23,18 +25,19 @@ export default function fetchNpmPackageInfo(packageName) {
 
     debug('Fetching package info for %s from %s', packageName, infoURL);
 
-    const { hostname, pathname } = url.parse(infoURL);
+    const { protocol, hostname, port, pathname } = url.parse(infoURL);
     const options = {
-      agent: agent,
+      agent: agent[protocol],
       hostname: hostname,
+      port: port,
       path: pathname,
       headers: {
         Accept: 'application/json'
       }
     };
 
-    https
-      .get(options, res => {
+    
+    registryGet(options, res => {
         if (res.statusCode === 200) {
           resolve(parseJSON(res));
         } else if (res.statusCode === 404) {
