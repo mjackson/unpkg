@@ -30,10 +30,18 @@ function stripLeadingSegment(name) {
   return name.replace(/^[^/]+\/?/, '');
 }
 
+/**
+ * Search the given tarball for entries that match the given name.
+ * Follows node's resolution algorithm.
+ * https://nodejs.org/api/modules.html#modules_all_together
+ */
 function searchEntries(tarballStream, entryName, wantsIndex) {
   return new Promise((resolve, reject) => {
+    const jsEntryName = `${entryName}.js`;
+    const jsonEntryName = `${entryName}.json`;
     const entries = {};
-    let foundEntry = null;
+
+    let foundEntry;
 
     if (entryName === '') {
       foundEntry = entries[''] = { name: '', type: 'directory' };
@@ -41,7 +49,6 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
 
     tarballStream
       .on('error', reject)
-      .on('finish', () => resolve({ entries, foundEntry }))
       .on('entry', (header, stream, next) => {
         const entry = {
           // Most packages have header names that look like `package/index.js`
@@ -52,7 +59,7 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
           type: header.type
         };
 
-        // We are only interested in files that match the entryName.
+        // Skip non-files and files that don't match the entryName.
         if (entry.type !== 'file' || entry.name.indexOf(entryName) !== 0) {
           stream.resume();
           stream.on('end', next);
@@ -63,62 +70,74 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
 
         // Dynamically create "directory" entries for all directories
         // that are in this file's path. Some tarballs omit these entries
-        // for some reason, so this is the brute force method.
-        let dirname = path.dirname(entry.name);
-        while (dirname !== '.') {
-          const directoryEntry = { name: dirname, type: 'directory' };
-
-          if (!entries[dirname]) {
-            entries[dirname] = directoryEntry;
-
-            if (directoryEntry.name === entryName) {
-              foundEntry = directoryEntry;
-            }
-          }
-
-          dirname = path.dirname(dirname);
+        // for some reason, so this is the "brute force" method.
+        let dir = path.dirname(entry.name);
+        while (dir !== '.') {
+          entries[dir] = entries[dir] || { name: dir, type: 'directory' };
+          dir = path.dirname(dir);
         }
 
-        // Set the foundEntry variable if this entry name
-        // matches exactly or if it's an index.html file
-        // and the client wants HTML.
         if (
           entry.name === entryName ||
-          // Allow accessing e.g. `/index.js` or `/index.json` using
-          // `/index` for compatibility with CommonJS
-          (!wantsIndex && entry.name === `${entryName}.js`) ||
-          (!wantsIndex && entry.name === `${entryName}.json`)
+          // Allow accessing e.g. `/index.js` or `/index.json`
+          // using `/index` for compatibility with npm
+          (!wantsIndex && entry.name === jsEntryName) ||
+          (!wantsIndex && entry.name === jsonEntryName)
         ) {
-          foundEntry = entry;
+          if (foundEntry) {
+            if (
+              foundEntry.name !== entryName &&
+              (entry.name === entryName ||
+                (entry.name === jsEntryName &&
+                  foundEntry.name === jsonEntryName))
+            ) {
+              // This entry is higher priority than the one
+              // we already found. Replace it.
+              delete foundEntry.content;
+              foundEntry = entry;
+            }
+          } else {
+            foundEntry = entry;
+          }
         }
 
         const chunks = [];
 
-        stream.on('data', chunk => chunks.push(chunk)).on('end', () => {
-          const content = Buffer.concat(chunks);
+        stream
+          .on('data', chunk => chunks.push(chunk))
+          .on('end', () => {
+            const content = Buffer.concat(chunks);
 
-          // Set some extra properties for files that we will
-          // need to serve them and for ?meta listings.
-          entry.contentType = getContentType(entry.name);
-          entry.integrity = getIntegrity(content);
-          entry.lastModified = header.mtime.toUTCString();
-          entry.size = content.length;
+            // Set some extra properties for files that we will
+            // need to serve them and for ?meta listings.
+            entry.contentType = getContentType(entry.name);
+            entry.integrity = getIntegrity(content);
+            entry.lastModified = header.mtime.toUTCString();
+            entry.size = content.length;
 
-          // Set the content only for the foundEntry and
-          // discard the buffer for all others.
-          if (entry === foundEntry) {
-            entry.content = content;
-          }
+            // Set the content only for the foundEntry and
+            // discard the buffer for all others.
+            if (entry === foundEntry) {
+              entry.content = content;
+            }
 
-          next();
+            next();
+          });
+      })
+      .on('finish', () => {
+        resolve({
+          entries,
+          // If we didn't find a matching file entry,
+          // try a directory entry with the same name.
+          foundEntry: foundEntry || entries[entryName] || null
         });
       });
   });
 }
 
 const leadingSlash = /^\//;
-const trailingSlash = /\/$/;
 const multipleSlash = /\/\/+/;
+const trailingSlash = /\/$/;
 
 /**
  * Fetch and search the archive to try and find the requested file.
@@ -126,11 +145,13 @@ const multipleSlash = /\/\/+/;
  */
 export default function findFile(req, res, next) {
   fetchNpmPackage(req.packageConfig).then(tarballStream => {
+    const wantsIndex = trailingSlash.test(req.filename);
+
+    // The name of the file/directory we're looking for.
     const entryName = req.filename
       .replace(multipleSlash, '/')
       .replace(trailingSlash, '')
       .replace(leadingSlash, '');
-    const wantsIndex = trailingSlash.test(req.filename);
 
     searchEntries(tarballStream, entryName, wantsIndex).then(
       ({ entries, foundEntry }) => {
