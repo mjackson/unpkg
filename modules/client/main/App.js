@@ -185,7 +185,7 @@ export default class App extends React.Component {
         <p>
           If you omit the file path (i.e. use a &ldquo;bare&rdquo; URL), unpkg
           will serve the file specified by the <code>unpkg</code> field in{' '}
-          <code>package.json</code>, or fall back to
+          <code>package.json</code>, or fall back to{' '}
           <code>main</code>.
         </p>
 
