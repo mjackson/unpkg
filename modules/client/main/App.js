@@ -185,8 +185,7 @@ export default class App extends React.Component {
         <p>
           If you omit the file path (i.e. use a &ldquo;bare&rdquo; URL), unpkg
           will serve the file specified by the <code>unpkg</code> field in{' '}
-          <code>package.json</code>, or fall back to{' '}
-          <code>main</code>.
+          <code>package.json</code>, or fall back to <code>main</code>.
         </p>
 
         <ul>
@@ -249,15 +248,23 @@ export default class App extends React.Component {
           different one at the same version number.
         </p>
         <p>
+          Browsers are instructed (via the <code>Cache-Control</code> header) to
+          cache assets indefinitely (1 year).
+        </p>
+        <p>
           URLs that do not specify a package version number redirect to one that
           does. This is the <code>latest</code> version when no version is
           specified, or the <code>maxSatisfying</code> version when a{' '}
           <a href="https://github.com/npm/node-semver">semver version</a> is
-          given. Redirects are cached for 5 minutes.
+          given. Redirects are cached for 10 minutes at the CDN, 1 minute in
+          browsers.
         </p>
         <p>
-          Browsers are instructed (via the <code>Cache-Control</code> header) to
-          cache assets for 1 year.
+          If you&apos;re you want users to be able to use the latest version
+          when you cut a new release, the best policy is to put the version
+          number in the URL directly in your installation instructions. This
+          will also load more quickly because we won&apos;t have to resolve the
+          latest version and redirect them.
         </p>
 
         <h3 css={styles.subheading} id="workflow">
@@ -283,8 +290,7 @@ export default class App extends React.Component {
             <a href="https://docs.npmjs.com/files/package.json#files">
               files array
             </a>{' '}
-            in{' '}
-            <code>package.json</code>
+            in <code>package.json</code>
           </li>
           <li>
             Use a build script to generate your UMD build in the{' '}
