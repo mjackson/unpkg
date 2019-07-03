@@ -47,10 +47,28 @@ function filenameRedirect(req, res) {
   let filename;
   if (req.query.module != null) {
     // See https://github.com/rollup/rollup/wiki/pkg.module
-    filename =
-      req.packageConfig.module ||
-      req.packageConfig['jsnext:main'] ||
-      '/index.js';
+    filename = req.packageConfig.module || req.packageConfig['jsnext:main'];
+
+    if (!filename) {
+      // https://nodejs.org/api/esm.html#esm_code_package_json_code_code_type_code_field
+      if (req.packageConfig.type === 'module') {
+        // Use whatever is in pkg.main or index.js
+        filename = req.packageConfig.main || '/index.js';
+      } else if (
+        req.packageConfig.main &&
+        /\.mjs$/.test(req.packageConfig.main)
+      ) {
+        // Use .mjs file in pkg.main
+        filename = req.packageConfig.main;
+      }
+    }
+
+    if (!filename) {
+      return res
+        .status(404)
+        .type('text')
+        .send(`Package ${req.packageSpec} does not contain an ES module`);
+    }
   } else if (
     req.query.main &&
     req.packageConfig[req.query.main] &&
