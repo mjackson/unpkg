@@ -14,4 +14,4 @@ Please visit [the UNPKG website](https://unpkg.com) to learn more about how to u
 
 ### Sponsors
 
-Our sponsors and backers are listed [in BACKERS.md](BACKERS.md).
+Our sponsors and backers are listed [in SPONSORS.md](SPONSORS.md).
