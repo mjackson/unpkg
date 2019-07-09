@@ -1,6 +1,6 @@
 {
+  "name": "unpkg",
   "private": true,
-  "name": "unpkg.com",
   "description": "The CDN for everything on npm",
   "scripts": {
     "build": "rollup -c",
