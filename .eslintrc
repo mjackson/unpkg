@@ -1,9 +1,9 @@
 {
+  "extends": ["eslint:recommended", "plugin:import/errors"],
   "parser": "babel-eslint",
   "env": {
     "node": true
   },
-  "extends": ["eslint:recommended", "plugin:import/errors"],
   "rules": {
     "no-console": 0
   },
@@ -12,9 +12,6 @@
     "Promise": true
   },
   "settings": {
-    "react": {
-      "version": "16"
-    },
     "import/resolver": {
       "node": {
         "moduleDirectory": [

@@ -37,6 +37,7 @@
     "sort-by": "^1.2.0",
     "sri-toolbox": "^0.2.0",
     "tar-stream": "^1.6.2",
+    "tempy": "^0.3.0",
     "validate-npm-package-name": "^3.0.0",
     "warning": "^4.0.2",
     "whatwg-url": "^7.0.0"
@@ -53,7 +54,7 @@
     "eslint": "^4.13.1",
     "eslint-import-resolver-node": "^0.3.2",
     "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-react": "^7.12.3",
+    "eslint-plugin-react": "^7.14.2",
     "jest": "^22.4.4",
     "node-forge": "^0.7.6",
     "rollup": "^1.1.0",
@@ -63,8 +64,7 @@
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-replace": "^2.1.0",
     "rollup-plugin-url": "^2.1.0",
-    "supertest": "^3.0.0",
-    "tempy": "^0.2.1"
+    "supertest": "^3.0.0"
   },
   "engines": {
     "node": "10.x.x"
