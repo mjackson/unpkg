@@ -1,4 +1,4 @@
-import 'isomorphic-fetch';
+import fetch from 'isomorphic-fetch';
 import invariant from 'invariant';
 import gunzip from 'gunzip-maybe';
 import ndjson from 'ndjson';
