@@ -6,8 +6,8 @@ import formatBytes from 'pretty-bytes';
 import formatDate from 'date-fns/format';
 import parseDate from 'date-fns/parse';
 
-import formatNumber from '../utils/formatNumber';
-import formatPercent from '../utils/formatPercent';
+import formatNumber from '../utils/formatNumber.js';
+import formatPercent from '../utils/formatPercent.js';
 
 import cloudflareLogo from './CloudflareLogo.png';
 import angularLogo from './AngularLogo.png';

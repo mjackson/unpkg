@@ -1,9 +1,8 @@
 /** @jsx jsx */
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Global, css, jsx } from '@emotion/core';
 
-import DirectoryListing from './DirectoryListing';
+import DirectoryListing from './DirectoryListing.js';
 
 const globalStyles = css`
   body {
@@ -16,69 +15,66 @@ const globalStyles = css`
   }
 `;
 
-export default class App extends React.Component {
-  static defaultProps = {
-    availableVersions: []
-  };
-
-  handleChange = event => {
+export default function App({
+  packageName,
+  packageVersion,
+  availableVersions = [],
+  filename,
+  entry,
+  entries
+}) {
+  function handleChange(event) {
     window.location.href = window.location.href.replace(
-      '@' + this.props.packageVersion,
+      '@' + packageVersion,
       '@' + event.target.value
     );
-  };
-
-  render() {
-    return (
-      <div css={{ maxWidth: 900, margin: '0 auto' }}>
-        <Global styles={globalStyles} />
-
-        <header
-          css={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <h1>
-            Index of /{this.props.packageName}@{this.props.packageVersion}
-            {this.props.filename}
-          </h1>
-
-          <div css={{ float: 'right', lineHeight: '2.25em' }}>
-            Version:{' '}
-            <select
-              id="version"
-              defaultValue={this.props.packageVersion}
-              onChange={this.handleChange}
-              css={{ fontSize: '1em' }}
-            >
-              {this.props.availableVersions.map(v => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
-        </header>
-
-        <hr />
-
-        <DirectoryListing
-          filename={this.props.filename}
-          entry={this.props.entry}
-          entries={this.props.entries}
-        />
-
-        <hr />
-
-        <address css={{ textAlign: 'right' }}>
-          {this.props.packageName}@{this.props.packageVersion}
-        </address>
-      </div>
-    );
   }
+
+  return (
+    <div css={{ maxWidth: 900, margin: '0 auto' }}>
+      <Global styles={globalStyles} />
+
+      <header
+        css={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <h1>
+          Index of /{packageName}@{packageVersion}
+          {filename}
+        </h1>
+
+        <div css={{ float: 'right', lineHeight: '2.25em' }}>
+          Version:{' '}
+          <select
+            id="version"
+            defaultValue={packageVersion}
+            onChange={handleChange}
+            css={{ fontSize: '1em' }}
+          >
+            {availableVersions.map(v => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+      </header>
+
+      <hr />
+
+      <DirectoryListing filename={filename} entry={entry} entries={entries} />
+
+      <hr />
+
+      <address css={{ textAlign: 'right' }}>
+        {packageName}@{packageVersion}
+      </address>
+    </div>
+  );
 }
 
 if (process.env.NODE_ENV !== 'production') {
