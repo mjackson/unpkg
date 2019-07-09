@@ -1,7 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import invariant from 'invariant';
-import gunzip from 'gunzip-maybe';
-import ndjson from 'ndjson';
 
 const cloudflareURL = 'https://api.cloudflare.com/client/v4';
 const cloudflareEmail = process.env.CLOUDFLARE_EMAIL;
@@ -14,7 +12,7 @@ invariant(
 
 invariant(cloudflareKey, 'Missing the $CLOUDFLARE_KEY environment variable');
 
-export function get(path, headers) {
+function get(path, headers) {
   return fetch(`${cloudflareURL}${path}`, {
     headers: Object.assign({}, headers, {
       'X-Auth-Email': cloudflareEmail,
@@ -23,7 +21,7 @@ export function get(path, headers) {
   });
 }
 
-export function getJSON(path, headers) {
+function getJSON(path, headers) {
   return get(path, headers)
     .then(res => {
       return res.json();
@@ -71,22 +69,4 @@ export function getZoneAnalyticsDashboard(zones, since, until) {
       );
     })
   ).then(results => results.reduce(reduceResults));
-}
-
-export function getJSONStream(path, headers) {
-  const gzipHeaders = Object.assign({}, headers, {
-    'Accept-Encoding': 'gzip'
-  });
-
-  return get(path, gzipHeaders)
-    .then(res => res.body.pipe(gunzip()))
-    .then(stream => stream.pipe(ndjson.parse()));
-}
-
-export function getLogs(zoneId, startTime, endTime, fieldsArray) {
-  const fields = fieldsArray.join(',');
-
-  return getJSONStream(
-    `/zones/${zoneId}/logs/received?start=${startTime}&end=${endTime}&fields=${fields}`
-  );
 }
