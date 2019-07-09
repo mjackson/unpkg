@@ -4,7 +4,7 @@
   "description": "The CDN for everything on npm",
   "scripts": {
     "build": "rollup -c",
-    "clean": "git clean -e '!/secret_key' -e '!/.env' -fdX .",
+    "clean": "git clean -e '!/.env' -fdX .",
     "lint": "eslint modules",
     "test": "jest",
     "watch": "rollup -c -w"

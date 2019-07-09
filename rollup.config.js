@@ -12,7 +12,6 @@ const url = require('rollup-plugin-url');
 
 const entryManifest = require('./plugins/entryManifest');
 const pkg = require('./package.json');
-const secretKey = require('./secretKey');
 
 const env = process.env.NODE_ENV || 'development';
 const dev = env === 'development';
@@ -91,8 +90,7 @@ const server = {
       'process.env.NPM_REGISTRY_URL': JSON.stringify(
         process.env.NPM_REGISTRY_URL
       ),
-      'process.env.ORIGIN': JSON.stringify(process.env.ORIGIN),
-      'process.env.SECRET_KEY': JSON.stringify(secretKey)
+      'process.env.ORIGIN': JSON.stringify(process.env.ORIGIN)
     })
   ]
 };
