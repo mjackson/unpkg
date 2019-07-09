@@ -3,7 +3,7 @@ import path from 'path';
 import addLeadingSlash from '../utils/addLeadingSlash';
 import createPackageURL from '../utils/createPackageURL';
 import createSearch from '../utils/createSearch';
-import fetchNpmPackage from '../utils/fetchNpmPackage';
+import { fetchPackage as fetchNpmPackage } from '../utils/npm';
 import getIntegrity from '../utils/getIntegrity';
 import getContentType from '../utils/getContentType';
 

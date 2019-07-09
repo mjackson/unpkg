@@ -3,7 +3,7 @@ import semver from 'semver';
 import addLeadingSlash from '../utils/addLeadingSlash';
 import createPackageURL from '../utils/createPackageURL';
 import createSearch from '../utils/createSearch';
-import getNpmPackageInfo from '../utils/getNpmPackageInfo';
+import { getPackageInfo as getNpmPackageInfo } from '../utils/npm';
 
 function tagRedirect(req, res) {
   const version = req.packageInfo['dist-tags'][req.packageVersion];
