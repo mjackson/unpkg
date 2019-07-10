@@ -1,0 +1,23 @@
+import request from 'supertest';
+
+import createServer from '../createServer.js';
+
+describe('A request for a JavaScript file', () => {
+  let server;
+  beforeEach(() => {
+    server = createServer();
+  });
+
+  it('returns 200', done => {
+    request(server)
+      .get('/react@16.8.6/index.js')
+      .end((err, res) => {
+        expect(res.statusCode).toBe(200);
+        expect(res.headers['content-type']).toMatch(
+          /\bapplication\/javascript\b/
+        );
+        expect(res.headers['content-type']).toMatch(/\bcharset=utf-8\b/);
+        done();
+      });
+  });
+});
