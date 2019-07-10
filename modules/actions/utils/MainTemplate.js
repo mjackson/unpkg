@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 
-import e from './createElement.js';
-import h from './createHTML.js';
-import x from './createScript.js';
+import {
+  createElement as e,
+  createHTML as h,
+  createScript as x
+} from './markupHelpers.js';
 
 const promiseShim =
   'window.Promise || document.write(\'\\x3Cscript src="/es6-promise@4.2.5/dist/es6-promise.min.js">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>\')';

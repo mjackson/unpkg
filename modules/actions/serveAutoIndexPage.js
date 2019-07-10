@@ -4,11 +4,13 @@ import semver from 'semver';
 import AutoIndexApp from '../client/autoIndex/App.js';
 
 import MainTemplate from './utils/MainTemplate.js';
-import createElement from './utils/createElement.js';
-import createHTML from './utils/createHTML.js';
-import createScript from './utils/createScript.js';
 import getEntryPoint from './utils/getEntryPoint.js';
 import getGlobalScripts from './utils/getGlobalScripts.js';
+import {
+  createElement,
+  createHTML,
+  createScript
+} from './utils/markupHelpers.js';
 
 const doctype = '<!DOCTYPE html>';
 const globalURLs =

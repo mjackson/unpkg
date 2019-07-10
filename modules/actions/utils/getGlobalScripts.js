@@ -1,4 +1,4 @@
-import createElement from './createElement.js';
+import { createElement } from './markupHelpers.js';
 
 export default function getGlobalScripts(entryPoint, globalURLs) {
   return entryPoint.globalImports.map(id => {
