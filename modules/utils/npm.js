@@ -13,12 +13,6 @@ const agent = new https.Agent({
   keepAlive: true
 });
 
-function get(options) {
-  return new Promise((accept, reject) => {
-    https.get(options, accept).on('error', reject);
-  });
-}
-
 const oneMegabyte = 1024 * 1024;
 const oneSecond = 1000;
 const oneMinute = oneSecond * 60;
@@ -31,8 +25,18 @@ const cache = new LRUCache({
 
 const notFound = '';
 
+function get(options) {
+  return new Promise((accept, reject) => {
+    https.get(options, accept).on('error', reject);
+  });
+}
+
+function isScopedPackageName(packageName) {
+  return packageName.startsWith('@');
+}
+
 function encodePackageName(packageName) {
-  return packageName.charAt(0) === '@'
+  return isScopedPackageName(packageName)
     ? `@${encodeURIComponent(packageName.substring(1))}`
     : encodeURIComponent(packageName);
 }
@@ -203,7 +207,7 @@ export async function getPackageConfig(packageName, version) {
  * Returns a stream of the tarball'd contents of the given package.
  */
 export async function getPackage(packageName, version) {
-  const tarballName = packageName.startsWith('@')
+  const tarballName = isScopedPackageName(packageName)
     ? packageName.split('/')[1]
     : packageName;
   const tarballURL = `${npmRegistryURL}/${packageName}/-/${tarballName}-${version}.tgz`;
