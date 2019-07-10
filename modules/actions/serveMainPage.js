@@ -3,13 +3,8 @@ import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import MainApp from '../client/main/App.js';
 
 import MainTemplate from './utils/MainTemplate.js';
-import getEntryPoint from './utils/getEntryPoint.js';
-import getGlobalScripts from './utils/getGlobalScripts.js';
-import {
-  createElement,
-  createHTML,
-  createScript
-} from './utils/markupHelpers.js';
+import getScripts from './utils/getScripts.js';
+import { createElement, createHTML } from './utils/markupHelpers.js';
 
 const doctype = '<!DOCTYPE html>';
 const globalURLs =
@@ -27,10 +22,7 @@ const globalURLs =
 
 export default function serveMainPage(req, res) {
   const content = createHTML(renderToString(createElement(MainApp)));
-  const entryPoint = getEntryPoint('main', 'iife');
-  const elements = getGlobalScripts(entryPoint, globalURLs).concat(
-    createScript(entryPoint.code)
-  );
+  const elements = getScripts('main', 'iife', globalURLs);
 
   const html =
     doctype +

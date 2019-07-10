@@ -4,13 +4,8 @@ import semver from 'semver';
 import AutoIndexApp from '../client/autoIndex/App.js';
 
 import MainTemplate from './utils/MainTemplate.js';
-import getEntryPoint from './utils/getEntryPoint.js';
-import getGlobalScripts from './utils/getGlobalScripts.js';
-import {
-  createElement,
-  createHTML,
-  createScript
-} from './utils/markupHelpers.js';
+import getScripts from './utils/getScripts.js';
+import { createElement, createHTML } from './utils/markupHelpers.js';
 
 const doctype = '<!DOCTYPE html>';
 const globalURLs =
@@ -40,10 +35,7 @@ export default function serveAutoIndexPage(req, res) {
     entries: req.entries
   };
   const content = createHTML(renderToString(createElement(AutoIndexApp, data)));
-  const entryPoint = getEntryPoint('autoIndex', 'iife');
-  const elements = getGlobalScripts(entryPoint, globalURLs).concat(
-    createScript(entryPoint.code)
-  );
+  const elements = getScripts('autoIndex', 'iife', globalURLs);
 
   const html =
     doctype +

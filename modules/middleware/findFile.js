@@ -7,6 +7,25 @@ import { fetchPackage as fetchNpmPackage } from '../utils/npm.js';
 import getIntegrity from '../utils/getIntegrity.js';
 import getContentType from '../utils/getContentType.js';
 
+function fileRedirect(req, res, entry) {
+  // Redirect to the file with the extension so it's more
+  // clear which file is being served.
+  res
+    .set({
+      'Cache-Control': 'public, max-age=31536000', // 1 year
+      'Cache-Tag': 'redirect, file-redirect'
+    })
+    .redirect(
+      302,
+      createPackageURL(
+        req.packageName,
+        req.packageVersion,
+        addLeadingSlash(entry.name),
+        createSearch(req.query)
+      )
+    );
+}
+
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
   // resolve correctly.
@@ -104,7 +123,9 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
         const chunks = [];
 
         stream
-          .on('data', chunk => chunks.push(chunk))
+          .on('data', chunk => {
+            chunks.push(chunk);
+          })
           .on('end', () => {
             const content = Buffer.concat(chunks);
 
@@ -170,6 +191,10 @@ export default async function findFile(req, res, next) {
       .send(`Cannot find "${req.filename}" in ${req.packageSpec}`);
   }
 
+  if (foundEntry.type === 'file' && foundEntry.name !== entryName) {
+    return fileRedirect(req, res, foundEntry);
+  }
+
   // If the foundEntry is a directory and there is no trailing slash
   // on the request path, we need to redirect to some "index" file
   // inside that directory. This is so our URLs work in a similar way
@@ -177,8 +202,7 @@ export default async function findFile(req, res, next) {
   // and `lib/index.json` when `lib` is a directory.
   if (foundEntry.type === 'directory' && !wantsIndex) {
     const indexEntry =
-      entries[path.join(entryName, 'index.js')] ||
-      entries[path.join(entryName, 'index.json')];
+      entries[`${entryName}/index.js`] || entries[`${entryName}/index.json`];
 
     if (indexEntry && indexEntry.type === 'file') {
       return indexRedirect(req, res, indexEntry);
