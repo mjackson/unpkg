@@ -1,4 +1,4 @@
-import { subDays, startOfDay, startOfSecond } from 'date-fns';
+import { subDays, startOfDay } from 'date-fns';
 
 import getStats from './utils/getStats.js';
 
@@ -20,18 +20,10 @@ export default function serveStats(req, res) {
         since = subDays(until, 30);
     }
   } else {
-    if (!req.query.since) {
-      return res.status(403).send({ error: 'Missing ?since query parameter' });
-    }
-
-    if (!req.query.until) {
-      return res.status(403).send({ error: 'Missing ?until query parameter' });
-    }
-
-    since = new Date(req.query.since);
     until = req.query.until
       ? new Date(req.query.until)
-      : startOfSecond(new Date());
+      : startOfDay(new Date());
+    since = req.query.since ? new Date(req.query.since) : subDays(until, 1);
   }
 
   if (isNaN(since.getTime())) {
