@@ -1,4 +1,5 @@
 // Virtual module id; see rollup.config.js
+// eslint-disable-next-line import/no-unresolved
 import entryManifest from 'entry-manifest';
 
 export default function getEntryPoint(name, format) {

@@ -1,4 +1,4 @@
-import createSearch from '../createSearch';
+import createSearch from '../createSearch.js';
 
 describe('createSearch', () => {
   it('omits the trailing = for empty string values', () => {

@@ -1,7 +1,7 @@
 import etag from 'etag';
 
-import getContentTypeHeader from '../utils/getContentTypeHeader';
-import rewriteBareModuleIdentifiers from '../utils/rewriteBareModuleIdentifiers';
+import getContentTypeHeader from '../utils/getContentTypeHeader.js';
+import rewriteBareModuleIdentifiers from '../utils/rewriteBareModuleIdentifiers.js';
 
 export default function serveJavaScriptModule(req, res) {
   try {
@@ -34,9 +34,7 @@ export default function serveJavaScriptModule(req, res) {
       .status(500)
       .type('text')
       .send(
-        `Cannot generate module for ${req.packageSpec}${
-          req.filename
-        }\n\n${debugInfo}`
+        `Cannot generate module for ${req.packageSpec}${req.filename}\n\n${debugInfo}`
       );
   }
 }

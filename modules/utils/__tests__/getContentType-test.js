@@ -1,4 +1,4 @@
-import getContentType from '../getContentType';
+import getContentType from '../getContentType.js';
 
 it('gets a content type of text/plain for LICENSE|README|CHANGES|AUTHORS|Makefile', () => {
   expect(getContentType('AUTHORS')).toBe('text/plain');

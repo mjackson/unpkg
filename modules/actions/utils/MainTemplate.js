@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 
-import e from './createElement';
-import h from './createHTML';
-import x from './createScript';
+import e from './createElement.js';
+import h from './createHTML.js';
+import x from './createScript.js';
 
 const promiseShim =
   'window.Promise || document.write(\'\\x3Cscript src="/es6-promise@4.2.5/dist/es6-promise.min.js">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>\')';
@@ -11,12 +11,12 @@ const fetchShim =
   'window.fetch || document.write(\'\\x3Cscript src="/whatwg-fetch@3.0.0/dist/fetch.umd.js">\\x3C/script>\')';
 
 export default function MainTemplate({
-  title,
-  description,
-  favicon,
+  title = 'UNPKG',
+  description = 'The CDN for everything on npm',
+  favicon = '/favicon.ico',
   data,
-  content,
-  elements
+  content = h(''),
+  elements = []
 }) {
   return e(
     'html',
@@ -46,14 +46,6 @@ export default function MainTemplate({
     )
   );
 }
-
-MainTemplate.defaultProps = {
-  title: 'UNPKG',
-  description: 'The CDN for everything on npm',
-  favicon: '/favicon.ico',
-  content: h(''),
-  elements: []
-};
 
 if (process.env.NODE_ENV !== 'production') {
   const htmlType = PropTypes.shape({

@@ -1,4 +1,4 @@
-import * as cloudflare from './cloudflare.js';
+import { getZones, getZoneAnalyticsDashboard } from './cloudflare.js';
 
 function extractPublicInfo(data) {
   return {
@@ -28,12 +28,8 @@ function extractPublicInfo(data) {
 const DomainNames = ['unpkg.com', 'npmcdn.com'];
 
 export default async function getStats(since, until) {
-  const zones = await cloudflare.getZones(DomainNames);
-  const dashboard = await cloudflare.getZoneAnalyticsDashboard(
-    zones,
-    since,
-    until
-  );
+  const zones = await getZones(DomainNames);
+  const dashboard = await getZoneAnalyticsDashboard(zones, since, until);
 
   return {
     timeseries: dashboard.timeseries.map(extractPublicInfo),

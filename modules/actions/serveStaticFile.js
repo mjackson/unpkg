@@ -1,7 +1,7 @@
 import path from 'path';
 import etag from 'etag';
 
-import getContentTypeHeader from '../utils/getContentTypeHeader';
+import getContentTypeHeader from '../utils/getContentTypeHeader.js';
 
 export default function serveStaticFile(req, res) {
   const tags = ['file'];

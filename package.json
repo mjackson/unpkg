@@ -23,7 +23,6 @@
     "etag": "^1.8.1",
     "express": "^4.16.4",
     "gunzip-maybe": "^1.4.1",
-    "invariant": "^2.2.4",
     "isomorphic-fetch": "^2.2.1",
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",

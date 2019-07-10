@@ -1,6 +1,6 @@
-import babel from 'babel-core';
+import * as babel from '@babel/core';
 
-import unpkgRewrite from '../unpkgRewrite';
+import unpkgRewrite from '../unpkgRewrite.js';
 
 const testCases = [
   {
@@ -66,6 +66,7 @@ const testCases = [
   }
 ];
 
+const origin = 'https://unpkg.com';
 const dependencies = {
   react: '15.6.1',
   '@angular/router': '4.3.5',
@@ -75,9 +76,9 @@ const dependencies = {
 
 describe('Rewriting imports/exports', () => {
   testCases.forEach(testCase => {
-    it(`successfully rewrites '${testCase.before}'`, () => {
+    it(`rewrites '${testCase.before}' => '${testCase.after}'`, () => {
       const result = babel.transform(testCase.before, {
-        plugins: [unpkgRewrite(dependencies)]
+        plugins: [unpkgRewrite(origin, dependencies)]
       });
 
       expect(result.code).toEqual(testCase.after);

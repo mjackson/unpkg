@@ -1,4 +1,4 @@
-import parsePackageURL from '../parsePackageURL';
+import parsePackageURL from '../parsePackageURL.js';
 
 describe('parsePackageURL', () => {
   it('parses plain packages', () => {

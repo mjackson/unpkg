@@ -4,8 +4,8 @@ import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 import LRUCache from 'lru-cache';
 
-import debug from './debug';
-import bufferStream from './bufferStream';
+import debug from './debug.js';
+import bufferStream from './bufferStream.js';
 
 const npmRegistryURL =
   process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org';

@@ -3,9 +3,7 @@ export default function createSearch(query) {
   const params = keys.reduce(
     (memo, key) =>
       memo.concat(
-        query[key] === ''
-          ? key // Omit the trailing "=" from key=
-          : `${key}=${encodeURIComponent(query[key])}`
+        query[key] ? `${key}=${encodeURIComponent(query[key])}` : key
       ),
     []
   );

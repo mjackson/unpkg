@@ -1,11 +1,11 @@
 import path from 'path';
 
-import addLeadingSlash from '../utils/addLeadingSlash';
-import createPackageURL from '../utils/createPackageURL';
-import createSearch from '../utils/createSearch';
-import { fetchPackage as fetchNpmPackage } from '../utils/npm';
-import getIntegrity from '../utils/getIntegrity';
-import getContentType from '../utils/getContentType';
+import addLeadingSlash from '../utils/addLeadingSlash.js';
+import createPackageURL from '../utils/createPackageURL.js';
+import createSearch from '../utils/createSearch.js';
+import { fetchPackage as fetchNpmPackage } from '../utils/npm.js';
+import getIntegrity from '../utils/getIntegrity.js';
+import getContentType from '../utils/getContentType.js';
 
 function indexRedirect(req, res, entry) {
   // Redirect to the index file so relative imports
@@ -143,62 +143,59 @@ const trailingSlash = /\/$/;
  * Fetch and search the archive to try and find the requested file.
  * Redirect to the "index" file if a directory was requested.
  */
-export default function findFile(req, res, next) {
-  fetchNpmPackage(req.packageConfig).then(tarballStream => {
-    const wantsIndex = trailingSlash.test(req.filename);
+export default async function findFile(req, res, next) {
+  const wantsIndex = trailingSlash.test(req.filename);
 
-    // The name of the file/directory we're looking for.
-    const entryName = req.filename
-      .replace(multipleSlash, '/')
-      .replace(trailingSlash, '')
-      .replace(leadingSlash, '');
+  // The name of the file/directory we're looking for.
+  const entryName = req.filename
+    .replace(multipleSlash, '/')
+    .replace(trailingSlash, '')
+    .replace(leadingSlash, '');
 
-    searchEntries(tarballStream, entryName, wantsIndex).then(
-      ({ entries, foundEntry }) => {
-        if (!foundEntry) {
-          return res
-            .status(404)
-            .set({
-              'Cache-Control': 'public, max-age=31536000', // 1 year
-              'Cache-Tag': 'missing, missing-entry'
-            })
-            .type('text')
-            .send(`Cannot find "${req.filename}" in ${req.packageSpec}`);
-        }
+  const tarballStream = await fetchNpmPackage(req.packageConfig);
+  const { entries, foundEntry } = await searchEntries(
+    tarballStream,
+    entryName,
+    wantsIndex
+  );
 
-        // If the foundEntry is a directory and there is no trailing slash
-        // on the request path, we need to redirect to some "index" file
-        // inside that directory. This is so our URLs work in a similar way
-        // to require("lib") in node where it searches for `lib/index.js`
-        // and `lib/index.json` when `lib` is a directory.
-        if (foundEntry.type === 'directory' && !wantsIndex) {
-          const indexEntry =
-            entries[path.join(entryName, 'index.js')] ||
-            entries[path.join(entryName, 'index.json')];
+  if (!foundEntry) {
+    return res
+      .status(404)
+      .set({
+        'Cache-Control': 'public, max-age=31536000', // 1 year
+        'Cache-Tag': 'missing, missing-entry'
+      })
+      .type('text')
+      .send(`Cannot find "${req.filename}" in ${req.packageSpec}`);
+  }
 
-          if (indexEntry && indexEntry.type === 'file') {
-            return indexRedirect(req, res, indexEntry);
-          } else {
-            return res
-              .status(404)
-              .set({
-                'Cache-Control': 'public, max-age=31536000', // 1 year
-                'Cache-Tag': 'missing, missing-index'
-              })
-              .type('text')
-              .send(
-                `Cannot find an index in "${req.filename}" in ${
-                  req.packageSpec
-                }`
-              );
-          }
-        }
+  // If the foundEntry is a directory and there is no trailing slash
+  // on the request path, we need to redirect to some "index" file
+  // inside that directory. This is so our URLs work in a similar way
+  // to require("lib") in node where it searches for `lib/index.js`
+  // and `lib/index.json` when `lib` is a directory.
+  if (foundEntry.type === 'directory' && !wantsIndex) {
+    const indexEntry =
+      entries[path.join(entryName, 'index.js')] ||
+      entries[path.join(entryName, 'index.json')];
 
-        req.entries = entries;
-        req.entry = foundEntry;
+    if (indexEntry && indexEntry.type === 'file') {
+      return indexRedirect(req, res, indexEntry);
+    }
 
-        next();
-      }
-    );
-  });
+    return res
+      .status(404)
+      .set({
+        'Cache-Control': 'public, max-age=31536000', // 1 year
+        'Cache-Tag': 'missing, missing-index'
+      })
+      .type('text')
+      .send(`Cannot find an index in "${req.filename}" in ${req.packageSpec}`);
+  }
+
+  req.entries = entries;
+  req.entry = foundEntry;
+
+  next();
 }

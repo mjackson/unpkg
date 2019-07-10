@@ -1,14 +1,14 @@
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import semver from 'semver';
 
-import AutoIndexApp from '../client/autoIndex/App';
+import AutoIndexApp from '../client/autoIndex/App.js';
 
-import createElement from './utils/createElement';
-import createHTML from './utils/createHTML';
-import createScript from './utils/createScript';
-import getEntryPoint from './utils/getEntryPoint';
-import getGlobalScripts from './utils/getGlobalScripts';
-import MainTemplate from './utils/MainTemplate';
+import MainTemplate from './utils/MainTemplate.js';
+import createElement from './utils/createElement.js';
+import createHTML from './utils/createHTML.js';
+import createScript from './utils/createScript.js';
+import getEntryPoint from './utils/getEntryPoint.js';
+import getGlobalScripts from './utils/getGlobalScripts.js';
 
 const doctype = '<!DOCTYPE html>';
 const globalURLs =

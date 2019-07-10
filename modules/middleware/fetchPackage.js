@@ -1,9 +1,9 @@
 import semver from 'semver';
 
-import addLeadingSlash from '../utils/addLeadingSlash';
-import createPackageURL from '../utils/createPackageURL';
-import createSearch from '../utils/createSearch';
-import { getPackageInfo as getNpmPackageInfo } from '../utils/npm';
+import addLeadingSlash from '../utils/addLeadingSlash.js';
+import createPackageURL from '../utils/createPackageURL.js';
+import createSearch from '../utils/createSearch.js';
+import { getPackageInfo as getNpmPackageInfo } from '../utils/npm.js';
 
 function tagRedirect(req, res) {
   const version = req.packageInfo['dist-tags'][req.packageVersion];
@@ -114,41 +114,41 @@ function filenameRedirect(req, res) {
  * version if the request targets a tag or uses a semver version, or to the
  * exact filename if the request omits the filename.
  */
-export default function fetchPackage(req, res, next) {
-  getNpmPackageInfo(req.packageName).then(
-    packageInfo => {
-      if (packageInfo == null || packageInfo.versions == null) {
-        return res
-          .status(404)
-          .type('text')
-          .send(`Cannot find package "${req.packageName}"`);
-      }
+export default async function fetchPackage(req, res, next) {
+  let packageInfo;
+  try {
+    packageInfo = await getNpmPackageInfo(req.packageName);
+  } catch (error) {
+    console.error(error);
 
-      req.packageInfo = packageInfo;
-      req.packageConfig = req.packageInfo.versions[req.packageVersion];
+    return res
+      .status(500)
+      .type('text')
+      .send(`Cannot get info for package "${req.packageName}"`);
+  }
 
-      if (!req.packageConfig) {
-        // Redirect to a fully-resolved version.
-        if (req.packageVersion in req.packageInfo['dist-tags']) {
-          return tagRedirect(req, res);
-        } else {
-          return semverRedirect(req, res);
-        }
-      }
+  if (packageInfo == null || packageInfo.versions == null) {
+    return res
+      .status(404)
+      .type('text')
+      .send(`Cannot find package "${req.packageName}"`);
+  }
 
-      if (!req.filename) {
-        return filenameRedirect(req, res);
-      }
+  req.packageInfo = packageInfo;
+  req.packageConfig = req.packageInfo.versions[req.packageVersion];
 
-      next();
-    },
-    error => {
-      console.error(error);
-
-      return res
-        .status(500)
-        .type('text')
-        .send(`Cannot get info for package "${req.packageName}"`);
+  if (!req.packageConfig) {
+    // Redirect to a fully-resolved version.
+    if (req.packageVersion in req.packageInfo['dist-tags']) {
+      return tagRedirect(req, res);
+    } else {
+      return semverRedirect(req, res);
     }
-  );
+  }
+
+  if (!req.filename) {
+    return filenameRedirect(req, res);
+  }
+
+  next();
 }

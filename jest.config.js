@@ -1,9 +1,9 @@
 module.exports = {
   moduleNameMapper: {
-    "\\.css$": "<rootDir>/modules/__mocks__/styleMock.js"
+    'entry-manifest': '<rootDir>/modules/__mocks__/entryManifest.js',
+    '\\.png$': '<rootDir>/modules/__mocks__/imageMock.js',
+    '\\.css$': '<rootDir>/modules/__mocks__/styleMock.js'
   },
-  setupTestFrameworkScriptFile:
-    "<rootDir>/modules/__tests__/setupTestFramework.js",
-  testMatch: ["**/__tests__/*-test.js"],
-  testURL: "http://localhost/"
+  testMatch: ['**/__tests__/*-test.js'],
+  testURL: 'http://localhost/'
 };

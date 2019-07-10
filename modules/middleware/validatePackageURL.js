@@ -1,4 +1,4 @@
-import parsePackageURL from '../utils/parsePackageURL';
+import parsePackageURL from '../utils/parsePackageURL.js';
 
 /**
  * Parse the URL and add various properties to the request object to

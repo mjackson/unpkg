@@ -1,6 +1,6 @@
 import path from 'path';
 
-import addLeadingSlash from '../utils/addLeadingSlash';
+import addLeadingSlash from '../utils/addLeadingSlash.js';
 
 function getMatchingEntries(entry, entries) {
   const dirname = entry.name || '.';

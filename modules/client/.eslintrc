@@ -1,4 +1,7 @@
 {
+  "env": {
+    "browser": true
+  },
   "plugins": [
     "react"
   ],
@@ -10,8 +13,5 @@
     "react": {
       "version": "16"
     }
-  },
-  "env": {
-    "browser": true
   }
 }

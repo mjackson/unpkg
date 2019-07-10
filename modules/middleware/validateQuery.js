@@ -1,4 +1,4 @@
-import createSearch from '../utils/createSearch';
+import createSearch from '../utils/createSearch.js';
 
 const knownQueryParams = {
   main: true, // Deprecated, see #63

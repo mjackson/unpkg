@@ -1,9 +1,7 @@
 {
   "presets": [
-    ["@babel/preset-env", { "loose": true }],
+    ["@babel/preset-env", { "loose": true, "targets": "> 0.25%, not dead" }],
     "@babel/preset-react"
   ],
-  "plugins": [
-    ["@babel/plugin-proposal-class-properties", { "loose": true }]
-  ]
+  "plugins": [["@babel/plugin-proposal-class-properties", { "loose": true }]]
 }

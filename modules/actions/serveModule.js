@@ -1,5 +1,5 @@
-import serveHTMLModule from './serveHTMLModule';
-import serveJavaScriptModule from './serveJavaScriptModule';
+import serveHTMLModule from './serveHTMLModule.js';
+import serveJavaScriptModule from './serveJavaScriptModule.js';
 
 export default function serveModule(req, res) {
   if (req.entry.contentType === 'application/javascript') {

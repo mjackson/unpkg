@@ -1,7 +1,7 @@
-import serveAutoIndexPage from './serveAutoIndexPage';
-import serveMetadata from './serveMetadata';
-import serveModule from './serveModule';
-import serveStaticFile from './serveStaticFile';
+import serveAutoIndexPage from './serveAutoIndexPage.js';
+import serveMetadata from './serveMetadata.js';
+import serveModule from './serveModule.js';
+import serveStaticFile from './serveStaticFile.js';
 
 /**
  * Send the file, JSON metadata, or HTML directory listing.
