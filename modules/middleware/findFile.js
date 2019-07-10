@@ -1,9 +1,11 @@
 import path from 'path';
+import gunzip from 'gunzip-maybe';
+import tar from 'tar-stream';
 
 import addLeadingSlash from '../utils/addLeadingSlash.js';
 import createPackageURL from '../utils/createPackageURL.js';
 import createSearch from '../utils/createSearch.js';
-import { fetchPackage as fetchNpmPackage } from '../utils/npm.js';
+import { getPackage } from '../utils/npm.js';
 import getIntegrity from '../utils/getIntegrity.js';
 import getContentType from '../utils/getContentType.js';
 
@@ -54,7 +56,7 @@ function stripLeadingSegment(name) {
  * Follows node's resolution algorithm.
  * https://nodejs.org/api/modules.html#modules_all_together
  */
-function searchEntries(tarballStream, entryName, wantsIndex) {
+function searchEntries(stream, entryName, wantsIndex) {
   return new Promise((resolve, reject) => {
     const jsEntryName = `${entryName}.js`;
     const jsonEntryName = `${entryName}.json`;
@@ -66,7 +68,9 @@ function searchEntries(tarballStream, entryName, wantsIndex) {
       foundEntry = entries[''] = { name: '', type: 'directory' };
     }
 
-    tarballStream
+    stream
+      .pipe(gunzip())
+      .pipe(tar.extract())
       .on('error', reject)
       .on('entry', (header, stream, next) => {
         const entry = {
@@ -173,9 +177,9 @@ export default async function findFile(req, res, next) {
     .replace(trailingSlash, '')
     .replace(leadingSlash, '');
 
-  const tarballStream = await fetchNpmPackage(req.packageConfig);
+  const stream = await getPackage(req.packageName, req.packageVersion);
   const { entries, foundEntry } = await searchEntries(
-    tarballStream,
+    stream,
     entryName,
     wantsIndex
   );

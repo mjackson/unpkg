@@ -1,46 +1,18 @@
-import semver from 'semver';
-
 import addLeadingSlash from '../utils/addLeadingSlash.js';
 import createPackageURL from '../utils/createPackageURL.js';
 import createSearch from '../utils/createSearch.js';
-import { getPackageInfo as getNpmPackageInfo } from '../utils/npm.js';
+import { getPackageConfig, resolveVersion } from '../utils/npm.js';
 
-function tagRedirect(req, res) {
-  const version = req.packageInfo['dist-tags'][req.packageVersion];
-
+function semverRedirect(req, res, newVersion) {
   res
     .set({
       'Cache-Control': 'public, s-maxage=600, max-age=60', // 10 mins on CDN, 1 min on clients
-      'Cache-Tag': 'redirect, tag-redirect'
+      'Cache-Tag': 'redirect, semver-redirect'
     })
     .redirect(
       302,
-      createPackageURL(req.packageName, version, req.filename, req.search)
+      createPackageURL(req.packageName, newVersion, req.filename, req.search)
     );
-}
-
-function semverRedirect(req, res) {
-  const maxVersion = semver.maxSatisfying(
-    Object.keys(req.packageInfo.versions),
-    req.packageVersion
-  );
-
-  if (maxVersion) {
-    res
-      .set({
-        'Cache-Control': 'public, s-maxage=600, max-age=60', // 10 mins on CDN, 1 min on clients
-        'Cache-Tag': 'redirect, semver-redirect'
-      })
-      .redirect(
-        302,
-        createPackageURL(req.packageName, maxVersion, req.filename, req.search)
-      );
-  } else {
-    res
-      .status(404)
-      .type('text')
-      .send(`Cannot find package ${req.packageSpec}`);
-  }
 }
 
 function filenameRedirect(req, res) {
@@ -110,40 +82,35 @@ function filenameRedirect(req, res) {
 }
 
 /**
- * Fetch the package metadata and tarball from npm. Redirect to the exact
- * version if the request targets a tag or uses a semver version, or to the
- * exact filename if the request omits the filename.
+ * Fetch the package config. Redirect to the exact version if the request
+ * targets a tag or uses semver, or to the exact filename if the request
+ * omits the filename.
  */
 export default async function fetchPackage(req, res, next) {
-  let packageInfo;
-  try {
-    packageInfo = await getNpmPackageInfo(req.packageName);
-  } catch (error) {
-    console.error(error);
+  const version = await resolveVersion(req.packageName, req.packageVersion);
 
-    return res
-      .status(500)
-      .type('text')
-      .send(`Cannot get info for package "${req.packageName}"`);
-  }
-
-  if (packageInfo == null || packageInfo.versions == null) {
+  if (!version) {
     return res
       .status(404)
       .type('text')
-      .send(`Cannot find package "${req.packageName}"`);
+      .send(`Cannot find package ${req.packageSpec}`);
   }
 
-  req.packageInfo = packageInfo;
-  req.packageConfig = req.packageInfo.versions[req.packageVersion];
+  if (version !== req.packageVersion) {
+    return semverRedirect(req, res, version);
+  }
+
+  req.packageConfig = await getPackageConfig(
+    req.packageName,
+    req.packageVersion
+  );
 
   if (!req.packageConfig) {
-    // Redirect to a fully-resolved version.
-    if (req.packageVersion in req.packageInfo['dist-tags']) {
-      return tagRedirect(req, res);
-    } else {
-      return semverRedirect(req, res);
-    }
+    // TODO: Log why.
+    return res
+      .status(500)
+      .type('text')
+      .send(`Cannot get config for package ${req.packageSpec}`);
   }
 
   if (!req.filename) {

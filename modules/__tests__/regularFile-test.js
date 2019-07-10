@@ -20,4 +20,19 @@ describe('A request for a JavaScript file', () => {
         done();
       });
   });
+
+  describe('from a scoped package', () => {
+    it('returns 200', done => {
+      request(server)
+        .get('/@babel/core@7.5.4/lib/index.js')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(200);
+          expect(res.headers['content-type']).toMatch(
+            /\bapplication\/javascript\b/
+          );
+          expect(res.headers['content-type']).toMatch(/\bcharset=utf-8\b/);
+          done();
+        });
+    });
+  });
 });
