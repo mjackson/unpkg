@@ -1,7 +1,5 @@
 import path from 'path';
 
-import addLeadingSlash from '../utils/addLeadingSlash.js';
-
 function getMatchingEntries(entry, entries) {
   const dirname = entry.name || '.';
 
@@ -10,9 +8,11 @@ function getMatchingEntries(entry, entries) {
     .map(name => entries[name]);
 }
 
+const leadingSlashes = /^\/*/;
+
 function getMetadata(entry, entries) {
   const metadata = {
-    path: addLeadingSlash(entry.name),
+    path: entry.name.replace(leadingSlashes, '/'),
     type: entry.type
   };
 

@@ -1,4 +1,3 @@
-import addLeadingSlash from '../utils/addLeadingSlash.js';
 import createPackageURL from '../utils/createPackageURL.js';
 import createSearch from '../utils/createSearch.js';
 import { getPackageConfig, resolveVersion } from '../utils/npm.js';
@@ -14,6 +13,8 @@ function semverRedirect(req, res, newVersion) {
       createPackageURL(req.packageName, newVersion, req.filename, req.search)
     );
 }
+
+const leadingSlashes = /^\/*/;
 
 function filenameRedirect(req, res) {
   let filename;
@@ -75,7 +76,7 @@ function filenameRedirect(req, res) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        addLeadingSlash(filename),
+        filename.replace(leadingSlashes, '/'),
         createSearch(req.query)
       )
     );

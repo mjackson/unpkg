@@ -2,12 +2,17 @@ import path from 'path';
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
-import addLeadingSlash from '../utils/addLeadingSlash.js';
 import createPackageURL from '../utils/createPackageURL.js';
 import createSearch from '../utils/createSearch.js';
 import { getPackage } from '../utils/npm.js';
 import getIntegrity from '../utils/getIntegrity.js';
 import getContentType from '../utils/getContentType.js';
+import bufferStream from '../utils/bufferStream.js';
+
+const leadingSlashes = /^\/*/;
+const multipleSlashes = /\/*/;
+const trailingSlashes = /\/*$/;
+const leadingSegment = /^[^/]+\/?/;
 
 function fileRedirect(req, res, entry) {
   // Redirect to the file with the extension so it's more
@@ -22,7 +27,7 @@ function fileRedirect(req, res, entry) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        addLeadingSlash(entry.name),
+        entry.name.replace(leadingSlashes, '/'),
         createSearch(req.query)
       )
     );
@@ -41,14 +46,10 @@ function indexRedirect(req, res, entry) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        addLeadingSlash(entry.name),
+        entry.name.replace(leadingSlashes, '/'),
         createSearch(req.query)
       )
     );
-}
-
-function stripLeadingSegment(name) {
-  return name.replace(/^[^/]+\/?/, '');
 }
 
 /**
@@ -57,7 +58,7 @@ function stripLeadingSegment(name) {
  * https://nodejs.org/api/modules.html#modules_all_together
  */
 function searchEntries(stream, entryName, wantsIndex) {
-  return new Promise((resolve, reject) => {
+  return new Promise((accept, reject) => {
     const jsEntryName = `${entryName}.js`;
     const jsonEntryName = `${entryName}.json`;
     const entries = {};
@@ -72,13 +73,13 @@ function searchEntries(stream, entryName, wantsIndex) {
       .pipe(gunzip())
       .pipe(tar.extract())
       .on('error', reject)
-      .on('entry', (header, stream, next) => {
+      .on('entry', async (header, stream, next) => {
         const entry = {
           // Most packages have header names that look like `package/index.js`
           // so we shorten that to just `index.js` here. A few packages use a
           // prefix other than `package/`. e.g. the firebase package uses the
           // `firebase_npm/` prefix. So we just strip the first dir name.
-          name: stripLeadingSegment(header.name),
+          name: header.name.replace(leadingSegment, ''),
           type: header.type
         };
 
@@ -124,33 +125,25 @@ function searchEntries(stream, entryName, wantsIndex) {
           }
         }
 
-        const chunks = [];
+        const content = await bufferStream(stream);
 
-        stream
-          .on('data', chunk => {
-            chunks.push(chunk);
-          })
-          .on('end', () => {
-            const content = Buffer.concat(chunks);
+        // Set some extra properties for files that we will
+        // need to serve them and for ?meta listings.
+        entry.contentType = getContentType(entry.name);
+        entry.integrity = getIntegrity(content);
+        entry.lastModified = header.mtime.toUTCString();
+        entry.size = content.length;
 
-            // Set some extra properties for files that we will
-            // need to serve them and for ?meta listings.
-            entry.contentType = getContentType(entry.name);
-            entry.integrity = getIntegrity(content);
-            entry.lastModified = header.mtime.toUTCString();
-            entry.size = content.length;
+        // Set the content only for the foundEntry and
+        // discard the buffer for all others.
+        if (entry === foundEntry) {
+          entry.content = content;
+        }
 
-            // Set the content only for the foundEntry and
-            // discard the buffer for all others.
-            if (entry === foundEntry) {
-              entry.content = content;
-            }
-
-            next();
-          });
+        next();
       })
       .on('finish', () => {
-        resolve({
+        accept({
           entries,
           // If we didn't find a matching file entry,
           // try a directory entry with the same name.
@@ -160,22 +153,18 @@ function searchEntries(stream, entryName, wantsIndex) {
   });
 }
 
-const leadingSlash = /^\//;
-const multipleSlash = /\/\/+/;
-const trailingSlash = /\/$/;
-
 /**
  * Fetch and search the archive to try and find the requested file.
  * Redirect to the "index" file if a directory was requested.
  */
 export default async function findFile(req, res, next) {
-  const wantsIndex = trailingSlash.test(req.filename);
+  const wantsIndex = req.filename.endsWith('/');
 
   // The name of the file/directory we're looking for.
   const entryName = req.filename
-    .replace(multipleSlash, '/')
-    .replace(trailingSlash, '')
-    .replace(leadingSlash, '');
+    .replace(multipleSlashes, '/')
+    .replace(trailingSlashes, '')
+    .replace(leadingSlashes, '');
 
   const stream = await getPackage(req.packageName, req.packageVersion);
   const { entries, foundEntry } = await searchEntries(
