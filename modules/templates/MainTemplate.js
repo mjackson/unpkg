@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 
+import encodeJSONForScript from '../utils/encodeJSONForScript.js';
 import {
   createElement as e,
   createHTML as h,
   createScript as x
-} from './markupHelpers.js';
+} from '../utils/markup.js';
 
 const promiseShim =
   'window.Promise || document.write(\'\\x3Cscript src="/es6-promise@4.2.5/dist/es6-promise.min.js">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>\')';
@@ -47,7 +48,7 @@ gtag('config', 'UA-140352188-1');`),
       e('title', null, title),
       x(promiseShim),
       x(fetchShim),
-      data && x(`window.__DATA__ = ${JSON.stringify(data)}`)
+      data && x(`window.__DATA__ = ${encodeJSONForScript(data)}`)
     ),
     e(
       'body',

@@ -19,7 +19,7 @@ export default function parsePackageURL(originalURL) {
 
   const packageName = match[1];
   const packageVersion = match[2] || 'latest';
-  const filename = match[3] || '';
+  const filename = (match[3] || '').replace(/\/\/+/g, '/');
 
   return {
     // If the URL is /@scope/name@version/file.js?main=browser:

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './autoIndex/App.js';
+import App from './browse/App.js';
 
 const props = window.__DATA__ || {};
 

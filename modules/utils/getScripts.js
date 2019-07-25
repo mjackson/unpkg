@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-unresolved
 import entryManifest from 'entry-manifest';
 
-import { createElement, createScript } from './markupHelpers.js';
+import { createElement, createScript } from './markup.js';
 
 function getEntryPoint(name, format) {
   let entryPoints;

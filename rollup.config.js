@@ -18,9 +18,9 @@ const dev = env === 'development';
 
 const manifest = entryManifest();
 
-const client = ['main', 'autoIndex'].map(entryName => {
+const client = ['browse', 'main'].map(entryName => {
   return {
-    external: ['react', 'react-dom', '@emotion/core'],
+    external: ['@emotion/core', 'react', 'react-dom', 'highlight.js'],
     input: `modules/client/${entryName}.js`,
     output: {
       format: 'iife',

@@ -1,40 +1,45 @@
 /** @jsx jsx */
-import React from 'react';
-import PropTypes from 'prop-types';
 import { Global, css, jsx } from '@emotion/core';
+import { Fragment, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import formatBytes from 'pretty-bytes';
 import formatDate from 'date-fns/format';
 import parseDate from 'date-fns/parse';
 
-import formatNumber from '../utils/formatNumber.js';
-import formatPercent from '../utils/formatPercent.js';
+import { formatNumber, formatPercent } from '../utils/format.js';
+import { fontSans, fontMono } from '../utils/style.js';
 
-import cloudflareLogo from './CloudflareLogo.png';
-import angularLogo from './AngularLogo.png';
-import googleCloudLogo from './GoogleCloudLogo.png';
+import { TwitterIcon, GitHubIcon } from './Icons.js';
+import CloudflareLogo from './images/CloudflareLogo.png';
+import AngularLogo from './images/AngularLogo.png';
 
 const globalStyles = css`
+  html {
+    box-sizing: border-box;
+  }
+  *,
+  *:before,
+  *:after {
+    box-sizing: inherit;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+
   body {
-    font-size: 14px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      Helvetica, Arial, sans-serif;
-    line-height: 1.7;
-    padding: 5px 20px;
+    ${fontSans}
+    font-size: 16px;
+    line-height: 1.5;
+    background: white;
     color: black;
   }
 
-  @media (min-width: 800px) {
-    body {
-      padding: 40px 20px 120px;
-    }
-  }
-
-  a:link {
-    color: blue;
-    text-decoration: none;
-  }
-  a:visited {
-    color: rebeccapurple;
+  code {
+    ${fontMono}
   }
 
   dd,
@@ -42,23 +47,18 @@ const globalStyles = css`
     margin-left: 0;
     padding-left: 25px;
   }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
-const styles = {
-  heading: {
-    margin: '0.8em 0',
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    fontSize: '5em'
-  },
-  subheading: {
-    fontSize: '1.6em'
-  },
-  example: {
-    textAlign: 'center',
-    backgroundColor: '#eee',
-    margin: '2em 0',
-    padding: '5px 0'
+const linkStyle = {
+  color: '#0076ff',
+  textDecoration: 'none',
+  ':hover': {
+    textDecoration: 'underline'
   }
 };
 
@@ -90,59 +90,73 @@ function Stats({ data }) {
   );
 }
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
+export default function App() {
+  const [stats, setStats] = useState(
+    typeof window === 'object' &&
+      window.localStorage &&
+      window.localStorage.savedStats
+      ? JSON.parse(window.localStorage.savedStats)
+      : null
+  );
+  const hasStats = !!(stats && !stats.error);
+  const stringStats = JSON.stringify(stats);
 
-    this.state = { stats: null };
+  useEffect(() => {
+    window.localStorage.savedStats = stringStats;
+  }, [stringStats]);
 
-    if (typeof window === 'object' && window.localStorage) {
-      const savedStats = window.localStorage.savedStats;
-
-      if (savedStats) {
-        this.state.stats = JSON.parse(savedStats);
-      }
-
-      window.onbeforeunload = () => {
-        window.localStorage.savedStats = JSON.stringify(this.state.stats);
-      };
-    }
-  }
-
-  componentDidMount() {
-    // Refresh latest stats.
+  useEffect(() => {
     fetch('/api/stats?period=last-month')
       .then(res => res.json())
-      .then(stats => this.setState({ stats }));
-  }
+      .then(setStats);
+  }, []);
 
-  render() {
-    const { stats } = this.state;
-    const hasStats = !!(stats && !stats.error);
-
-    return (
-      <div css={{ maxWidth: 700, margin: '0 auto' }}>
+  return (
+    <Fragment>
+      <div
+        css={{
+          maxWidth: 740,
+          margin: '0 auto',
+          padding: '0 20px'
+        }}
+      >
         <Global styles={globalStyles} />
 
         <header>
-          <h1 css={styles.heading}>unpkg</h1>
+          <h1
+            css={{
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              fontSize: '5em'
+            }}
+          >
+            unpkg
+          </h1>
 
           <p>
-            unpkg is a fast, global{' '}
-            <a href="https://en.wikipedia.org/wiki/Content_delivery_network">
-              content delivery network
-            </a>{' '}
-            for everything on <a href="https://www.npmjs.com/">npm</a>. Use it
-            to quickly and easily load any file from any package using a URL
-            like:
+            unpkg is a fast, global content delivery network for everything on{' '}
+            <a href="https://www.npmjs.com/" css={linkStyle}>
+              npm
+            </a>
+            . Use it to quickly and easily load any file from any package using
+            a URL like:
           </p>
 
-          <div css={styles.example}>unpkg.com/:package@:version/:file</div>
+          <div
+            css={{
+              textAlign: 'center',
+              backgroundColor: '#eee',
+              margin: '2em 0',
+              padding: '5px 0'
+            }}
+          >
+            unpkg.com/:package@:version/:file
+          </div>
 
           {hasStats && <Stats data={stats} />}
         </header>
 
-        <h3 css={styles.subheading} id="examples">
+        <h3 css={{ fontSize: '1.6em' }} id="examples">
           Examples
         </h3>
 
@@ -150,12 +164,20 @@ export default class App extends React.Component {
 
         <ul>
           <li>
-            <a href="/react@16.7.0/umd/react.production.min.js">
+            <a
+              title="react.production.min.js"
+              href="/react@16.7.0/umd/react.production.min.js"
+              css={linkStyle}
+            >
               unpkg.com/react@16.7.0/umd/react.production.min.js
             </a>
           </li>
           <li>
-            <a href="/react-dom@16.7.0/umd/react-dom.production.min.js">
+            <a
+              title="react-dom.production.min.js"
+              href="/react-dom@16.7.0/umd/react-dom.production.min.js"
+              css={linkStyle}
+            >
               unpkg.com/react-dom@16.7.0/umd/react-dom.production.min.js
             </a>
           </li>
@@ -163,20 +185,41 @@ export default class App extends React.Component {
 
         <p>
           You may also use a{' '}
-          <a href="https://docs.npmjs.com/misc/semver">semver range</a> or a{' '}
-          <a href="https://docs.npmjs.com/cli/dist-tag">tag</a> instead of a
-          fixed version number, or omit the version/tag entirely to use the{' '}
-          <code>latest</code> tag.
+          <a
+            title="semver"
+            href="https://docs.npmjs.com/misc/semver"
+            css={linkStyle}
+          >
+            semver range
+          </a>{' '}
+          or a{' '}
+          <a
+            title="tags"
+            href="https://docs.npmjs.com/cli/dist-tag"
+            css={linkStyle}
+          >
+            tag
+          </a>{' '}
+          instead of a fixed version number, or omit the version/tag entirely to
+          use the <code>latest</code> tag.
         </p>
 
         <ul>
           <li>
-            <a href="/react@^16/umd/react.production.min.js">
+            <a
+              title="react.production.min.js"
+              href="/react@^16/umd/react.production.min.js"
+              css={linkStyle}
+            >
               unpkg.com/react@^16/umd/react.production.min.js
             </a>
           </li>
           <li>
-            <a href="/react/umd/react.production.min.js">
+            <a
+              title="react.production.min.js"
+              href="/react/umd/react.production.min.js"
+              css={linkStyle}
+            >
               unpkg.com/react/umd/react.production.min.js
             </a>
           </li>
@@ -190,10 +233,14 @@ export default class App extends React.Component {
 
         <ul>
           <li>
-            <a href="/jquery">unpkg.com/jquery</a>
+            <a title="jQuery" href="/jquery" css={linkStyle}>
+              unpkg.com/jquery
+            </a>
           </li>
           <li>
-            <a href="/three">unpkg.com/three</a>
+            <a title="Three.js" href="/three" css={linkStyle}>
+              unpkg.com/three
+            </a>
           </li>
         </ul>
 
@@ -204,14 +251,26 @@ export default class App extends React.Component {
 
         <ul>
           <li>
-            <a href="/react/">unpkg.com/react/</a>
+            <a
+              title="Index of the react package"
+              href="/react/"
+              css={linkStyle}
+            >
+              unpkg.com/react/
+            </a>
           </li>
           <li>
-            <a href="/lodash/">unpkg.com/lodash/</a>
+            <a
+              title="Index of the react-router package"
+              href="/react-router/"
+              css={linkStyle}
+            >
+              unpkg.com/react-router/
+            </a>
           </li>
         </ul>
 
-        <h3 css={styles.subheading} id="query-params">
+        <h3 css={{ fontSize: '1.6em' }} id="query-params">
           Query Parameters
         </h3>
 
@@ -229,7 +288,11 @@ export default class App extends React.Component {
           </dt>
           <dd>
             Expands all{' '}
-            <a href="https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier">
+            <a
+              title="bare import specifiers"
+              href="https://html.spec.whatwg.org/multipage/webappapis.html#resolve-a-module-specifier"
+              css={linkStyle}
+            >
               &ldquo;bare&rdquo; <code>import</code> specifiers
             </a>{' '}
             in JavaScript modules to unpkg URLs. This feature is{' '}
@@ -237,7 +300,7 @@ export default class App extends React.Component {
           </dd>
         </dl>
 
-        <h3 css={styles.subheading} id="cache-behavior">
+        <h3 css={{ fontSize: '1.6em' }} id="cache-behavior">
           Cache Behavior
         </h3>
 
@@ -255,8 +318,14 @@ export default class App extends React.Component {
           URLs that do not specify a package version number redirect to one that
           does. This is the <code>latest</code> version when no version is
           specified, or the <code>maxSatisfying</code> version when a{' '}
-          <a href="https://github.com/npm/node-semver">semver version</a> is
-          given. Redirects are cached for 10 minutes at the CDN, 1 minute in
+          <a
+            title="semver"
+            href="https://github.com/npm/node-semver"
+            css={linkStyle}
+          >
+            semver version
+          </a>{' '}
+          is given. Redirects are cached for 10 minutes at the CDN, 1 minute in
           browsers.
         </p>
         <p>
@@ -267,15 +336,18 @@ export default class App extends React.Component {
           latest version and redirect them.
         </p>
 
-        <h3 css={styles.subheading} id="workflow">
+        <h3 css={{ fontSize: '1.6em' }} id="workflow">
           Workflow
         </h3>
 
         <p>
           For npm package authors, unpkg relieves the burden of publishing your
           code to a CDN in addition to the npm registry. All you need to do is
-          include your <a href="https://github.com/umdjs/umd">UMD</a> build in
-          your npm package (not your repo, that&apos;s different!).
+          include your{' '}
+          <a title="UMD" href="https://github.com/umdjs/umd" css={linkStyle}>
+            UMD
+          </a>{' '}
+          build in your npm package (not your repo, that&apos;s different!).
         </p>
 
         <p>You can do this easily using the following setup:</p>
@@ -287,7 +359,11 @@ export default class App extends React.Component {
           </li>
           <li>
             Add the <code>umd</code> directory to your{' '}
-            <a href="https://docs.npmjs.com/files/package.json#files">
+            <a
+              title="package.json files array"
+              href="https://docs.npmjs.com/files/package.json#files"
+              css={linkStyle}
+            >
               files array
             </a>{' '}
             in <code>package.json</code>
@@ -303,24 +379,50 @@ export default class App extends React.Component {
           a version available on unpkg as well.
         </p>
 
-        <h3 css={styles.subheading} id="about">
+        <h3 css={{ fontSize: '1.6em' }} id="about">
           About
         </h3>
 
         <p>
-          unpkg is an <a href="https://github.com/unpkg">open source</a> project
-          built and maintained by{' '}
-          <a href="https://twitter.com/mjackson">Michael Jackson</a>. unpkg is
-          not affiliated with or supported by npm, Inc. in any way. Please do
-          not contact npm for help with unpkg. Instead, please reach out to{' '}
-          <a href="https://twitter.com/unpkg">@unpkg</a> with any questions or
-          concerns.
+          unpkg is an{' '}
+          <a
+            title="unpkg on GitHub"
+            href="https://github.com/unpkg"
+            css={linkStyle}
+          >
+            open source
+          </a>{' '}
+          project built and maintained by{' '}
+          <a
+            title="mjackson on Twitter"
+            href="https://twitter.com/mjackson"
+            css={linkStyle}
+          >
+            Michael Jackson
+          </a>
+          . unpkg is not affiliated with or supported by npm, Inc. in any way.
+          Please do not contact npm for help with unpkg. Instead, please reach
+          out to{' '}
+          <a
+            title="unpkg on Twitter"
+            href="https://twitter.com/unpkg"
+            css={linkStyle}
+          >
+            @unpkg
+          </a>{' '}
+          with any questions or concerns.
         </p>
 
         <p>
           The unpkg CDN is powered by{' '}
-          <a href="https://www.cloudflare.com">Cloudflare</a>, one of the
-          world&apos;s largest and fastest cloud network platforms.{' '}
+          <a
+            title="Cloudflare"
+            href="https://www.cloudflare.com"
+            css={linkStyle}
+          >
+            Cloudflare
+          </a>
+          , one of the world&apos;s largest and fastest cloud network platforms.{' '}
           {hasStats && (
             <span>
               In the past month, Cloudflare served over{' '}
@@ -339,19 +441,27 @@ export default class App extends React.Component {
           }}
         >
           <AboutLogo>
-            <a href="https://www.cloudflare.com">
-              <AboutLogoImage src={cloudflareLogo} height="100" />
+            <a title="Cloudflare" href="https://www.cloudflare.com">
+              <AboutLogoImage src={CloudflareLogo} height="100" />
             </a>
           </AboutLogo>
         </div>
 
         <p>
           The origin servers for unpkg are powered by{' '}
-          <a href="https://cloud.google.com/">Google Cloud</a> and made possible
-          by a generous donation from the{' '}
-          <a href="https://angular.io">Angular web framework</a>, one of the
-          world&apos;s most popular libraries for building incredible user
-          experiences on both desktop and mobile.
+          <a
+            title="Google Cloud"
+            href="https://cloud.google.com/"
+            css={linkStyle}
+          >
+            Google Cloud
+          </a>{' '}
+          and made possible by a generous donation from the{' '}
+          <a title="Angular" href="https://angular.io" css={linkStyle}>
+            Angular web framework
+          </a>
+          , one of the world&apos;s most popular libraries for building
+          incredible user experiences on both desktop and mobile.
         </p>
 
         <div
@@ -362,37 +472,61 @@ export default class App extends React.Component {
           }}
         >
           <AboutLogo>
-            <a href="https://angular.io">
-              <AboutLogoImage src={angularLogo} width="200" />
+            <a title="Angular" href="https://angular.io">
+              <AboutLogoImage src={AngularLogo} width="200" />
             </a>
           </AboutLogo>
         </div>
+      </div>
 
-        <footer
+      <footer
+        css={{
+          marginTop: '5rem',
+          background: 'black',
+          color: '#aaa'
+        }}
+      >
+        <div
           css={{
-            marginTop: '10em',
-            color: '#aaa'
+            maxWidth: 740,
+            padding: '10px 20px',
+            margin: '0 auto',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
           }}
         >
-          <p css={{ textAlign: 'center' }}>
-            &copy; {new Date().getFullYear()} unpkg &nbsp;&mdash;&nbsp; powered
-            by{' '}
-            <a href="https://cloud.google.com/">
-              <img
-                src={googleCloudLogo}
-                height="32"
-                css={{
-                  verticalAlign: 'middle',
-                  marginTop: -2,
-                  marginLeft: -10
-                }}
-              />
+          <p>&copy; {new Date().getFullYear()} UNPKG</p>
+          <p css={{ fontSize: '1.5rem' }}>
+            <a
+              title="Twitter"
+              href="https://twitter.com/unpkg"
+              css={{
+                color: '#aaa',
+                display: 'inline-block',
+                ':hover': { color: 'white' }
+              }}
+            >
+              <TwitterIcon />
+            </a>
+            <a
+              title="GitHub"
+              href="https://github.com/mjackson/unpkg"
+              css={{
+                color: '#aaa',
+                display: 'inline-block',
+                marginLeft: '1rem',
+                ':hover': { color: 'white' }
+              }}
+            >
+              <GitHubIcon />
             </a>
           </p>
-        </footer>
-      </div>
-    );
-  }
+        </div>
+      </footer>
+    </Fragment>
+  );
 }
 
 if (process.env.NODE_ENV !== 'production') {

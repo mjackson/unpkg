@@ -33,7 +33,7 @@ function entryManifest() {
           Object.keys(bundle).forEach(fileName => {
             const info = bundle[fileName];
 
-            // We're only interested in entry points.
+            // We're interested only in entry points.
             if (!info.isEntry) return;
 
             const globalImports = info.imports.filter(

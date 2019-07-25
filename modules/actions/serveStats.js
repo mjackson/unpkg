@@ -1,6 +1,6 @@
 import { subDays, startOfDay } from 'date-fns';
 
-import getStats from './utils/getStats.js';
+import getStats from '../utils/getStats.js';
 
 export default function serveStats(req, res) {
   let since, until;

@@ -1,18 +1,5 @@
 import createPackageURL from '../utils/createPackageURL.js';
 import createSearch from '../utils/createSearch.js';
-import { getPackageConfig, resolveVersion } from '../utils/npm.js';
-
-function semverRedirect(req, res, newVersion) {
-  res
-    .set({
-      'Cache-Control': 'public, s-maxage=600, max-age=60', // 10 mins on CDN, 1 min on clients
-      'Cache-Tag': 'redirect, semver-redirect'
-    })
-    .redirect(
-      302,
-      createPackageURL(req.packageName, newVersion, req.filename, req.search)
-    );
-}
 
 const leadingSlashes = /^\/*/;
 
@@ -83,37 +70,9 @@ function filenameRedirect(req, res) {
 }
 
 /**
- * Fetch the package config. Redirect to the exact version if the request
- * targets a tag or uses semver, or to the exact filename if the request
- * omits the filename.
+ * Redirect to the exact filename if the request omits one.
  */
-export default async function fetchPackage(req, res, next) {
-  const version = await resolveVersion(req.packageName, req.packageVersion);
-
-  if (!version) {
-    return res
-      .status(404)
-      .type('text')
-      .send(`Cannot find package ${req.packageSpec}`);
-  }
-
-  if (version !== req.packageVersion) {
-    return semverRedirect(req, res, version);
-  }
-
-  req.packageConfig = await getPackageConfig(
-    req.packageName,
-    req.packageVersion
-  );
-
-  if (!req.packageConfig) {
-    // TODO: Log why.
-    return res
-      .status(500)
-      .type('text')
-      .send(`Cannot get config for package ${req.packageSpec}`);
-  }
-
+export default async function validateFilename(req, res, next) {
   if (!req.filename) {
     return filenameRedirect(req, res);
   }

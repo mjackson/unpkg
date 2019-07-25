@@ -1,23 +1,24 @@
-import serveAutoIndexPage from './serveAutoIndexPage.js';
-import serveMetadata from './serveMetadata.js';
-import serveModule from './serveModule.js';
-import serveStaticFile from './serveStaticFile.js';
+import path from 'path';
+import etag from 'etag';
 
-/**
- * Send the file, JSON metadata, or HTML directory listing.
- */
+import getContentTypeHeader from '../utils/getContentTypeHeader.js';
+
 export default function serveFile(req, res) {
-  if (req.query.meta != null) {
-    return serveMetadata(req, res);
+  const tags = ['file'];
+
+  const ext = path.extname(req.entry.path).substr(1);
+  if (ext) {
+    tags.push(`${ext}-file`);
   }
 
-  if (req.entry.type === 'directory') {
-    return serveAutoIndexPage(req, res);
-  }
-
-  if (req.query.module != null) {
-    return serveModule(req, res);
-  }
-
-  serveStaticFile(req, res);
+  res
+    .set({
+      'Content-Type': getContentTypeHeader(req.entry.contentType),
+      'Content-Length': req.entry.size,
+      'Cache-Control': 'public, max-age=31536000', // 1 year
+      'Last-Modified': req.entry.lastModified,
+      ETag: etag(req.entry.content),
+      'Cache-Tag': tags.join(', ')
+    })
+    .send(req.entry.content);
 }

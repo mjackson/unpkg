@@ -9,13 +9,8 @@ import getIntegrity from '../utils/getIntegrity.js';
 import getContentType from '../utils/getContentType.js';
 import bufferStream from '../utils/bufferStream.js';
 
-const leadingSlashes = /^\/*/;
-const multipleSlashes = /\/*/;
-const trailingSlashes = /\/*$/;
-const leadingSegment = /^[^/]+\/?/;
-
 function fileRedirect(req, res, entry) {
-  // Redirect to the file with the extension so it's more
+  // Redirect to the file with the extension so it's
   // clear which file is being served.
   res
     .set({
@@ -27,7 +22,7 @@ function fileRedirect(req, res, entry) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        entry.name.replace(leadingSlashes, '/'),
+        entry.path,
         createSearch(req.query)
       )
     );
@@ -46,7 +41,7 @@ function indexRedirect(req, res, entry) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        entry.name.replace(leadingSlashes, '/'),
+        entry.path,
         createSearch(req.query)
       )
     );
@@ -57,16 +52,17 @@ function indexRedirect(req, res, entry) {
  * Follows node's resolution algorithm.
  * https://nodejs.org/api/modules.html#modules_all_together
  */
-function searchEntries(stream, entryName, wantsIndex) {
+function searchEntries(stream, filename) {
+  // filename = /some/file/name.js or /some/dir/name
   return new Promise((accept, reject) => {
-    const jsEntryName = `${entryName}.js`;
-    const jsonEntryName = `${entryName}.json`;
-    const entries = {};
+    const jsEntryFilename = `${filename}.js`;
+    const jsonEntryFilename = `${filename}.json`;
 
+    const matchingEntries = {};
     let foundEntry;
 
-    if (entryName === '') {
-      foundEntry = entries[''] = { name: '', type: 'directory' };
+    if (filename === '/') {
+      foundEntry = matchingEntries['/'] = { name: '/', type: 'directory' };
     }
 
     stream
@@ -79,41 +75,43 @@ function searchEntries(stream, entryName, wantsIndex) {
           // so we shorten that to just `index.js` here. A few packages use a
           // prefix other than `package/`. e.g. the firebase package uses the
           // `firebase_npm/` prefix. So we just strip the first dir name.
-          name: header.name.replace(leadingSegment, ''),
+          path: header.name.replace(/^[^/]+/g, ''),
           type: header.type
         };
 
         // Skip non-files and files that don't match the entryName.
-        if (entry.type !== 'file' || entry.name.indexOf(entryName) !== 0) {
+        if (entry.type !== 'file' || !entry.path.startsWith(filename)) {
           stream.resume();
           stream.on('end', next);
           return;
         }
 
-        entries[entry.name] = entry;
+        matchingEntries[entry.path] = entry;
 
         // Dynamically create "directory" entries for all directories
         // that are in this file's path. Some tarballs omit these entries
         // for some reason, so this is the "brute force" method.
-        let dir = path.dirname(entry.name);
-        while (dir !== '.') {
-          entries[dir] = entries[dir] || { name: dir, type: 'directory' };
+        let dir = path.dirname(entry.path);
+        while (dir !== '/') {
+          if (!matchingEntries[dir]) {
+            matchingEntries[dir] = { name: dir, type: 'directory' };
+          }
           dir = path.dirname(dir);
         }
 
         if (
-          entry.name === entryName ||
+          entry.path === filename ||
           // Allow accessing e.g. `/index.js` or `/index.json`
           // using `/index` for compatibility with npm
-          (!wantsIndex && entry.name === jsEntryName) ||
-          (!wantsIndex && entry.name === jsonEntryName)
+          entry.path === jsEntryFilename ||
+          entry.path === jsonEntryFilename
         ) {
           if (foundEntry) {
             if (
-              foundEntry.name !== entryName &&
-              (entry.name === entryName ||
-                (entry.name === jsEntryName &&
-                  foundEntry.name === jsonEntryName))
+              foundEntry.path !== filename &&
+              (entry.path === filename ||
+                (entry.path === jsEntryFilename &&
+                  foundEntry.path === jsonEntryFilename))
             ) {
               // This entry is higher priority than the one
               // we already found. Replace it.
@@ -127,9 +125,7 @@ function searchEntries(stream, entryName, wantsIndex) {
 
         const content = await bufferStream(stream);
 
-        // Set some extra properties for files that we will
-        // need to serve them and for ?meta listings.
-        entry.contentType = getContentType(entry.name);
+        entry.contentType = getContentType(entry.path);
         entry.integrity = getIntegrity(content);
         entry.lastModified = header.mtime.toUTCString();
         entry.size = content.length;
@@ -144,10 +140,10 @@ function searchEntries(stream, entryName, wantsIndex) {
       })
       .on('finish', () => {
         accept({
-          entries,
           // If we didn't find a matching file entry,
           // try a directory entry with the same name.
-          foundEntry: foundEntry || entries[entryName] || null
+          foundEntry: foundEntry || matchingEntries[filename] || null,
+          matchingEntries: matchingEntries
         });
       });
   });
@@ -157,23 +153,14 @@ function searchEntries(stream, entryName, wantsIndex) {
  * Fetch and search the archive to try and find the requested file.
  * Redirect to the "index" file if a directory was requested.
  */
-export default async function findFile(req, res, next) {
-  const wantsIndex = req.filename.endsWith('/');
-
-  // The name of the file/directory we're looking for.
-  const entryName = req.filename
-    .replace(multipleSlashes, '/')
-    .replace(trailingSlashes, '')
-    .replace(leadingSlashes, '');
-
+export default async function findEntry(req, res, next) {
   const stream = await getPackage(req.packageName, req.packageVersion);
-  const { entries, foundEntry } = await searchEntries(
+  const { foundEntry: entry, matchingEntries: entries } = await searchEntries(
     stream,
-    entryName,
-    wantsIndex
+    req.filename
   );
 
-  if (!foundEntry) {
+  if (!entry) {
     return res
       .status(404)
       .set({
@@ -184,18 +171,17 @@ export default async function findFile(req, res, next) {
       .send(`Cannot find "${req.filename}" in ${req.packageSpec}`);
   }
 
-  if (foundEntry.type === 'file' && foundEntry.name !== entryName) {
-    return fileRedirect(req, res, foundEntry);
+  if (entry.type === 'file' && entry.path !== req.filename) {
+    return fileRedirect(req, res, entry);
   }
 
-  // If the foundEntry is a directory and there is no trailing slash
-  // on the request path, we need to redirect to some "index" file
-  // inside that directory. This is so our URLs work in a similar way
-  // to require("lib") in node where it searches for `lib/index.js`
-  // and `lib/index.json` when `lib` is a directory.
-  if (foundEntry.type === 'directory' && !wantsIndex) {
+  if (entry.type === 'directory') {
+    // We need to redirect to some "index" file inside the directory so
+    // our URLs work in a similar way to require("lib") in node where it
+    // uses `lib/index.js` when `lib` is a directory.
     const indexEntry =
-      entries[`${entryName}/index.js`] || entries[`${entryName}/index.json`];
+      entries[`${req.filename}/index.js`] ||
+      entries[`${req.filename}/index.json`];
 
     if (indexEntry && indexEntry.type === 'file') {
       return indexRedirect(req, res, indexEntry);
@@ -211,8 +197,7 @@ export default async function findFile(req, res, next) {
       .send(`Cannot find an index in "${req.filename}" in ${req.packageSpec}`);
   }
 
-  req.entries = entries;
-  req.entry = foundEntry;
+  req.entry = entry;
 
   next();
 }

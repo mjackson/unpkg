@@ -1,3 +1,4 @@
+import path from 'path';
 import mime from 'mime';
 
 mime.define(
@@ -19,5 +20,9 @@ mime.define(
 const textFiles = /\/?(\.[a-z]*rc|\.git[a-z]*|\.[a-z]*ignore|\.lock)$/i;
 
 export default function getContentType(file) {
-  return textFiles.test(file) ? 'text/plain' : mime.getType(file);
+  const name = path.basename(file);
+
+  return textFiles.test(name)
+    ? 'text/plain'
+    : mime.getType(name) || 'text/plain';
 }

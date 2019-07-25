@@ -1,7 +1,7 @@
 import serveHTMLModule from './serveHTMLModule.js';
 import serveJavaScriptModule from './serveJavaScriptModule.js';
 
-export default function serveModule(req, res) {
+export default async function serveModule(req, res) {
   if (req.entry.contentType === 'application/javascript') {
     return serveJavaScriptModule(req, res);
   }
