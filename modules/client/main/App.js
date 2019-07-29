@@ -329,7 +329,7 @@ export default function App() {
           browsers.
         </p>
         <p>
-          If you&apos;re you want users to be able to use the latest version
+          If you want you&apos;re users to be able to use the latest version
           when you cut a new release, the best policy is to put the version
           number in the URL directly in your installation instructions. This
           will also load more quickly because we won&apos;t have to resolve the
