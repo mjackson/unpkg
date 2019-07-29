@@ -213,59 +213,76 @@ export default function App({
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                '@media (max-width: 700px)': {
+                  flexDirection: 'column-reverse',
+                  alignItems: 'flex-start'
+                }
               }}
             >
-              <h1 css={{ fontSize: '1.5rem' }}>
+              <h1 css={{ fontSize: '1.5rem', fontWeight: 'normal', flex: 1 }}>
                 <nav>
-                  {breadcrumbs.map((link, index) => (
+                  {breadcrumbs.map((item, index, array) => (
                     <span key={index}>
                       {index !== 0 && (
                         <span css={{ paddingLeft: 5, paddingRight: 5 }}>/</span>
                       )}
-                      {link}
+                      {index === array.length - 1 ? (
+                        <strong>{item}</strong>
+                      ) : (
+                        item
+                      )}
                     </span>
                   ))}
                 </nav>
               </h1>
-              <div>
-                <label htmlFor="version">Version:</label>{' '}
-                <select
-                  name="version"
-                  defaultValue={packageVersion}
-                  onChange={handleChange}
-                  css={{
-                    appearance: 'none',
-                    cursor: 'pointer',
-                    padding: '4px 24px 4px 8px',
-                    fontWeight: 600,
-                    fontSize: '0.9em',
-                    color: '#24292e',
-                    border: '1px solid rgba(27,31,35,.2)',
-                    borderRadius: 3,
-                    backgroundColor: '#eff3f6',
-                    backgroundImage: `url(${SelectDownArrow})`,
-                    backgroundPosition: 'right 8px center',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'auto 25%',
-                    ':hover': {
-                      backgroundColor: '#e6ebf1',
-                      borderColor: 'rgba(27,31,35,.35)'
-                    },
-                    ':active': {
-                      backgroundColor: '#e9ecef',
-                      borderColor: 'rgba(27,31,35,.35)',
-                      boxShadow: 'inset 0 0.15em 0.3em rgba(27,31,35,.15)'
-                    }
-                  }}
-                >
-                  {availableVersions.map(v => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <p
+                css={{
+                  marginLeft: 20,
+                  '@media (max-width: 700px)': {
+                    marginLeft: 0,
+                    marginBottom: 0
+                  }
+                }}
+              >
+                <label>
+                  Version:{' '}
+                  <select
+                    name="version"
+                    defaultValue={packageVersion}
+                    onChange={handleChange}
+                    css={{
+                      appearance: 'none',
+                      cursor: 'pointer',
+                      padding: '4px 24px 4px 8px',
+                      fontWeight: 600,
+                      fontSize: '0.9em',
+                      color: '#24292e',
+                      border: '1px solid rgba(27,31,35,.2)',
+                      borderRadius: 3,
+                      backgroundColor: '#eff3f6',
+                      backgroundImage: `url(${SelectDownArrow})`,
+                      backgroundPosition: 'right 8px center',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: 'auto 25%',
+                      ':hover': {
+                        backgroundColor: '#e6ebf1',
+                        borderColor: 'rgba(27,31,35,.35)'
+                      },
+                      ':active': {
+                        backgroundColor: '#e9ecef',
+                        borderColor: 'rgba(27,31,35,.35)',
+                        boxShadow: 'inset 0 0.15em 0.3em rgba(27,31,35,.15)'
+                      }
+                    }}
+                  >
+                    {availableVersions.map(v => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </p>
             </header>
           </div>
 

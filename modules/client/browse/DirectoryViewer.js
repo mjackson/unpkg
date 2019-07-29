@@ -141,7 +141,12 @@ export default function DirectoryViewer({ path, details: entries }) {
           width: '100%',
           borderCollapse: 'collapse',
           borderRadius: 2,
-          background: '#fff'
+          background: '#fff',
+          '@media (max-width: 700px)': {
+            '& th + th + th + th, & td + td + td + td': {
+              display: 'none'
+            }
+          }
         }}
       >
         <thead>
