@@ -329,11 +329,11 @@ export default function App() {
           browsers.
         </p>
         <p>
-          If you&apos;re you want users to be able to use the latest version
-          when you cut a new release, the best policy is to put the version
-          number in the URL directly in your installation instructions. This
-          will also load more quickly because we won&apos;t have to resolve the
-          latest version and redirect them.
+          If you want users to be able to use the latest version when you cut a
+          new release, the best policy is to put the version number in the URL
+          directly in your installation instructions. This will also load more
+          quickly because we won&apos;t have to resolve the latest version and
+          redirect them.
         </p>
 
         <h3 css={{ fontSize: '1.6em' }} id="workflow">
