@@ -20,7 +20,7 @@ const manifest = entryManifest();
 
 const client = ['browse', 'main'].map(entryName => {
   return {
-    external: ['@emotion/core', 'react', 'react-dom', 'highlight.js'],
+    external: ['@emotion/core', 'react', 'react-dom'],
     input: `modules/client/${entryName}.js`,
     output: {
       format: 'iife',
