@@ -13,8 +13,7 @@ const url = require('rollup-plugin-url');
 const entryManifest = require('./plugins/entryManifest');
 const pkg = require('./package.json');
 
-const env = process.env.NODE_ENV || 'development';
-const dev = env === 'development';
+const env = process.env.BUILD_ENV || 'development';
 
 const manifest = entryManifest();
 
@@ -55,12 +54,14 @@ const client = ['browse', 'main'].map(entryName => {
         limit: 5 * 1024,
         publicPath: '/_client/'
       }),
-      compiler(dev ? { formatting: 'PRETTY_PRINT' } : undefined)
+      compiler(
+        env !== 'production' ? { formatting: 'PRETTY_PRINT' } : undefined
+      )
     ]
   };
 });
 
-const dependencies = (dev
+const dependencies = (env === 'development'
   ? Object.keys(pkg.dependencies).concat(Object.keys(pkg.devDependencies || {}))
   : Object.keys(pkg.dependencies)
 ).concat('react-dom/server');
@@ -86,7 +87,6 @@ const server = {
       ),
       'process.env.CLOUDFLARE_KEY': JSON.stringify(process.env.CLOUDFLARE_KEY),
       'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
-      'process.env.NODE_ENV': JSON.stringify(env),
       'process.env.NPM_REGISTRY_URL': JSON.stringify(
         process.env.NPM_REGISTRY_URL
       ),
