@@ -1,12 +1,14 @@
 export default function createSearch(query) {
   const keys = Object.keys(query).sort();
-  const params = keys.reduce(
+  const pairs = keys.reduce(
     (memo, key) =>
       memo.concat(
-        query[key] ? `${key}=${encodeURIComponent(query[key])}` : key
+        query[key] == null || query[key] === ''
+          ? key
+          : `${key}=${encodeURIComponent(query[key])}`
       ),
     []
   );
 
-  return params.length ? `?${params.join('&')}` : '';
+  return pairs.length ? `?${pairs.join('&')}` : '';
 }
