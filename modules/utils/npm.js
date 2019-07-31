@@ -78,14 +78,14 @@ async function fetchPackageInfo(packageName) {
 async function fetchVersionsAndTags(packageName) {
   const info = await fetchPackageInfo(packageName);
 
-  if (!info) {
-    return null;
+  if (info && info.versions) {
+    return {
+      versions: Object.keys(info.versions),
+      tags: info['dist-tags']
+    };
   }
 
-  return {
-    versions: Object.keys(info.versions),
-    tags: info['dist-tags']
-  };
+  return null;
 }
 
 async function getVersionsAndTags(packageName) {
