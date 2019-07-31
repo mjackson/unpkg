@@ -3,5 +3,6 @@ env: standard
 instance_class: F4
 automatic_scaling:
   min_idle_instances: 2
+  max_instances: 12
 env_variables:
   NODE_ENV: 'production'
