@@ -1,9 +1,12 @@
 runtime: nodejs10
 env: standard
-instance_class: F4_HIGHMEM
-automatic_scaling:
-  max_idle_instances: 2
-  max_concurrent_requests: 40
-  target_cpu_utilization: 0.7
+# instance_class: F4_HIGHMEM
+# automatic_scaling:
+#   max_idle_instances: 2
+#   max_concurrent_requests: 40
+#   target_cpu_utilization: 0.7
+instance_class: B4_HIGHMEM
+manual_scaling:
+  instances: 10
 env_variables:
   NODE_ENV: 'production'
