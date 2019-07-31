@@ -2,6 +2,7 @@ import path from 'path';
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
+import asyncHandler from '../utils/asyncHandler.js';
 import bufferStream from '../utils/bufferStream.js';
 import getContentType from '../utils/getContentType.js';
 import getIntegrity from '../utils/getIntegrity.js';
@@ -46,16 +47,20 @@ async function findMatchingEntries(stream, filename) {
           return;
         }
 
-        const content = await bufferStream(stream);
+        try {
+          const content = await bufferStream(stream);
 
-        entry.contentType = getContentType(entry.path);
-        entry.integrity = getIntegrity(content);
-        entry.lastModified = header.mtime.toUTCString();
-        entry.size = content.length;
+          entry.contentType = getContentType(entry.path);
+          entry.integrity = getIntegrity(content);
+          entry.lastModified = header.mtime.toUTCString();
+          entry.size = content.length;
 
-        entries[entry.path] = entry;
+          entries[entry.path] = entry;
 
-        next();
+          next();
+        } catch (error) {
+          next(error);
+        }
       })
       .on('finish', () => {
         accept(entries);
@@ -86,7 +91,7 @@ function getMetadata(entry, entries) {
   return metadata;
 }
 
-export default async function serveDirectoryMetadata(req, res) {
+async function serveDirectoryMetadata(req, res) {
   const stream = await getPackage(req.packageName, req.packageVersion);
 
   const filename = req.filename.slice(0, -1) || '/';
@@ -95,3 +100,5 @@ export default async function serveDirectoryMetadata(req, res) {
 
   res.send(metadata);
 }
+
+export default asyncHandler(serveDirectoryMetadata);

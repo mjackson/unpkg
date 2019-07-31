@@ -2,9 +2,10 @@ import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 
 import BrowseApp from '../client/browse/App.js';
 import MainTemplate from '../templates/MainTemplate.js';
-import { getAvailableVersions } from '../utils/npm.js';
+import asyncHandler from '../utils/asyncHandler.js';
 import getScripts from '../utils/getScripts.js';
 import { createElement, createHTML } from '../utils/markup.js';
+import { getAvailableVersions } from '../utils/npm.js';
 
 const doctype = '<!DOCTYPE html>';
 const globalURLs =
@@ -20,7 +21,7 @@ const globalURLs =
         'react-dom': '/react-dom@16.8.6/umd/react-dom.development.js'
       };
 
-export default async function serveBrowsePage(req, res) {
+async function serveBrowsePage(req, res) {
   const availableVersions = await getAvailableVersions(req.packageName);
   const data = {
     packageName: req.packageName,
@@ -51,3 +52,5 @@ export default async function serveBrowsePage(req, res) {
     })
     .send(html);
 }
+
+export default asyncHandler(serveBrowsePage);

@@ -1,3 +1,4 @@
+import asyncHandler from '../utils/asyncHandler.js';
 import createPackageURL from '../utils/createPackageURL.js';
 import { getPackageConfig, resolveVersion } from '../utils/npm.js';
 
@@ -18,7 +19,7 @@ function semverRedirect(req, res, newVersion) {
  * fetch the package config and add it to req.packageConfig. Redirect to
  * the resolved version number if necessary.
  */
-export default async function validateVersion(req, res, next) {
+async function validateVersion(req, res, next) {
   const version = await resolveVersion(req.packageName, req.packageVersion);
 
   if (!version) {
@@ -47,3 +48,5 @@ export default async function validateVersion(req, res, next) {
 
   next();
 }
+
+export default asyncHandler(validateVersion);

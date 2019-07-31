@@ -2,12 +2,13 @@ import path from 'path';
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
+import asyncHandler from '../utils/asyncHandler.js';
+import bufferStream from '../utils/bufferStream.js';
 import createPackageURL from '../utils/createPackageURL.js';
 import createSearch from '../utils/createSearch.js';
-import { getPackage } from '../utils/npm.js';
-import getIntegrity from '../utils/getIntegrity.js';
 import getContentType from '../utils/getContentType.js';
-import bufferStream from '../utils/bufferStream.js';
+import getIntegrity from '../utils/getIntegrity.js';
+import { getPackage } from '../utils/npm.js';
 
 function fileRedirect(req, res, entry) {
   // Redirect to the file with the extension so it's
@@ -123,20 +124,24 @@ function searchEntries(stream, filename) {
           }
         }
 
-        const content = await bufferStream(stream);
+        try {
+          const content = await bufferStream(stream);
 
-        entry.contentType = getContentType(entry.path);
-        entry.integrity = getIntegrity(content);
-        entry.lastModified = header.mtime.toUTCString();
-        entry.size = content.length;
+          entry.contentType = getContentType(entry.path);
+          entry.integrity = getIntegrity(content);
+          entry.lastModified = header.mtime.toUTCString();
+          entry.size = content.length;
 
-        // Set the content only for the foundEntry and
-        // discard the buffer for all others.
-        if (entry === foundEntry) {
-          entry.content = content;
+          // Set the content only for the foundEntry and
+          // discard the buffer for all others.
+          if (entry === foundEntry) {
+            entry.content = content;
+          }
+
+          next();
+        } catch (error) {
+          next(error);
         }
-
-        next();
       })
       .on('finish', () => {
         accept({
@@ -153,7 +158,7 @@ function searchEntries(stream, filename) {
  * Fetch and search the archive to try and find the requested file.
  * Redirect to the "index" file if a directory was requested.
  */
-export default async function findEntry(req, res, next) {
+async function findEntry(req, res, next) {
   const stream = await getPackage(req.packageName, req.packageVersion);
   const { foundEntry: entry, matchingEntries: entries } = await searchEntries(
     stream,
@@ -201,3 +206,5 @@ export default async function findEntry(req, res, next) {
 
   next();
 }
+
+export default asyncHandler(findEntry);

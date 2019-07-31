@@ -1,6 +1,7 @@
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
+import asyncHandler from '../utils/asyncHandler.js';
 import bufferStream from '../utils/bufferStream.js';
 import createDataURI from '../utils/createDataURI.js';
 import getContentType from '../utils/getContentType.js';
@@ -37,10 +38,15 @@ async function findEntry(stream, filename) {
           return;
         }
 
-        entry.content = await bufferStream(stream);
-        foundEntry = entry;
+        try {
+          entry.content = await bufferStream(stream);
 
-        next();
+          foundEntry = entry;
+
+          next();
+        } catch (error) {
+          next(error);
+        }
       })
       .on('finish', () => {
         accept(foundEntry);
@@ -48,7 +54,7 @@ async function findEntry(stream, filename) {
   });
 }
 
-export default async function serveFileBrowser(req, res) {
+async function serveFileBrowser(req, res) {
   const stream = await getPackage(req.packageName, req.packageVersion);
   const entry = await findEntry(stream, req.filename);
 
@@ -82,3 +88,5 @@ export default async function serveFileBrowser(req, res) {
 
   serveBrowsePage(req, res);
 }
+
+export default asyncHandler(serveFileBrowser);
