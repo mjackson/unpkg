@@ -6,5 +6,6 @@ module.exports = {
     'getStats\\.js': '<rootDir>/modules/__mocks__/getStatsMock.js'
   },
   testMatch: ['**/__tests__/*-test.js'],
-  testURL: 'http://localhost/'
+  testURL: 'http://localhost/',
+  setupTestFrameworkScriptFile: './jest.setup.js'
 };
