@@ -8,6 +8,20 @@ describe('A request to browse a directory', () => {
     server = createServer();
   });
 
+  describe('with no version specified', () => {
+    it('redirects to the latest version', done => {
+      request(server)
+        .get('/browse/react/')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toMatch(
+            /\/browse\/react@\d+\.\d+\.\d+\//
+          );
+          done();
+        });
+    });
+  });
+
   describe('when the directory exists', () => {
     it('returns an HTML page', done => {
       request(server)

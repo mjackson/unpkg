@@ -10,7 +10,8 @@ function semverRedirect(req, res, newVersion) {
     })
     .redirect(
       302,
-      createPackageURL(req.packageName, newVersion, req.filename, req.search)
+      req.baseUrl +
+        createPackageURL(req.packageName, newVersion, req.filename, req.search)
     );
 }
 
