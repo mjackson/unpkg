@@ -22,7 +22,7 @@ async function findEntry(stream, filename) {
           // so we shorten that to just `/index.js` here. A few packages use a
           // prefix other than `package/`. e.g. the firebase package uses the
           // `firebase_npm/` prefix. So we just strip the first dir name.
-          path: header.name.replace(/^[^/]+/, ''),
+          path: header.name.replace(/^[^/]+\/?/, '/'),
           type: header.type
         };
 
