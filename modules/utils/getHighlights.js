@@ -18,6 +18,7 @@ const extLanguages = {
   mjs: 'javascript',
   tsbuildinfo: 'json',
   tsx: 'typescript',
+  txt: 'text',
   vue: 'html'
 };
 
