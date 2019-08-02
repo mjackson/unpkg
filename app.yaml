@@ -5,5 +5,6 @@ automatic_scaling:
   max_idle_instances: 2
   max_concurrent_requests: 40
   target_cpu_utilization: 0.8
+  max_instances: 14
 env_variables:
   NODE_ENV: 'production'
