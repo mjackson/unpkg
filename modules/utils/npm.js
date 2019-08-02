@@ -1,7 +1,6 @@
 import url from 'url';
 import https from 'https';
 import LRUCache from 'lru-cache';
-import semver from 'semver';
 
 import debug from './debug.js';
 import bufferStream from './bufferStream.js';
@@ -77,18 +76,16 @@ async function fetchPackageInfo(packageName) {
 
 async function fetchVersionsAndTags(packageName) {
   const info = await fetchPackageInfo(packageName);
-
-  if (info && info.versions) {
-    return {
-      versions: Object.keys(info.versions),
-      tags: info['dist-tags']
-    };
-  }
-
-  return null;
+  return info && info.versions
+    ? { versions: Object.keys(info.versions), tags: info['dist-tags'] }
+    : null;
 }
 
-async function getVersionsAndTags(packageName) {
+/**
+ * Returns an object of available { versions, tags }.
+ * Uses a cache to avoid over-fetching from the registry.
+ */
+export async function getVersionsAndTags(packageName) {
   const cacheKey = `versions-${packageName}`;
   const cacheValue = cache.get(cacheKey);
 
@@ -107,45 +104,6 @@ async function getVersionsAndTags(packageName) {
   return value;
 }
 
-function byVersion(a, b) {
-  return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
-}
-
-/**
- * Returns an array of available versions, sorted by semver.
- */
-export async function getAvailableVersions(packageName) {
-  const versionsAndTags = await getVersionsAndTags(packageName);
-
-  if (versionsAndTags) {
-    return versionsAndTags.versions.sort(byVersion);
-  }
-
-  return [];
-}
-
-/**
- * Resolves the semver range or tag to a valid version.
- * Output is cached to avoid over-fetching from the registry.
- */
-export async function resolveVersion(packageName, range) {
-  const versionsAndTags = await getVersionsAndTags(packageName);
-
-  if (versionsAndTags) {
-    const { versions, tags } = versionsAndTags;
-
-    if (range in tags) {
-      range = tags[range];
-    }
-
-    return versions.includes(range)
-      ? range
-      : semver.maxSatisfying(versions, range);
-  }
-
-  return null;
-}
-
 // All the keys that sometimes appear in package info
 // docs that we don't need. There are probably more.
 const packageConfigExcludeKeys = [
@@ -160,10 +118,10 @@ const packageConfigExcludeKeys = [
   'scripts'
 ];
 
-function cleanPackageConfig(doc) {
-  return Object.keys(doc).reduce((memo, key) => {
+function cleanPackageConfig(config) {
+  return Object.keys(config).reduce((memo, key) => {
     if (!key.startsWith('_') && !packageConfigExcludeKeys.includes(key)) {
-      memo[key] = doc[key];
+      memo[key] = config[key];
     }
 
     return memo;
@@ -172,17 +130,14 @@ function cleanPackageConfig(doc) {
 
 async function fetchPackageConfig(packageName, version) {
   const info = await fetchPackageInfo(packageName);
-
-  if (!info || !(version in info.versions)) {
-    return null;
-  }
-
-  return cleanPackageConfig(info.versions[version]);
+  return info && info.versions && version in info.versions
+    ? cleanPackageConfig(info.versions[version])
+    : null;
 }
 
 /**
  * Returns metadata about a package, mostly the same as package.json.
- * Output is cached to avoid over-fetching from the registry.
+ * Uses a cache to avoid over-fetching from the registry.
  */
 export async function getPackageConfig(packageName, version) {
   const cacheKey = `config-${packageName}-${version}`;

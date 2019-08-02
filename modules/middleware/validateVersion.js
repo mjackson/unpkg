@@ -1,6 +1,8 @@
+import semver from 'semver';
+
 import asyncHandler from '../utils/asyncHandler.js';
 import createPackageURL from '../utils/createPackageURL.js';
-import { getPackageConfig, resolveVersion } from '../utils/npm.js';
+import { getPackageConfig, getVersionsAndTags } from '../utils/npm.js';
 
 function semverRedirect(req, res, newVersion) {
   res
@@ -13,6 +15,24 @@ function semverRedirect(req, res, newVersion) {
       req.baseUrl +
         createPackageURL(req.packageName, newVersion, req.filename, req.search)
     );
+}
+
+async function resolveVersion(packageName, range) {
+  const versionsAndTags = await getVersionsAndTags(packageName);
+
+  if (versionsAndTags) {
+    const { versions, tags } = versionsAndTags;
+
+    if (range in tags) {
+      range = tags[range];
+    }
+
+    return versions.includes(range)
+      ? range
+      : semver.maxSatisfying(versions, range);
+  }
+
+  return null;
 }
 
 /**

@@ -10,7 +10,7 @@ describe('A request for metadata', () => {
 
   it('returns 200', done => {
     request(server)
-      .get('/react@16.8.6/?meta')
+      .get('/react@16.8.0/?meta')
       .end((err, res) => {
         expect(res.statusCode).toBe(200);
         expect(res.headers['content-type']).toMatch(/\bapplication\/json\b/);

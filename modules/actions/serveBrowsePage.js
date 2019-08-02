@@ -1,11 +1,12 @@
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
+import semver from 'semver';
 
 import BrowseApp from '../client/browse/App.js';
 import MainTemplate from '../templates/MainTemplate.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import getScripts from '../utils/getScripts.js';
 import { createElement, createHTML } from '../utils/markup.js';
-import { getAvailableVersions } from '../utils/npm.js';
+import { getVersionsAndTags } from '../utils/npm.js';
 
 const doctype = '<!DOCTYPE html>';
 const globalURLs =
@@ -20,6 +21,15 @@ const globalURLs =
         react: '/react@16.8.6/umd/react.development.js',
         'react-dom': '/react-dom@16.8.6/umd/react-dom.development.js'
       };
+
+function byVersion(a, b) {
+  return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
+}
+
+async function getAvailableVersions(packageName) {
+  const versionsAndTags = await getVersionsAndTags(packageName);
+  return versionsAndTags ? versionsAndTags.versions.sort(byVersion) : [];
+}
 
 async function serveBrowsePage(req, res) {
   const availableVersions = await getAvailableVersions(req.packageName);

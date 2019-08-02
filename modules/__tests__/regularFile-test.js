@@ -10,7 +10,7 @@ describe('A request for a JavaScript file', () => {
 
   it('returns 200', done => {
     request(server)
-      .get('/react@16.8.6/index.js')
+      .get('/react@16.8.0/index.js')
       .end((err, res) => {
         expect(res.statusCode).toBe(200);
         expect(res.headers['content-type']).toMatch(
