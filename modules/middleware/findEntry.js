@@ -1,5 +1,4 @@
 import path from 'path';
-import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
 import asyncHandler from '../utils/asyncHandler.js';
@@ -67,7 +66,6 @@ function searchEntries(stream, filename) {
     }
 
     stream
-      .pipe(gunzip())
       .pipe(tar.extract())
       .on('error', reject)
       .on('entry', async (header, stream, next) => {

@@ -1,5 +1,6 @@
 import url from 'url';
 import https from 'https';
+import gunzip from 'gunzip-maybe';
 import LRUCache from 'lru-cache';
 
 import debug from './debug.js';
@@ -179,7 +180,9 @@ export async function getPackage(packageName, version) {
   const res = await get(options);
 
   if (res.statusCode === 200) {
-    return res;
+    const stream = res.pipe(gunzip());
+    // stream.pause();
+    return stream;
   }
 
   const data = await bufferStream(res);

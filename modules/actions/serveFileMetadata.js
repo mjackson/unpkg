@@ -1,4 +1,3 @@
-import gunzip from 'gunzip-maybe';
 import tar from 'tar-stream';
 
 import asyncHandler from '../utils/asyncHandler.js';
@@ -13,7 +12,6 @@ async function findEntry(stream, filename) {
     let foundEntry = null;
 
     stream
-      .pipe(gunzip())
       .pipe(tar.extract())
       .on('error', reject)
       .on('entry', async (header, stream, next) => {

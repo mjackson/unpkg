@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import gunzip from 'gunzip-maybe';
 
 function getPackageInfo(packageName) {
   const file = path.resolve(__dirname, `./metadata/${packageName}.json`);
@@ -29,5 +30,5 @@ export function getPackage(packageName, version) {
     `./packages/${packageName}-${version}.tgz`
   );
 
-  return fs.existsSync(file) ? fs.createReadStream(file) : null;
+  return fs.existsSync(file) ? fs.createReadStream(file).pipe(gunzip()) : null;
 }
