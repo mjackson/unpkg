@@ -1,4 +1,6 @@
+import cors from 'cors';
 import express from 'express';
+import morgan from 'morgan';
 
 import serveDirectoryBrowser from './actions/serveDirectoryBrowser.js';
 import serveDirectoryMetadata from './actions/serveDirectoryMetadata.js';
@@ -9,10 +11,9 @@ import serveMainPage from './actions/serveMainPage.js';
 import serveModule from './actions/serveModule.js';
 import serveStats from './actions/serveStats.js';
 
-import cors from './middleware/cors.js';
 import findEntry from './middleware/findEntry.js';
-import logger from './middleware/logger.js';
 import redirectLegacyURLs from './middleware/redirectLegacyURLs.js';
+import requestLog from './middleware/requestLog.js';
 import staticFiles from './middleware/staticFiles.js';
 import validateFilename from './middleware/validateFilename.js';
 import validatePackageURL from './middleware/validatePackageURL.js';
@@ -32,8 +33,11 @@ export default function createServer() {
     app.enable('trust proxy');
     app.enable('strict routing');
 
-    app.use(logger);
-    app.use(cors);
+    if (process.env.NODE_ENV === 'development') {
+      app.use(morgan('dev'));
+    }
+
+    app.use(cors());
     app.use(staticFiles);
 
     // Special startup request from App Engine
@@ -41,6 +45,8 @@ export default function createServer() {
     app.get('/_ah/start', (req, res) => {
       res.status(200).end();
     });
+
+    app.use(requestLog);
 
     app.get('/', serveMainPage);
     app.get('/api/stats', serveStats);

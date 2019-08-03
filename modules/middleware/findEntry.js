@@ -157,7 +157,7 @@ function searchEntries(stream, filename) {
  * Redirect to the "index" file if a directory was requested.
  */
 async function findEntry(req, res, next) {
-  const stream = await getPackage(req.packageName, req.packageVersion);
+  const stream = await getPackage(req.packageName, req.packageVersion, req.log);
   const { foundEntry: entry, matchingEntries: entries } = await searchEntries(
     stream,
     req.filename

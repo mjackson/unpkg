@@ -26,13 +26,16 @@ function byVersion(a, b) {
   return semver.lt(a, b) ? -1 : semver.gt(a, b) ? 1 : 0;
 }
 
-async function getAvailableVersions(packageName) {
-  const versionsAndTags = await getVersionsAndTags(packageName);
+async function getAvailableVersions(packageName, log) {
+  const versionsAndTags = await getVersionsAndTags(packageName, log);
   return versionsAndTags ? versionsAndTags.versions.sort(byVersion) : [];
 }
 
 async function serveBrowsePage(req, res) {
-  const availableVersions = await getAvailableVersions(req.packageName);
+  const availableVersions = await getAvailableVersions(
+    req.packageName,
+    req.log
+  );
   const data = {
     packageName: req.packageName,
     packageVersion: req.packageVersion,

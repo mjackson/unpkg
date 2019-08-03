@@ -5,3 +5,4 @@ basic_scaling:
   max_instances: 1
 env_variables:
   NODE_ENV: 'staging'
+  DEBUG: 1

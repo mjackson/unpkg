@@ -4,7 +4,6 @@ import gunzip from 'gunzip-maybe';
 import LRUCache from 'lru-cache';
 
 import bufferStream from './bufferStream.js';
-import * as log from './logging.js';
 
 const npmRegistryURL =
   process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org';
@@ -41,7 +40,7 @@ function encodePackageName(packageName) {
     : encodeURIComponent(packageName);
 }
 
-async function fetchPackageInfo(packageName) {
+async function fetchPackageInfo(packageName, log) {
   const name = encodePackageName(packageName);
   const infoURL = `${npmRegistryURL}/${name}`;
 
@@ -72,8 +71,8 @@ async function fetchPackageInfo(packageName) {
   return null;
 }
 
-async function fetchVersionsAndTags(packageName) {
-  const info = await fetchPackageInfo(packageName);
+async function fetchVersionsAndTags(packageName, log) {
+  const info = await fetchPackageInfo(packageName, log);
   return info && info.versions
     ? { versions: Object.keys(info.versions), tags: info['dist-tags'] }
     : null;
@@ -83,7 +82,7 @@ async function fetchVersionsAndTags(packageName) {
  * Returns an object of available { versions, tags }.
  * Uses a cache to avoid over-fetching from the registry.
  */
-export async function getVersionsAndTags(packageName) {
+export async function getVersionsAndTags(packageName, log) {
   const cacheKey = `versions-${packageName}`;
   const cacheValue = cache.get(cacheKey);
 
@@ -91,7 +90,7 @@ export async function getVersionsAndTags(packageName) {
     return cacheValue === notFound ? null : JSON.parse(cacheValue);
   }
 
-  const value = await fetchVersionsAndTags(packageName);
+  const value = await fetchVersionsAndTags(packageName, log);
 
   if (value == null) {
     cache.set(cacheKey, notFound, 5 * oneMinute);
@@ -126,8 +125,8 @@ function cleanPackageConfig(config) {
   }, {});
 }
 
-async function fetchPackageConfig(packageName, version) {
-  const info = await fetchPackageInfo(packageName);
+async function fetchPackageConfig(packageName, version, log) {
+  const info = await fetchPackageInfo(packageName, log);
   return info && info.versions && version in info.versions
     ? cleanPackageConfig(info.versions[version])
     : null;
@@ -137,7 +136,7 @@ async function fetchPackageConfig(packageName, version) {
  * Returns metadata about a package, mostly the same as package.json.
  * Uses a cache to avoid over-fetching from the registry.
  */
-export async function getPackageConfig(packageName, version) {
+export async function getPackageConfig(packageName, version, log) {
   const cacheKey = `config-${packageName}-${version}`;
   const cacheValue = cache.get(cacheKey);
 
@@ -145,7 +144,7 @@ export async function getPackageConfig(packageName, version) {
     return cacheValue === notFound ? null : JSON.parse(cacheValue);
   }
 
-  const value = await fetchPackageConfig(packageName, version);
+  const value = await fetchPackageConfig(packageName, version, log);
 
   if (value == null) {
     cache.set(cacheKey, notFound, 5 * oneMinute);
@@ -159,7 +158,7 @@ export async function getPackageConfig(packageName, version) {
 /**
  * Returns a stream of the tarball'd contents of the given package.
  */
-export async function getPackage(packageName, version) {
+export async function getPackage(packageName, version, log) {
   const tarballName = isScopedPackageName(packageName)
     ? packageName.split('/')[1]
     : packageName;
