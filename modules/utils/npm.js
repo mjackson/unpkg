@@ -3,8 +3,8 @@ import https from 'https';
 import gunzip from 'gunzip-maybe';
 import LRUCache from 'lru-cache';
 
-import debug from './debug.js';
 import bufferStream from './bufferStream.js';
+import * as log from './logging.js';
 
 const npmRegistryURL =
   process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org';
@@ -45,7 +45,7 @@ async function fetchPackageInfo(packageName) {
   const name = encodePackageName(packageName);
   const infoURL = `${npmRegistryURL}/${name}`;
 
-  debug('Fetching package info for %s from %s', packageName, infoURL);
+  log.debug('Fetching package info for %s from %s', packageName, infoURL);
 
   const { hostname, pathname } = url.parse(infoURL);
   const options = {
@@ -63,16 +63,13 @@ async function fetchPackageInfo(packageName) {
     return bufferStream(res).then(JSON.parse);
   }
 
-  if (res.statusCode === 404) {
-    return null;
-  }
+  const content = (await bufferStream(res)).toString('utf-8');
 
-  const data = await bufferStream(res);
-  const content = data.toString('utf-8');
+  log.error('Failed to fetch info for %s', packageName);
+  log.error('Status: %s', res.statusCode);
+  log.error('Content: %s', content);
 
-  throw new Error(
-    `Failed to fetch info for ${packageName}\nstatus: ${res.statusCode}\ndata: ${content}`
-  );
+  return null;
 }
 
 async function fetchVersionsAndTags(packageName) {
@@ -168,7 +165,7 @@ export async function getPackage(packageName, version) {
     : packageName;
   const tarballURL = `${npmRegistryURL}/${packageName}/-/${tarballName}-${version}.tgz`;
 
-  debug('Fetching package for %s from %s', packageName, tarballURL);
+  log.debug('Fetching package for %s from %s', packageName, tarballURL);
 
   const { hostname, pathname } = url.parse(tarballURL);
   const options = {
@@ -185,11 +182,11 @@ export async function getPackage(packageName, version) {
     return stream;
   }
 
-  const data = await bufferStream(res);
-  const spec = `${packageName}@${version}`;
-  const content = data.toString('utf-8');
+  const content = (await bufferStream(res)).toString('utf-8');
 
-  throw new Error(
-    `Failed to fetch tarball for ${spec}\nstatus: ${res.statusCode}\ndata: ${content}`
-  );
+  log.error('Failed to fetch tarball for %s@%s', packageName, version);
+  log.error('Status: %s', res.statusCode);
+  log.error('Content: %s', content);
+
+  return null;
 }
