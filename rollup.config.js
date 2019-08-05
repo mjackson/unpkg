@@ -86,7 +86,6 @@ const server = {
         process.env.CLOUDFLARE_EMAIL
       ),
       'process.env.CLOUDFLARE_KEY': JSON.stringify(process.env.CLOUDFLARE_KEY),
-      'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
       'process.env.NPM_REGISTRY_URL': JSON.stringify(
         process.env.NPM_REGISTRY_URL
       ),
