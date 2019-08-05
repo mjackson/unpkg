@@ -62,11 +62,18 @@ async function fetchPackageInfo(packageName, log) {
     return bufferStream(res).then(JSON.parse);
   }
 
+  if (res.statusCode === 404) {
+    return null;
+  }
+
   const content = (await bufferStream(res)).toString('utf-8');
 
-  log.error('Failed to fetch info for %s', packageName);
-  log.error('Status: %s', res.statusCode);
-  log.error('Content: %s', content);
+  log.error(
+    'Error fetching info for %s (status: %s)',
+    packageName,
+    res.statusCode
+  );
+  log.error(content);
 
   return null;
 }
@@ -181,11 +188,19 @@ export async function getPackage(packageName, version, log) {
     return stream;
   }
 
+  if (res.statusCode === 404) {
+    return null;
+  }
+
   const content = (await bufferStream(res)).toString('utf-8');
 
-  log.error('Failed to fetch tarball for %s@%s', packageName, version);
-  log.error('Status: %s', res.statusCode);
-  log.error('Content: %s', content);
+  log.error(
+    'Error fetching tarball for %s@%s (status: %s)',
+    packageName,
+    version,
+    res.statusCode
+  );
+  log.error(content);
 
   return null;
 }

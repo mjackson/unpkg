@@ -1,7 +1,7 @@
 import util from 'util';
 
 // https://cloud.google.com/appengine/docs/standard/nodejs/runtime#environment_variables
-const projectId = process.env.GAE_APPLICATION;
+const projectId = process.env.GOOGLE_CLOUD_PROJECT;
 
 const enableDebugging = process.env.DEBUG != null;
 
