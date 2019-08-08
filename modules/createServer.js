@@ -16,7 +16,6 @@ import findEntry from './middleware/findEntry.js';
 import noQuery from './middleware/noQuery.js';
 import redirectLegacyURLs from './middleware/redirectLegacyURLs.js';
 import requestLog from './middleware/requestLog.js';
-import staticFiles from './middleware/staticFiles.js';
 import validateFilename from './middleware/validateFilename.js';
 import validatePackageURL from './middleware/validatePackageURL.js';
 import validatePackageName from './middleware/validatePackageName.js';
@@ -39,7 +38,7 @@ export default function createServer() {
     }
 
     app.use(cors());
-    app.use(staticFiles);
+    app.use(express.static('public', { maxAge: '1y' }));
 
     // Special startup request from App Engine
     // https://cloud.google.com/appengine/docs/standard/nodejs/how-instances-are-managed
