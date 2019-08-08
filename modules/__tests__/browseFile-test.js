@@ -31,4 +31,18 @@ describe('A request to browse a file', () => {
         });
     });
   });
+
+  describe('when the URL contains invalid query params', () => {
+    it('strips them from the URL', done => {
+      request(server)
+        .get('/browse/react@16.8.0/react.production.min.js?invalid')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toBe(
+            '/browse/react@16.8.0/react.production.min.js'
+          );
+          done();
+        });
+    });
+  });
 });

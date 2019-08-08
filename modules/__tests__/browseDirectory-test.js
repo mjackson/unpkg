@@ -45,4 +45,16 @@ describe('A request to browse a directory', () => {
         });
     });
   });
+
+  describe('with invalid query params', () => {
+    it('strips them from the query string', done => {
+      request(server)
+        .get('/browse/react@16.8.0/umd/?invalid')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toEqual('/browse/react@16.8.0/umd/');
+          done();
+        });
+    });
+  });
 });

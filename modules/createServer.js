@@ -12,6 +12,7 @@ import serveModule from './actions/serveModule.js';
 import serveStats from './actions/serveStats.js';
 
 import findEntry from './middleware/findEntry.js';
+import noQuery from './middleware/noQuery.js';
 import redirectLegacyURLs from './middleware/redirectLegacyURLs.js';
 import requestLog from './middleware/requestLog.js';
 import staticFiles from './middleware/staticFiles.js';
@@ -60,18 +61,18 @@ export default function createServer() {
 
         app.get(
           '*/',
+          noQuery(),
           validatePackageURL,
           validatePackageName,
-          validateQuery,
           validateVersion,
           serveDirectoryBrowser
         );
 
         app.get(
           '*',
+          noQuery(),
           validatePackageURL,
           validatePackageName,
-          validateQuery,
           validateVersion,
           serveFileBrowser
         );
