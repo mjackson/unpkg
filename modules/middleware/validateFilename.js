@@ -1,7 +1,4 @@
 import createPackageURL from '../utils/createPackageURL.js';
-import createSearch from '../utils/createSearch.js';
-
-const leadingSlashes = /^\/*/;
 
 function filenameRedirect(req, res) {
   let filename;
@@ -63,8 +60,8 @@ function filenameRedirect(req, res) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        filename.replace(leadingSlashes, '/'),
-        createSearch(req.query)
+        filename.replace(/^\/*/, '/'),
+        req.query
       )
     );
 }

@@ -13,7 +13,7 @@ function semverRedirect(req, res, newVersion) {
     .redirect(
       302,
       req.baseUrl +
-        createPackageURL(req.packageName, newVersion, req.filename, req.search)
+        createPackageURL(req.packageName, newVersion, req.filename, req.query)
     );
 }
 
@@ -65,7 +65,6 @@ async function validateVersion(req, res, next) {
   );
 
   if (!req.packageConfig) {
-    // TODO: Log why.
     return res
       .status(500)
       .type('text')

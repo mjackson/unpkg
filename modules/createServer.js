@@ -17,9 +17,9 @@ import noQuery from './middleware/noQuery.js';
 import redirectLegacyURLs from './middleware/redirectLegacyURLs.js';
 import requestLog from './middleware/requestLog.js';
 import validateFilename from './middleware/validateFilename.js';
-import validatePackageURL from './middleware/validatePackageURL.js';
+import validatePackagePathname from './middleware/validatePackagePathname.js';
 import validatePackageName from './middleware/validatePackageName.js';
-import validateVersion from './middleware/validateVersion.js';
+import validatePackageVersion from './middleware/validatePackageVersion.js';
 
 function createApp(callback) {
   const app = express();
@@ -61,18 +61,18 @@ export default function createServer() {
         app.get(
           '*/',
           noQuery(),
-          validatePackageURL,
+          validatePackagePathname,
           validatePackageName,
-          validateVersion,
+          validatePackageVersion,
           serveDirectoryBrowser
         );
 
         app.get(
           '*',
           noQuery(),
-          validatePackageURL,
+          validatePackagePathname,
           validatePackageName,
-          validateVersion,
+          validatePackageVersion,
           serveFileBrowser
         );
       })
@@ -86,9 +86,9 @@ export default function createServer() {
       app.get(
         '*/',
         allowQuery('meta'),
-        validatePackageURL,
+        validatePackagePathname,
         validatePackageName,
-        validateVersion,
+        validatePackageVersion,
         validateFilename,
         serveDirectoryMetadata
       );
@@ -96,9 +96,9 @@ export default function createServer() {
       app.get(
         '*',
         allowQuery('meta'),
-        validatePackageURL,
+        validatePackagePathname,
         validatePackageName,
-        validateVersion,
+        validatePackageVersion,
         validateFilename,
         serveFileMetadata
       );
@@ -120,9 +120,9 @@ export default function createServer() {
       app.get(
         '*',
         allowQuery('module'),
-        validatePackageURL,
+        validatePackagePathname,
         validatePackageName,
-        validateVersion,
+        validatePackageVersion,
         validateFilename,
         findEntry,
         serveModule
@@ -145,9 +145,9 @@ export default function createServer() {
     app.get(
       '*',
       noQuery(),
-      validatePackageURL,
+      validatePackagePathname,
       validatePackageName,
-      validateVersion,
+      validatePackageVersion,
       validateFilename,
       findEntry,
       serveFile

@@ -1,14 +1,16 @@
+import createSearch from './createSearch.js';
+
 export default function createPackageURL(
   packageName,
-  version,
-  pathname,
-  search
+  packageVersion,
+  filename,
+  query
 ) {
   let url = `/${packageName}`;
 
-  if (version != null) url += `@${version}`;
-  if (pathname) url += pathname;
-  if (search) url += search;
+  if (packageVersion) url += `@${packageVersion}`;
+  if (filename) url += filename;
+  if (query) url += createSearch(query);
 
   return url;
 }

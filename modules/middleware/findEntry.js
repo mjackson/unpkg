@@ -23,7 +23,7 @@ function fileRedirect(req, res, entry) {
         req.packageName,
         req.packageVersion,
         entry.path,
-        createSearch(req.query)
+        req.query
       )
     );
 }
@@ -42,7 +42,7 @@ function indexRedirect(req, res, entry) {
         req.packageName,
         req.packageVersion,
         entry.path,
-        createSearch(req.query)
+        req.query
       )
     );
 }
