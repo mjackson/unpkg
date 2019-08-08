@@ -29,4 +29,16 @@ describe('A request for metadata', () => {
         });
     });
   });
+
+  describe('when the URL includes invalid query parameters', () => {
+    it('removes them from the URL', done => {
+      request(server)
+        .get('/react@16.8.0/?meta&invalid')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toBe('/react@16.8.0/?meta');
+          done();
+        });
+    });
+  });
 });

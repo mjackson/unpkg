@@ -11,6 +11,7 @@ import serveMainPage from './actions/serveMainPage.js';
 import serveModule from './actions/serveModule.js';
 import serveStats from './actions/serveStats.js';
 
+import allowQuery from './middleware/allowQuery.js';
 import findEntry from './middleware/findEntry.js';
 import noQuery from './middleware/noQuery.js';
 import redirectLegacyURLs from './middleware/redirectLegacyURLs.js';
@@ -19,7 +20,6 @@ import staticFiles from './middleware/staticFiles.js';
 import validateFilename from './middleware/validateFilename.js';
 import validatePackageURL from './middleware/validatePackageURL.js';
 import validatePackageName from './middleware/validatePackageName.js';
-import validateQuery from './middleware/validateQuery.js';
 import validateVersion from './middleware/validateVersion.js';
 
 function createApp(callback) {
@@ -86,9 +86,9 @@ export default function createServer() {
 
       app.get(
         '*/',
+        allowQuery('meta'),
         validatePackageURL,
         validatePackageName,
-        validateQuery,
         validateVersion,
         validateFilename,
         serveDirectoryMetadata
@@ -96,9 +96,9 @@ export default function createServer() {
 
       app.get(
         '*',
+        allowQuery('meta'),
         validatePackageURL,
         validatePackageName,
-        validateQuery,
         validateVersion,
         validateFilename,
         serveFileMetadata
@@ -113,14 +113,16 @@ export default function createServer() {
       }
     });
 
+    // We need to route in this weird way because Express
+    // doesn't have a way to route based on query params.
     const moduleApp = createApp(app => {
       app.enable('strict routing');
 
       app.get(
         '*',
+        allowQuery('module'),
         validatePackageURL,
         validatePackageName,
-        validateQuery,
         validateVersion,
         validateFilename,
         findEntry,
@@ -143,9 +145,9 @@ export default function createServer() {
 
     app.get(
       '*',
+      noQuery(),
       validatePackageURL,
       validatePackageName,
-      validateQuery,
       validateVersion,
       validateFilename,
       findEntry,

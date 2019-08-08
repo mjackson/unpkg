@@ -35,4 +35,16 @@ describe('A request for a JavaScript file', () => {
         });
     });
   });
+
+  describe('when the URL has invalid query params', () => {
+    it('removes them from the URL', done => {
+      request(server)
+        .get('/react@16.8.0/index.js?invalid')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toBe('/react@16.8.0/index.js');
+          done();
+        });
+    });
+  });
 });
