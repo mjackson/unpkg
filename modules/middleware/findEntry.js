@@ -4,7 +4,6 @@ import tar from 'tar-stream';
 import asyncHandler from '../utils/asyncHandler.js';
 import bufferStream from '../utils/bufferStream.js';
 import createPackageURL from '../utils/createPackageURL.js';
-import createSearch from '../utils/createSearch.js';
 import getContentType from '../utils/getContentType.js';
 import getIntegrity from '../utils/getIntegrity.js';
 import { getPackage } from '../utils/npm.js';
