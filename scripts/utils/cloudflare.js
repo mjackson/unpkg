@@ -3,14 +3,16 @@ const fetch = require('isomorphic-fetch');
 const CloudflareEmail = process.env.CLOUDFLARE_EMAIL;
 const CloudflareKey = process.env.CLOUDFLARE_KEY;
 
-if (CloudflareEmail == null) {
-  console.error('Missing the $CLOUDFLARE_EMAIL environment variable');
-  process.exit(1);
-}
+if (process.env.ENABLE_CLOUDFLARE === 'true') {
+  if (CloudflareEmail == null) {
+    console.error('Missing the $CLOUDFLARE_EMAIL environment variable');
+    process.exit(1);
+  }
 
-if (CloudflareKey == null) {
-  console.error('Missing the $CLOUDFLARE_KEY environment variable');
-  process.exit(1);
+  if (CloudflareKey == null) {
+    console.error('Missing the $CLOUDFLARE_KEY environment variable');
+    process.exit(1);
+  }
 }
 
 function get(path) {
@@ -24,8 +26,8 @@ function get(path) {
 }
 
 function getLog(zoneId, rayId) {
-  return get(`/zones/${zoneId}/logs/requests/${rayId}`).then(
-    res => (res.status === 404 ? null : res.json())
+  return get(`/zones/${zoneId}/logs/requests/${rayId}`).then(res =>
+    res.status === 404 ? null : res.json()
   );
 }
 

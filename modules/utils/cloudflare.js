@@ -4,7 +4,10 @@ const cloudflareURL = 'https://api.cloudflare.com/client/v4';
 const cloudflareEmail = process.env.CLOUDFLARE_EMAIL;
 const cloudflareKey = process.env.CLOUDFLARE_KEY;
 
-if (process.env.NODE_ENV !== 'production') {
+if (
+  process.env.NODE_ENV !== 'production' &&
+  process.env.ENABLE_CLOUDFLARE === 'true'
+) {
   if (!cloudflareEmail) {
     throw new Error('Missing the $CLOUDFLARE_EMAIL environment variable');
   }

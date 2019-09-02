@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 
+import setEnv from './utils/setEnv';
 import serveDirectoryBrowser from './actions/serveDirectoryBrowser.js';
 import serveDirectoryMetadata from './actions/serveDirectoryMetadata.js';
 import serveFileBrowser from './actions/serveFileBrowser.js';
@@ -20,6 +21,8 @@ import validateFilename from './middleware/validateFilename.js';
 import validatePackagePathname from './middleware/validatePackagePathname.js';
 import validatePackageName from './middleware/validatePackageName.js';
 import validatePackageVersion from './middleware/validatePackageVersion.js';
+
+setEnv();
 
 function createApp(callback) {
   const app = express();
@@ -49,7 +52,10 @@ export default function createServer() {
     app.use(requestLog);
 
     app.get('/', serveMainPage);
-    app.get('/api/stats', serveStats);
+
+    if (process.env.ENABLE_CLOUDFLARE === 'true') {
+      app.get('/api/stats', serveStats);
+    }
 
     app.use(redirectLegacyURLs);
 

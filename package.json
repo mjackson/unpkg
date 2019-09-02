@@ -1,6 +1,6 @@
 {
   "name": "unpkg-server",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": false,
   "description": "The CDN for everything on npm",
   "main": "server.js",
@@ -36,6 +36,7 @@
     "jsesc": "^2.5.2",
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",
+    "minimist": "^1.2.0",
     "morgan": "^1.9.1",
     "ndjson": "^1.5.0",
     "pretty-bytes": "^5.1.0",
