@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-const path = require('path');
 const builtinModules = require('module').builtinModules;
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
@@ -68,7 +67,7 @@ const dependencies = (env === 'development'
 
 const server = {
   external: builtinModules.concat(dependencies),
-  input: path.resolve(__dirname, 'modules/server.js'),
+  input: 'modules/server.js',
   output: { file: 'server.js', format: 'cjs' },
   plugins: [
     manifest.inject({ virtualId: 'entry-manifest' }),
