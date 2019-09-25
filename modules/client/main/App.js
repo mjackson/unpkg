@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import { Global, css, jsx } from '@emotion/core';
-// import { Fragment, useEffect, useState } from 'react';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import formatBytes from 'pretty-bytes';
 import formatDate from 'date-fns/format';
@@ -92,8 +91,7 @@ function Stats({ data }) {
 }
 
 export default function App() {
-  // const [stats, setStats] = useState(
-  const [stats] = useState(
+  const [stats, setStats] = useState(
     typeof window === 'object' &&
       window.localStorage &&
       window.localStorage.savedStats
@@ -101,17 +99,17 @@ export default function App() {
       : null
   );
   const hasStats = !!(stats && !stats.error);
-  // const stringStats = JSON.stringify(stats);
+  const stringStats = JSON.stringify(stats);
 
-  // useEffect(() => {
-  //   window.localStorage.savedStats = stringStats;
-  // }, [stringStats]);
+  useEffect(() => {
+    window.localStorage.savedStats = stringStats;
+  }, [stringStats]);
 
-  // useEffect(() => {
-  //   fetch('/api/stats?period=last-month')
-  //     .then(res => res.json())
-  //     .then(setStats);
-  // }, []);
+  useEffect(() => {
+    fetch('/api/stats?period=last-month')
+      .then(res => res.json())
+      .then(setStats);
+  }, []);
 
   return (
     <Fragment>
