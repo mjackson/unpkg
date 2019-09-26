@@ -24,10 +24,10 @@ export function getPackageConfig(packageName, version) {
   return info ? info.versions[version] : null;
 }
 
-export function getPackage(packageName, version) {
+export function getPackage(packageConfig) {
   const file = path.resolve(
     __dirname,
-    `./packages/${packageName}-${version}.tgz`
+    `./packages/${packageConfig.name}-${packageConfig.version}.tgz`
   );
 
   return fs.existsSync(file) ? fs.createReadStream(file).pipe(gunzip()) : null;

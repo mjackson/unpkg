@@ -165,13 +165,10 @@ export async function getPackageConfig(packageName, version, log) {
 /**
  * Returns a stream of the tarball'd contents of the given package.
  */
-export async function getPackage(packageName, version, log) {
-  const tarballName = isScopedPackageName(packageName)
-    ? packageName.split('/')[1]
-    : packageName;
-  const tarballURL = `${npmRegistryURL}/${packageName}/-/${tarballName}-${version}.tgz`;
+export async function getPackage(packageConfig, log) {
+  const tarballURL = packageConfig.dist.tarball;
 
-  log.debug('Fetching package for %s from %s', packageName, tarballURL);
+  log.debug('Fetching package for %s from %s', packageConfig.name, tarballURL);
 
   const { hostname, pathname } = url.parse(tarballURL);
   const options = {
@@ -196,8 +193,8 @@ export async function getPackage(packageName, version, log) {
 
   log.error(
     'Error fetching tarball for %s@%s (status: %s)',
-    packageName,
-    version,
+    packageConfig.name,
+    packageConfig.version,
     res.statusCode
   );
   log.error(content);
