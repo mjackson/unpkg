@@ -1,23 +1,15 @@
 import PropTypes from 'prop-types';
 
-import encodeJSONForScript from '../utils/encodeJSONForScript.js';
 import {
   createElement as e,
   createHTML as h,
   createScript as x
 } from '../utils/markup.js';
 
-const promiseShim =
-  'window.Promise || document.write(\'\\x3Cscript src="/es6-promise@4.2.5/dist/es6-promise.min.js">\\x3C/script>\\x3Cscript>ES6Promise.polyfill()\\x3C/script>\')';
-
-const fetchShim =
-  'window.fetch || document.write(\'\\x3Cscript src="/whatwg-fetch@3.0.0/dist/fetch.umd.js">\\x3C/script>\')';
-
 export default function MainTemplate({
   title = 'UNPKG',
   description = 'The CDN for everything on npm',
   favicon = '/favicon.ico',
-  data,
   content = h(''),
   elements = []
 }) {
@@ -45,17 +37,9 @@ gtag('config', 'UA-140352188-1');`),
       }),
       e('meta', { name: 'timestamp', content: new Date().toISOString() }),
       favicon && e('link', { rel: 'shortcut icon', href: favicon }),
-      e('title', null, title),
-      x(promiseShim),
-      x(fetchShim),
-      data && x(`window.__DATA__ = ${encodeJSONForScript(data)}`)
+      e('title', null, title)
     ),
-    e(
-      'body',
-      null,
-      e('div', { id: 'root', dangerouslySetInnerHTML: content }),
-      ...elements
-    )
+    e('body', null, e('div', { id: 'root' }, content), ...elements)
   );
 }
 
@@ -68,7 +52,6 @@ if (process.env.NODE_ENV !== 'production') {
     title: PropTypes.string,
     description: PropTypes.string,
     favicon: PropTypes.string,
-    data: PropTypes.any,
     content: htmlType,
     elements: PropTypes.arrayOf(PropTypes.node)
   };

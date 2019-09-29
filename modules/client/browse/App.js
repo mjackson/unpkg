@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import { fontSans, fontMono } from '../utils/style.js';
+import { createScript } from '../utils/markup.js';
 
 import { PackageInfoProvider } from './PackageInfo.js';
 import DirectoryViewer from './DirectoryViewer.js';
@@ -134,13 +135,6 @@ export default function App({
   filename,
   target
 }) {
-  function handleChange(event) {
-    window.location.href = window.location.href.replace(
-      '@' + packageVersion,
-      '@' + event.target.value
-    );
-  }
-
   const breadcrumbs = [];
 
   if (filename === '/') {
@@ -247,9 +241,9 @@ export default function App({
                 <label>
                   Version:{' '}
                   <select
+                    id="version-selector"
                     name="version"
                     defaultValue={packageVersion}
-                    onChange={handleChange}
                     css={{
                       appearance: 'none',
                       cursor: 'pointer',
@@ -281,6 +275,14 @@ export default function App({
                       </option>
                     ))}
                   </select>
+                  {createScript(`
+                    document.getElementById('version-selector').addEventListener('change', function(event) {
+                      window.location.href = window.location.href.replace(
+                        '@${packageVersion}',
+                        '@' + event.target.value
+                      );
+                    });
+                  `)}
                 </label>
               </p>
             </header>
