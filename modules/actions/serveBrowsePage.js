@@ -42,6 +42,7 @@ async function serveBrowsePage(req, res) {
   );
 
   res.set({
+    'Content-Type': 'text/html',
     'Cache-Control': 'public, max-age=14400', // 4 hours
     'Cache-Tag': 'browse'
   });
