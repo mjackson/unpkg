@@ -53,7 +53,7 @@ gtag('config', 'UA-140352188-1');`),
     e(
       'body',
       null,
-      e('div', { id: 'root', dangerouslySetInnerHTML: content }),
+      e('div', { id: 'root' }, content),
       ...elements
     )
   );
