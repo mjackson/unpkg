@@ -2,7 +2,6 @@ import tar from 'tar-stream';
 
 import asyncHandler from '../utils/asyncHandler.js';
 import { getPackage } from '../utils/npm.js';
-import createPackageURL from '../utils/createPackageURL.js';
 
 async function findEntryType(stream, filename) {
   // filename = /some/file/name.js
@@ -44,31 +43,27 @@ async function findEntryType(stream, filename) {
 
 async function validateFileType(req, res, next) {
   if (!req.filename) {
-    req.fileType = 'directory';
+    req.type = 'directory';
+  } else {
+    const stream = await getPackage(
+      req.packageName,
+      req.packageVersion,
+      req.log
+    );
+
+    const entryType = await findEntryType(stream, req.filename);
+
+    req.type = entryType;
   }
 
-  const stream = await getPackage(req.packageName, req.packageVersion, req.log);
-
-  const entryType = await findEntryType(stream, req.filename);
-
-  req.type = entryType;
-
-  if (req.type === 'directory' && req.filename.slice(-1) !== '/') {
-    // If there is no trailing slash, redirect to the one that have
+  if (req.type === 'directory' && req.filename.slice(-1) === '/') {
+    // If there is a trailing slash, redirect to the url without it
     return res
       .set({
         'Cache-Control': 'public, max-age=31536000', // 1 year
-        'Cache-Tag': 'redirect, filename-redirect'
+        'Cache-Tag': 'redirect, file-type-redirect'
       })
-      .redirect(
-        301,
-        createPackageURL(
-          req.packageName,
-          req.packageVersion,
-          req.filename.replace(/^\/+/, '/') + '/',
-          req.query
-        )
-      );
+      .redirect(302, req.originalUrl.slice(0, -1));
   }
 
   next();

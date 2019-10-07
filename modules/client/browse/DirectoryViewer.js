@@ -5,6 +5,7 @@ import VisuallyHidden from '@reach/visually-hidden';
 import sortBy from 'sort-by';
 
 import { formatBytes } from '../utils/format.js';
+import { join, basename, dirname } from '../utils/path.js';
 
 import { DirectoryIcon, CodeFileIcon } from './Icons.js';
 
@@ -44,19 +45,16 @@ const typeCellStyle = {
   }
 };
 
-function getRelName(path, base) {
-  return path.substr(base.length > 1 ? base.length + 1 : 1);
-}
-
-export default function DirectoryViewer({ path, details: entries }) {
+export default function DirectoryViewer({ path, isRoot, details: entries }) {
+  const parentPath = dirname(path);
   const rows = [];
 
-  if (path !== '/') {
+  if (!isRoot) {
     rows.push(
       <tr key="..">
         <td css={iconCellStyle} />
         <td css={tableCellStyle}>
-          <a title="Parent directory" href="../" css={linkStyle}>
+          <a title="Parent directory" href={parentPath} css={linkStyle}>
             ..
           </a>
         </td>
@@ -83,8 +81,8 @@ export default function DirectoryViewer({ path, details: entries }) {
   );
 
   subdirs.sort(sortBy('path')).forEach(({ path: dirname }) => {
-    const relName = getRelName(dirname, path);
-    const href = relName + '/';
+    const relName = basename(dirname);
+    const href = join(path, relName);
 
     rows.push(
       <tr key={relName}>
@@ -105,8 +103,8 @@ export default function DirectoryViewer({ path, details: entries }) {
   files
     .sort(sortBy('path'))
     .forEach(({ path: filename, size, contentType }) => {
-      const relName = getRelName(filename, path);
-      const href = relName;
+      const relName = basename(filename);
+      const href = join(path, relName);
 
       rows.push(
         <tr key={relName}>
@@ -174,6 +172,7 @@ export default function DirectoryViewer({ path, details: entries }) {
 if (process.env.NODE_ENV !== 'production') {
   DirectoryViewer.propTypes = {
     path: PropTypes.string.isRequired,
+    isRoot: PropTypes.bool.isRequired,
     details: PropTypes.objectOf(
       PropTypes.shape({
         path: PropTypes.string.isRequired,
