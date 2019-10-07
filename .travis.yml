@@ -1,13 +1,14 @@
 language: node_js
 cache: yarn
 before_install:
-- openssl aes-256-cbc -K $encrypted_a35d52d190dd_key -iv $encrypted_a35d52d190dd_iv
+- openssl aes-256-cbc -K $encrypted_f0cc5a0bf9b1_key -iv $encrypted_f0cc5a0bf9b1_iv
   -in secrets.tar.enc -out secrets.tar -d
 - tar xvf secrets.tar
 script:
 - yarn lint
 - yarn test
-- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") yarn build
+- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging")
+  yarn build
 deploy:
 - provider: gae
   skip_cleanup: true
