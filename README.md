@@ -1,10 +1,7 @@
-<h1 align="center">UNPKG</h1>
+# UNPKG &middot; [![Travis][build-badge]][build]
 
-<p align="center">
-  <a title="Travis Build" href="https://travis-ci.org/mjackson/unpkg">
-    <img alt="Travis Build Badge" src="https://img.shields.io/travis/mjackson/unpkg/master.svg?style=flat-square" />
-  </a>
-</p>
+[build-badge]: https://img.shields.io/travis/mjackson/unpkg/master.svg?style=flat-square
+[build]: https://travis-ci.org/mjackson/unpkg
 
 [UNPKG](https://unpkg.com) is a fast, global [content delivery network](https://en.wikipedia.org/wiki/Content_delivery_network) for everything on [npm](https://www.npmjs.com/).
 
