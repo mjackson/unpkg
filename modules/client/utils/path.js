@@ -3,7 +3,7 @@ export function join(...paths) {
     paths
       .join('/')
       .replace(/\/+/g, '/')
-      .replace(/\/$/, '') || '/'
+      .replace(/\/$/, '') || '.'
   );
 }
 
@@ -12,9 +12,11 @@ export function basename(path) {
 }
 
 export function dirname(path) {
-  return path
-    .replace(/\/$/, '')
-    .split('/')
-    .slice(0, -1)
-    .join('/');
+  return (
+    path
+      .replace(/\/$/, '')
+      .split('/')
+      .slice(0, -1)
+      .join('/') || '.'
+  );
 }
