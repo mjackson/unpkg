@@ -14,7 +14,7 @@ describe('A request with a trailing slash', () => {
         .get('/react/')
         .end((err, res) => {
           expect(res.statusCode).toBe(302);
-          expect(res.headers.location).toEqual('/browse/react/');
+          expect(res.headers.location).toEqual('/browse/react');
           done();
         });
     });
@@ -26,7 +26,19 @@ describe('A request with a trailing slash', () => {
         .get('/react@16.8.0/')
         .end((err, res) => {
           expect(res.statusCode).toBe(302);
-          expect(res.headers.location).toEqual('/browse/react@16.8.0/');
+          expect(res.headers.location).toEqual('/browse/react@16.8.0');
+          done();
+        });
+    });
+  });
+
+  describe('in /browse', () => {
+    it('redirects to the same url without trailing slash', done => {
+      request(server)
+        .get('/browse/react@16.8.0/')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toEqual('/browse/react@16.8.0');
           done();
         });
     });
