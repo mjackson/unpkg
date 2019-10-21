@@ -1,20 +1,6 @@
 {
-  "env": {
-    "es6": true,
-    "node": true
-  },
-  "extends": ["eslint:recommended", "plugin:import/errors"],
-  "parser": "babel-eslint",
+  "extends": "react-app",
   "rules": {
-    "no-console": 0
-  },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "moduleDirectory": [
-          "node_modules"
-        ]
-      }
-    }
+    "import/first": 0
   }
 }

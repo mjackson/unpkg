@@ -67,6 +67,7 @@ function AboutLogo({ children }) {
 }
 
 function AboutLogoImage(props) {
+  /* eslint-disable-next-line jsx-a11y/alt-text */
   return <img {...props} css={{ maxWidth: '90%' }} />;
 }
 
@@ -442,7 +443,11 @@ export default function App() {
         >
           <AboutLogo>
             <a title="Cloudflare" href="https://www.cloudflare.com">
-              <AboutLogoImage src={CloudflareLogo} height="100" />
+              <AboutLogoImage
+                alt="Cloudflare"
+                src={CloudflareLogo}
+                height="100"
+              />
             </a>
           </AboutLogo>
         </div>
@@ -473,7 +478,7 @@ export default function App() {
         >
           <AboutLogo>
             <a title="Angular" href="https://angular.io">
-              <AboutLogoImage src={AngularLogo} width="200" />
+              <AboutLogoImage alt="Angular" src={AngularLogo} width="200" />
             </a>
           </AboutLogo>
         </div>

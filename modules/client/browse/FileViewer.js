@@ -15,7 +15,7 @@ function getBasename(path) {
 function ImageViewer({ path, uri }) {
   return (
     <div css={{ padding: 20, textAlign: 'center' }}>
-      <img title={getBasename(path)} src={uri} />
+      <img alt={getBasename(path)} src={uri} />
     </div>
   );
 }
