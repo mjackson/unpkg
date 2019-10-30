@@ -37,7 +37,7 @@ export default function createServer() {
       app.use(morgan('dev'));
     }
 
-    app.use(cors());
+    app.use(cors({ origin: true }));
     app.use(express.static('public', { maxAge: '1y' }));
 
     // Special startup request from App Engine
