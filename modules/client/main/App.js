@@ -388,7 +388,7 @@ export default function App() {
           unpkg is an{' '}
           <a
             title="unpkg on GitHub"
-            href="https://github.com/unpkg"
+            href="https://github.com/mjackson/unpkg"
             css={linkStyle}
           >
             open source
