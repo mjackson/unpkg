@@ -9,7 +9,7 @@ function groupBy(array, n) {
   return groups;
 }
 
-async function run(packageName, version) {
+async function purgeCache(packageName, version) {
   if (packageName == null) {
     console.error(
       chalk.red(
@@ -67,6 +67,6 @@ async function run(packageName, version) {
 const packageName = process.argv[2];
 const version = process.argv[3];
 
-run(packageName, version).then(exitCode => {
+purgeCache(packageName, version).then(exitCode => {
   process.exit(exitCode);
 });
