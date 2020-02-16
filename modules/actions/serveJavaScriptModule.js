@@ -4,10 +4,13 @@ import getContentTypeHeader from '../utils/getContentTypeHeader.js';
 import rewriteBareModuleIdentifiers from '../utils/rewriteBareModuleIdentifiers.js';
 
 export default function serveJavaScriptModule(req, res) {
+  const isTypeScript = req.entry.contentType === 'text/x-typescript';
   try {
     const code = rewriteBareModuleIdentifiers(
       req.entry.content.toString('utf8'),
-      req.packageConfig
+      req.packageConfig,
+      req.query.types != null,
+      isTypeScript
     );
 
     res
@@ -16,7 +19,9 @@ export default function serveJavaScriptModule(req, res) {
         'Content-Type': getContentTypeHeader(req.entry.contentType),
         'Cache-Control': 'public, max-age=31536000', // 1 year
         ETag: etag(code),
-        'Cache-Tag': 'file, js-file, js-module'
+        'Cache-Tag': `file, ${isTypeScript ? 'ts-file' : 'js-file'}, ${
+          isTypeScript ? 'ts-module' : 'js-module'
+        }`
       })
       .send(code);
   } catch (error) {

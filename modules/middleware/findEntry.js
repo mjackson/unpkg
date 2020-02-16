@@ -51,13 +51,27 @@ function indexRedirect(req, res, entry) {
  * Follows node's resolution algorithm.
  * https://nodejs.org/api/modules.html#modules_all_together
  */
-function searchEntries(stream, filename) {
+function searchEntries(stream, filename, { includeTypings } = {}) {
   // filename = /some/file/name.js or /some/dir/name
   return new Promise((accept, reject) => {
+    const { dir, name } = path.parse(filename);
+    const filenameSansExtension = path.join(dir, name);
+    // in the order of priority
+    const typingEntriesFilenames = [
+      `${filenameSansExtension}.d.ts`,
+      `${filenameSansExtension}.ts`,
+      `${filenameSansExtension}.tsx`
+    ];
+    // we shouldn't try to resolve typings for the files
+    // that already contain typings in them
+    const shouldTryResolveTypings =
+      includeTypings && !typingEntriesFilenames.includes(filename);
+
     const jsEntryFilename = `${filename}.js`;
     const jsonEntryFilename = `${filename}.json`;
 
     const matchingEntries = {};
+    const foundTypingEntries = [];
     let foundEntry;
 
     if (filename === '/') {
@@ -76,6 +90,14 @@ function searchEntries(stream, filename) {
           path: header.name.replace(/^[^/]+/g, ''),
           type: header.type
         };
+
+        if (
+          shouldTryResolveTypings &&
+          entry.type === 'file' &&
+          typingEntriesFilenames.includes(entry.path)
+        ) {
+          foundTypingEntries.push(entry.path);
+        }
 
         // Skip non-files and files that don't match the entryName.
         if (entry.type !== 'file' || !entry.path.startsWith(filename)) {
@@ -145,7 +167,10 @@ function searchEntries(stream, filename) {
           // If we didn't find a matching file entry,
           // try a directory entry with the same name.
           foundEntry: foundEntry || matchingEntries[filename] || null,
-          matchingEntries: matchingEntries
+          matchingEntries: matchingEntries,
+          typingEntries: shouldTryResolveTypings
+            ? foundTypingEntries
+            : undefined
         });
       });
   });
@@ -157,10 +182,14 @@ function searchEntries(stream, filename) {
  */
 async function findEntry(req, res, next) {
   const stream = await getPackage(req.packageName, req.packageVersion, req.log);
-  const { foundEntry: entry, matchingEntries: entries } = await searchEntries(
-    stream,
-    req.filename
-  );
+  const includeTypings = req.query.types != null;
+  const {
+    foundEntry: entry,
+    matchingEntries: entries,
+    typingEntries
+  } = await searchEntries(stream, req.filename, {
+    includeTypings
+  });
 
   if (!entry) {
     return res
@@ -200,6 +229,9 @@ async function findEntry(req, res, next) {
   }
 
   req.entry = entry;
+  if (includeTypings) {
+    req.localTypingEntries = typingEntries;
+  }
 
   next();
 }

@@ -26,18 +26,18 @@ describe('getContentType', () => {
     expect(getContentType('.anythingignore')).toBe('text/plain');
   });
 
-  it('returns text/plain for .ts(x) files', () => {
-    expect(getContentType('app.ts')).toBe('text/plain');
-    expect(getContentType('app.d.ts')).toBe('text/plain');
-    expect(getContentType('app.tsx')).toBe('text/plain');
-  });
-
   it('returns text/plain for .flow files', () => {
     expect(getContentType('app.js.flow')).toBe('text/plain');
   });
 
   it('returns text/plain for .lock files', () => {
     expect(getContentType('yarn.lock')).toBe('text/plain');
+  });
+
+  it('returns text/x-typescript for .ts(x) files', () => {
+    expect(getContentType('app.ts')).toBe('text/x-typescript');
+    expect(getContentType('app.d.ts')).toBe('text/x-typescript');
+    expect(getContentType('app.tsx')).toBe('text/x-typescript');
   });
 
   it('returns application/json for .map files', () => {

@@ -10,9 +10,9 @@ mime.define(
       'makefile',
       'patents',
       'readme',
-      'ts',
       'flow'
-    ]
+    ],
+    'text/x-typescript': ['ts', 'tsx']
   },
   /* force */ true
 );

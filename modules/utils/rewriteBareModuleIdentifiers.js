@@ -1,10 +1,15 @@
-import babel from '@babel/core';
+import { transform } from '@babel/core';
 
 import unpkgRewrite from '../plugins/unpkgRewrite.js';
 
 const origin = process.env.ORIGIN || 'https://unpkg.com';
 
-export default function rewriteBareModuleIdentifiers(code, packageConfig) {
+export default function rewriteBareModuleIdentifiers(
+  code,
+  packageConfig,
+  resolveTypes,
+  isTypeScript
+) {
   const dependencies = Object.assign(
     {},
     packageConfig.peerDependencies,
@@ -20,8 +25,8 @@ export default function rewriteBareModuleIdentifiers(code, packageConfig) {
     // from the original file. This ensures minified
     // .mjs stays minified; see #149
     retainLines: true,
-    plugins: [unpkgRewrite(origin, dependencies)]
+    plugins: [unpkgRewrite(origin, dependencies, resolveTypes, isTypeScript)]
   };
 
-  return babel.transform(code, options).code;
+  return transform(code, options).code;
 }

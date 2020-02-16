@@ -1,5 +1,6 @@
 import URL from 'whatwg-url';
 import warning from 'warning';
+import getTypesPackageName from '../utils/getTypesPackagename';
 
 const bareIdentifierFormat = /^((?:@[^/]+\/)?[^/]+)(\/.*)?$/;
 
@@ -19,7 +20,37 @@ function isBareIdentifier(value) {
   return value.charAt(0) !== '.' && value.charAt(0) !== '/';
 }
 
-function rewriteValue(/* StringLiteral */ node, origin, dependencies) {
+function resolveDependencyNameAndVersion(name, dependencies, isTypeScript) {
+  let dependencyName = name;
+  let dependencyVersion = dependencies[dependencyName];
+
+  if (!dependencyVersion && isTypeScript) {
+    const typesPackageName = getTypesPackageName(dependencyName);
+    dependencyVersion = dependencies[typesPackageName];
+    if (dependencyVersion) {
+      dependencyName = typesPackageName;
+    }
+  }
+
+  warning(
+    dependencyVersion,
+    'Missing version info for package "%s" in dependencies; falling back to "latest"',
+    dependencyName
+  );
+  if (!dependencyVersion) {
+    dependencyVersion = 'latest';
+  }
+
+  return [dependencyName, dependencyVersion];
+}
+
+function rewriteValue(
+  /* StringLiteral */ node,
+  origin,
+  dependencies,
+  resolveTypes = false,
+  isTypeScript = false
+) {
   if (isAbsoluteURL(node.value)) {
     return;
   }
@@ -30,22 +61,27 @@ function rewriteValue(/* StringLiteral */ node, origin, dependencies) {
     const packageName = match[1];
     const file = match[2] || '';
 
-    warning(
-      dependencies[packageName],
-      'Missing version info for package "%s" in dependencies; falling back to "latest"',
-      packageName
+    const [dependencyName, dependencyVersion] = resolveDependencyNameAndVersion(
+      packageName,
+      dependencies,
+      isTypeScript
     );
 
-    const version = dependencies[packageName] || 'latest';
-
-    node.value = `${origin}/${packageName}@${version}${file}?module`;
+    node.value = `${origin}/${dependencyName}@${dependencyVersion}${file}?module${
+      resolveTypes ? '&types' : ''
+    }`;
   } else {
     // local path
-    node.value = `${node.value}?module`;
+    node.value = `${node.value}?module${resolveTypes ? '&types' : ''}`;
   }
 }
 
-export default function unpkgRewrite(origin, dependencies = {}) {
+export default function unpkgRewrite(
+  origin,
+  dependencies = {},
+  resolveTypes = false,
+  isTypeScript = false
+) {
   return {
     manipulateOptions(opts, parserOpts) {
       parserOpts.plugins.push(
@@ -54,6 +90,7 @@ export default function unpkgRewrite(origin, dependencies = {}) {
         'exportNamespaceFrom',
         'importMeta'
       );
+      if (isTypeScript) parserOpts.plugins.push('typescript');
     },
 
     visitor: {
@@ -63,10 +100,22 @@ export default function unpkgRewrite(origin, dependencies = {}) {
           return;
         }
 
-        rewriteValue(path.node.arguments[0], origin, dependencies);
+        rewriteValue(
+          path.node.arguments[0],
+          origin,
+          dependencies,
+          resolveTypes,
+          isTypeScript
+        );
       },
       ExportAllDeclaration(path) {
-        rewriteValue(path.node.source, origin, dependencies);
+        rewriteValue(
+          path.node.source,
+          origin,
+          dependencies,
+          resolveTypes,
+          isTypeScript
+        );
       },
       ExportNamedDeclaration(path) {
         if (!path.node.source) {
@@ -78,10 +127,22 @@ export default function unpkgRewrite(origin, dependencies = {}) {
           return;
         }
 
-        rewriteValue(path.node.source, origin, dependencies);
+        rewriteValue(
+          path.node.source,
+          origin,
+          dependencies,
+          resolveTypes,
+          isTypeScript
+        );
       },
       ImportDeclaration(path) {
-        rewriteValue(path.node.source, origin, dependencies);
+        rewriteValue(
+          path.node.source,
+          origin,
+          dependencies,
+          resolveTypes,
+          isTypeScript
+        );
       }
     }
   };

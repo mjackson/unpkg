@@ -11,6 +11,7 @@ import serveMainPage from './actions/serveMainPage.js';
 import serveModule from './actions/serveModule.js';
 import serveStats from './actions/serveStats.js';
 
+import addTypesHeader from './middleware/addTypesHeader';
 import allowQuery from './middleware/allowQuery.js';
 import findEntry from './middleware/findEntry.js';
 import noQuery from './middleware/noQuery.js';
@@ -119,12 +120,13 @@ export default function createServer() {
 
       app.get(
         '*',
-        allowQuery('module'),
+        allowQuery(['module', 'types']),
         validatePackagePathname,
         validatePackageName,
         validatePackageVersion,
         validateFilename,
         findEntry,
+        addTypesHeader,
         serveModule
       );
     });

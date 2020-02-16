@@ -7,7 +7,7 @@
     "clean": "git clean -e '!/.env' -fdX .",
     "lint": "eslint .",
     "serve": "nodemon -w server.js server.js",
-    "test": "jest",
+    "test": "ORIGIN='http://127.0.0.1:62062' jest",
     "watch": "rollup -c -w"
   },
   "dependencies": {

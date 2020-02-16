@@ -2,11 +2,15 @@ import serveHTMLModule from './serveHTMLModule.js';
 import serveJavaScriptModule from './serveJavaScriptModule.js';
 
 export default function serveModule(req, res) {
-  if (req.entry.contentType === 'application/javascript') {
+  const { contentType } = req.entry;
+  if (
+    contentType === 'application/javascript' ||
+    contentType === 'text/x-typescript'
+  ) {
     return serveJavaScriptModule(req, res);
   }
 
-  if (req.entry.contentType === 'text/html') {
+  if (contentType === 'text/html') {
     return serveHTMLModule(req, res);
   }
 

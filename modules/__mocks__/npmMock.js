@@ -16,7 +16,7 @@ export function getVersionsAndTags(packageName) {
   const info = getPackageInfo(packageName);
   return info
     ? { versions: Object.keys(info.versions), tags: info['dist-tags'] }
-    : [];
+    : null;
 }
 
 export function getPackageConfig(packageName, version) {
