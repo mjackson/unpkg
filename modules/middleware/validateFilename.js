@@ -60,7 +60,7 @@ function filenameRedirect(req, res) {
       createPackageURL(
         req.packageName,
         req.packageVersion,
-        filename.replace(/^\/*/, '/'),
+        filename.replace(/^[./]*/, '/'),
         req.query
       )
     );
