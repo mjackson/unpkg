@@ -67,7 +67,7 @@ async function findMatchingEntries(stream, filename) {
 async function serveDirectoryBrowser(req, res) {
   const stream = await getPackage(req.packageName, req.packageVersion, req.log);
 
-  const filename = req.filename.slice(0, -1) || '/';
+  const filename = req.filename || '/';
   const entries = await findMatchingEntries(stream, filename);
 
   if (Object.keys(entries).length === 0) {

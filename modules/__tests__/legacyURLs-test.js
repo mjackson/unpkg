@@ -33,7 +33,7 @@ describe('Legacy URLs', () => {
       .get('/react@16.8.0/umd/')
       .end((err, res) => {
         expect(res.statusCode).toBe(302);
-        expect(res.headers.location).toEqual('/browse/react@16.8.0/umd/');
+        expect(res.headers.location).toEqual('/browse/react@16.8.0/umd');
         done();
       });
   });

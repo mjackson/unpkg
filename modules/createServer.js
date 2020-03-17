@@ -20,6 +20,7 @@ import validateFilename from './middleware/validateFilename.js';
 import validatePackagePathname from './middleware/validatePackagePathname.js';
 import validatePackageName from './middleware/validatePackageName.js';
 import validatePackageVersion from './middleware/validatePackageVersion.js';
+import validateFileType from './middleware/validateFileType.js';
 
 function createApp(callback) {
   const app = express();
@@ -56,24 +57,20 @@ export default function createServer() {
     app.use(
       '/browse',
       createApp(app => {
-        app.enable('strict routing');
-
-        app.get(
-          '*/',
-          noQuery(),
-          validatePackagePathname,
-          validatePackageName,
-          validatePackageVersion,
-          serveDirectoryBrowser
-        );
-
         app.get(
           '*',
           noQuery(),
           validatePackagePathname,
           validatePackageName,
           validatePackageVersion,
-          serveFileBrowser
+          validateFileType,
+          (req, res) => {
+            if (req.type === 'directory') {
+              return serveDirectoryBrowser(req, res);
+            }
+
+            return serveFileBrowser(req, res);
+          }
         );
       })
     );
@@ -139,7 +136,7 @@ export default function createServer() {
 
     // Send old */ requests to the new /browse UI.
     app.get('*/', (req, res) => {
-      res.redirect(302, '/browse' + req.url);
+      res.redirect(302, '/browse' + req.url.slice(0, -1));
     });
 
     app.get(

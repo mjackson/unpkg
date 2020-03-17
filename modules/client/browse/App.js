@@ -141,15 +141,19 @@ export default function App({
     );
   }
 
-  const breadcrumbs = [];
+  // We're on the package root directory when filename is an empty string
+  const isRoot = !filename;
 
-  if (filename === '/') {
+  const breadcrumbs = [];
+  const rootUrl = `/browse/${packageName}@${packageVersion}`;
+
+  if (isRoot) {
     breadcrumbs.push(packageName);
   } else {
-    let url = `/browse/${packageName}@${packageVersion}`;
+    let url = rootUrl;
 
     breadcrumbs.push(
-      <a href={`${url}/`} css={linkStyle}>
+      <a href={url} css={linkStyle}>
         {packageName}
       </a>
     );
@@ -164,7 +168,7 @@ export default function App({
     segments.forEach(segment => {
       url += `/${segment}`;
       breadcrumbs.push(
-        <a href={`${url}/`} css={linkStyle}>
+        <a href={url} css={linkStyle}>
           {segment}
         </a>
       );
@@ -298,7 +302,11 @@ export default function App({
             }}
           >
             {target.type === 'directory' ? (
-              <DirectoryViewer path={target.path} details={target.details} />
+              <DirectoryViewer
+                path={rootUrl + target.path}
+                isRoot={isRoot}
+                details={target.details}
+              />
             ) : target.type === 'file' ? (
               <FileViewer path={target.path} details={target.details} />
             ) : null}
