@@ -6,7 +6,8 @@ import sortBy from 'sort-by';
 
 import { formatBytes } from '../utils/format.js';
 
-import { DirectoryIcon, CodeFileIcon } from './Icons.js';
+import { ContentArea, ContentAreaHeaderBar } from './ContentArea.js';
+import { FolderIcon, FileIcon, FileCodeIcon } from './Icons.js';
 
 const linkStyle = {
   color: '#0076ff',
@@ -48,7 +49,26 @@ function getRelName(path, base) {
   return path.substr(base.length > 1 ? base.length + 1 : 1);
 }
 
-export default function DirectoryViewer({ path, details: entries }) {
+export default function FolderViewer({ path, details: entries }) {
+  const { subdirs, files } = Object.keys(entries).reduce(
+    (memo, key) => {
+      const { subdirs, files } = memo;
+      const entry = entries[key];
+
+      if (entry.type === 'directory') {
+        subdirs.push(entry);
+      } else if (entry.type === 'file') {
+        files.push(entry);
+      }
+
+      return memo;
+    },
+    { subdirs: [], files: [] }
+  );
+
+  subdirs.sort(sortBy('path'));
+  files.sort(sortBy('path'));
+
   const rows = [];
 
   if (path !== '/') {
@@ -66,30 +86,14 @@ export default function DirectoryViewer({ path, details: entries }) {
     );
   }
 
-  const { subdirs, files } = Object.keys(entries).reduce(
-    (memo, key) => {
-      const { subdirs, files } = memo;
-      const entry = entries[key];
-
-      if (entry.type === 'directory') {
-        subdirs.push(entry);
-      } else if (entry.type === 'file') {
-        files.push(entry);
-      }
-
-      return memo;
-    },
-    { subdirs: [], files: [] }
-  );
-
-  subdirs.sort(sortBy('path')).forEach(({ path: dirname }) => {
+  subdirs.forEach(({ path: dirname }) => {
     const relName = getRelName(dirname, path);
     const href = relName + '/';
 
     rows.push(
       <tr key={relName}>
         <td css={iconCellStyle}>
-          <DirectoryIcon />
+          <FolderIcon />
         </td>
         <td css={tableCellStyle}>
           <a title={relName} href={href} css={linkStyle}>
@@ -102,40 +106,44 @@ export default function DirectoryViewer({ path, details: entries }) {
     );
   });
 
-  files
-    .sort(sortBy('path'))
-    .forEach(({ path: filename, size, contentType }) => {
-      const relName = getRelName(filename, path);
-      const href = relName;
+  files.forEach(({ path: filename, size, contentType }) => {
+    const relName = getRelName(filename, path);
+    const href = relName;
 
-      rows.push(
-        <tr key={relName}>
-          <td css={iconCellStyle}>
-            <CodeFileIcon />
-          </td>
-          <td css={tableCellStyle}>
-            <a title={relName} href={href} css={linkStyle}>
-              {relName}
-            </a>
-          </td>
-          <td css={tableCellStyle}>{formatBytes(size)}</td>
-          <td css={typeCellStyle}>{contentType}</td>
-        </tr>
-      );
-    });
+    rows.push(
+      <tr key={relName}>
+        <td css={iconCellStyle}>
+          {contentType === 'text/plain' || contentType === 'text/markdown' ? (
+            <FileIcon />
+          ) : (
+            <FileCodeIcon />
+          )}
+        </td>
+        <td css={tableCellStyle}>
+          <a title={relName} href={href} css={linkStyle}>
+            {relName}
+          </a>
+        </td>
+        <td css={tableCellStyle}>{formatBytes(size)}</td>
+        <td css={typeCellStyle}>{contentType}</td>
+      </tr>
+    );
+  });
+
+  let counts = [];
+  if (files.length > 0) {
+    counts.push(`${files.length} file${files.length === 1 ? '' : 's'}`);
+  }
+  if (subdirs.length > 0) {
+    counts.push(`${subdirs.length} folder${subdirs.length === 1 ? '' : 's'}`);
+  }
 
   return (
-    <div
-      css={{
-        border: '1px solid #dfe2e5',
-        borderRadius: 3,
-        borderTopWidth: 0,
-        '@media (max-width: 700px)': {
-          borderRightWidth: 0,
-          borderLeftWidth: 0
-        }
-      }}
-    >
+    <ContentArea>
+      <ContentAreaHeaderBar>
+        <span>{counts.join(', ')}</span>
+      </ContentAreaHeaderBar>
+
       <table
         css={{
           width: '100%',
@@ -146,6 +154,9 @@ export default function DirectoryViewer({ path, details: entries }) {
             '& th + th + th + th, & td + td + td + td': {
               display: 'none'
             }
+          },
+          '& tr:first-child td': {
+            borderTop: 0
           }
         }}
       >
@@ -167,12 +178,12 @@ export default function DirectoryViewer({ path, details: entries }) {
         </thead>
         <tbody>{rows}</tbody>
       </table>
-    </div>
+    </ContentArea>
   );
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  DirectoryViewer.propTypes = {
+  FolderViewer.propTypes = {
     path: PropTypes.string.isRequired,
     details: PropTypes.objectOf(
       PropTypes.shape({

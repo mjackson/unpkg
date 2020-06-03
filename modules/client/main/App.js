@@ -41,6 +41,9 @@ const globalStyles = css`
 
   code {
     ${fontMono}
+    font-size: 1rem;
+    padding: 0 3px;
+    background-color: #eee;
   }
 
   dd,
@@ -58,9 +61,7 @@ function Link(props) {
       css={{
         color: '#0076ff',
         textDecoration: 'none',
-        ':hover': {
-          textDecoration: 'underline'
-        }
+        ':hover': { textDecoration: 'underline' }
       }}
     />
   );
@@ -127,7 +128,10 @@ export default function App() {
               css={{
                 textAlign: 'center',
                 fontSize: '4.5em',
-                letterSpacing: '0.05em'
+                letterSpacing: '0.05em',
+                '@media (min-width: 700px)': {
+                  margin: '1.5em 0 1em'
+                }
               }}
             >
               UNPKG
@@ -365,10 +369,11 @@ export default function App() {
           </div>
 
           <p>
-            The origin infrastructure runs on{' '}
+            The origin servers run on world-class auto-scaling infrastructure
+            provided by{' '}
             <Link href="https://cloud.google.com/">Google Cloud</Link> which
-            automatically scales the number of available servers to meet the
-            current demand.
+            dynamically adjusts the number of available servers to meet the
+            current demand for maximum efficiency and uptime.
           </p>
 
           <div

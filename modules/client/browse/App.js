@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 
 import { fontSans, fontMono } from '../utils/style.js';
 
-import { PackageInfoProvider } from './PackageInfo.js';
-import DirectoryViewer from './DirectoryViewer.js';
+import FolderViewer from './FolderViewer.js';
 import FileViewer from './FileViewer.js';
 import { TwitterIcon, GitHubIcon } from './Icons.js';
 
@@ -128,30 +127,52 @@ function Link({ css, ...rest }) {
       css={{
         color: '#0076ff',
         textDecoration: 'none',
-        ':hover': {
-          textDecoration: 'underline'
-        },
+        ':hover': { textDecoration: 'underline' },
         ...css
       }}
     />
   );
 }
 
-export default function App({
+function AppHeader() {
+  return (
+    <header css={{ marginTop: '2rem' }}>
+      <h1
+        css={{
+          textAlign: 'center',
+          fontSize: '3rem',
+          letterSpacing: '0.05em'
+        }}
+      >
+        <a href="/" css={{ color: '#000', textDecoration: 'none' }}>
+          UNPKG
+        </a>
+      </h1>
+      {/*
+        <nav>
+          <Link href="#" css={{ color: '#c400ff' }}>
+            Become a Sponsor
+          </Link>
+        </nav>
+        */}
+    </header>
+  );
+}
+
+function AppNavigation({
   packageName,
   packageVersion,
-  availableVersions = [],
-  filename,
-  target
+  availableVersions,
+  filename
 }) {
-  function handleChange(event) {
+  function handleVersionChange(nextVersion) {
     window.location.href = window.location.href.replace(
       '@' + packageVersion,
-      '@' + event.target.value
+      '@' + nextVersion
     );
   }
 
-  const breadcrumbs = [];
+  let breadcrumbs = [];
 
   if (filename === '/') {
     breadcrumbs.push(packageName);
@@ -160,12 +181,11 @@ export default function App({
 
     breadcrumbs.push(<Link href={`${url}/`}>{packageName}</Link>);
 
-    const segments = filename
+    let segments = filename
       .replace(/^\/+/, '')
       .replace(/\/+$/, '')
       .split('/');
-
-    const lastSegment = segments.pop();
+    let lastSegment = segments.pop();
 
     segments.forEach(segment => {
       url += `/${segment}`;
@@ -175,8 +195,126 @@ export default function App({
     breadcrumbs.push(lastSegment);
   }
 
-  // TODO: Provide a user pref to go full width?
-  const maxContentWidth = 940;
+  return (
+    <header
+      css={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        '@media (max-width: 700px)': {
+          flexDirection: 'column-reverse',
+          alignItems: 'flex-start'
+        }
+      }}
+    >
+      <h1
+        css={{
+          fontSize: '1.5rem',
+          fontWeight: 'normal',
+          flex: 1,
+          wordBreak: 'break-all'
+        }}
+      >
+        <nav>
+          {breadcrumbs.map((item, index, array) => (
+            <Fragment key={index}>
+              {index !== 0 && (
+                <span css={{ paddingLeft: 5, paddingRight: 5 }}>/</span>
+              )}
+              {index === array.length - 1 ? <strong>{item}</strong> : item}
+            </Fragment>
+          ))}
+        </nav>
+      </h1>
+      <PackageVersionPicker
+        packageVersion={packageVersion}
+        availableVersions={availableVersions}
+        onChange={handleVersionChange}
+      />
+    </header>
+  );
+}
+
+function PackageVersionPicker({ packageVersion, availableVersions, onChange }) {
+  function handleChange(event) {
+    if (onChange) onChange(event.target.value);
+  }
+
+  return (
+    <p
+      css={{
+        marginLeft: 20,
+        '@media (max-width: 700px)': {
+          marginLeft: 0,
+          marginBottom: 0
+        }
+      }}
+    >
+      <label>
+        Version:{' '}
+        <select
+          name="version"
+          defaultValue={packageVersion}
+          onChange={handleChange}
+          css={{
+            appearance: 'none',
+            cursor: 'pointer',
+            padding: '4px 24px 4px 8px',
+            fontWeight: 600,
+            fontSize: '0.9em',
+            color: '#24292e',
+            border: '1px solid rgba(27,31,35,.2)',
+            borderRadius: 3,
+            backgroundColor: '#eff3f6',
+            backgroundImage: `url(${SelectDownArrow})`,
+            backgroundPosition: 'right 8px center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'auto 25%',
+            ':hover': {
+              backgroundColor: '#e6ebf1',
+              borderColor: 'rgba(27,31,35,.35)'
+            },
+            ':active': {
+              backgroundColor: '#e9ecef',
+              borderColor: 'rgba(27,31,35,.35)',
+              boxShadow: 'inset 0 0.15em 0.3em rgba(27,31,35,.15)'
+            }
+          }}
+        >
+          {availableVersions.map(v => (
+            <option key={v} value={v}>
+              {v}
+            </option>
+          ))}
+        </select>
+      </label>
+    </p>
+  );
+}
+
+function AppContent({ packageName, packageVersion, target }) {
+  return target.type === 'directory' ? (
+    <FolderViewer path={target.path} details={target.details} />
+  ) : target.type === 'file' ? (
+    <FileViewer
+      packageName={packageName}
+      packageVersion={packageVersion}
+      path={target.path}
+      details={target.details}
+    />
+  ) : null;
+}
+
+export default function App({
+  packageName,
+  packageVersion,
+  availableVersions = [],
+  filename,
+  target
+}) {
+  let maxContentWidth = 940;
+  // TODO: Make this changeable
+  let isFullWidth = false;
 
   return (
     <Fragment>
@@ -191,115 +329,25 @@ export default function App({
             margin: '0 auto'
           }}
         >
-          <header css={{ marginTop: '2rem' }}>
-            <h1
-              css={{
-                textAlign: 'center',
-                fontSize: '3rem',
-                letterSpacing: '0.05em'
-              }}
-            >
-              <a href="/" css={{ color: '#000', textDecoration: 'none' }}>
-                UNPKG
-              </a>
-            </h1>
-            {/*
-              <nav>
-                <Link href="#" css={{ color: '#c400ff' }}>
-                  Become a Sponsor
-                </Link>
-              </nav>
-              */}
-          </header>
-
-          <header
-            css={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              '@media (max-width: 700px)': {
-                flexDirection: 'column-reverse',
-                alignItems: 'flex-start'
-              }
-            }}
-          >
-            <h1
-              css={{
-                fontSize: '1.5rem',
-                fontWeight: 'normal',
-                flex: 1,
-                wordBreak: 'break-all'
-              }}
-            >
-              <nav>
-                {breadcrumbs.map((item, index, array) => (
-                  <Fragment key={index}>
-                    {index !== 0 && (
-                      <span css={{ paddingLeft: 5, paddingRight: 5 }}>/</span>
-                    )}
-                    {index === array.length - 1 ? (
-                      <strong>{item}</strong>
-                    ) : (
-                      item
-                    )}
-                  </Fragment>
-                ))}
-              </nav>
-            </h1>
-            <p
-              css={{
-                marginLeft: 20,
-                '@media (max-width: 700px)': {
-                  marginLeft: 0,
-                  marginBottom: 0
-                }
-              }}
-            >
-              <label>
-                Version:{' '}
-                <select
-                  name="version"
-                  defaultValue={packageVersion}
-                  onChange={handleChange}
-                  css={{
-                    appearance: 'none',
-                    cursor: 'pointer',
-                    padding: '4px 24px 4px 8px',
-                    fontWeight: 600,
-                    fontSize: '0.9em',
-                    color: '#24292e',
-                    border: '1px solid rgba(27,31,35,.2)',
-                    borderRadius: 3,
-                    backgroundColor: '#eff3f6',
-                    backgroundImage: `url(${SelectDownArrow})`,
-                    backgroundPosition: 'right 8px center',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'auto 25%',
-                    ':hover': {
-                      backgroundColor: '#e6ebf1',
-                      borderColor: 'rgba(27,31,35,.35)'
-                    },
-                    ':active': {
-                      backgroundColor: '#e9ecef',
-                      borderColor: 'rgba(27,31,35,.35)',
-                      boxShadow: 'inset 0 0.15em 0.3em rgba(27,31,35,.15)'
-                    }
-                  }}
-                >
-                  {availableVersions.map(v => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </p>
-          </header>
+          <AppHeader />
         </div>
-
         <div
           css={{
-            maxWidth: maxContentWidth,
+            maxWidth: isFullWidth ? undefined : maxContentWidth,
+            padding: '0 20px',
+            margin: '0 auto'
+          }}
+        >
+          <AppNavigation
+            packageName={packageName}
+            packageVersion={packageVersion}
+            availableVersions={availableVersions}
+            filename={filename}
+          />
+        </div>
+        <div
+          css={{
+            maxWidth: isFullWidth ? undefined : maxContentWidth,
             padding: '0 20px',
             margin: '0 auto',
             '@media (max-width: 700px)': {
@@ -308,16 +356,11 @@ export default function App({
             }
           }}
         >
-          <PackageInfoProvider
+          <AppContent
             packageName={packageName}
             packageVersion={packageVersion}
-          >
-            {target.type === 'directory' ? (
-              <DirectoryViewer path={target.path} details={target.details} />
-            ) : target.type === 'file' ? (
-              <FileViewer path={target.path} details={target.details} />
-            ) : null}
-          </PackageInfoProvider>
+            target={target}
+          />
         </div>
       </div>
 
@@ -342,7 +385,6 @@ export default function App({
           <p>&copy; {new Date().getFullYear()} UNPKG</p>
           <p css={{ fontSize: '1.5rem' }}>
             <a
-              title="Twitter"
               href="https://twitter.com/unpkg"
               css={{
                 color: '#aaa',
@@ -353,13 +395,12 @@ export default function App({
               <TwitterIcon />
             </a>
             <a
-              title="GitHub"
               href="https://github.com/mjackson/unpkg"
               css={{
                 color: '#aaa',
                 display: 'inline-block',
-                marginLeft: '1rem',
-                ':hover': { color: 'white' }
+                ':hover': { color: 'white' },
+                marginLeft: '1rem'
               }}
             >
               <GitHubIcon />

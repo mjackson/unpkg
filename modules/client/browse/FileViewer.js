@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 import { formatBytes } from '../utils/format.js';
 import { createHTML } from '../utils/markup.js';
 
-import { usePackageInfo } from './PackageInfo.js';
+import { ContentArea, ContentAreaHeaderBar } from './ContentArea.js';
 
 function getBasename(path) {
-  const segments = path.split('/');
+  let segments = path.split('/');
   return segments[segments.length - 1];
 }
 
@@ -21,8 +21,8 @@ function ImageViewer({ path, uri }) {
 }
 
 function CodeListing({ highlights }) {
-  const lines = highlights.slice(0);
-  const hasTrailingNewline = lines.length && lines[lines.length - 1] === '';
+  let lines = highlights.slice(0);
+  let hasTrailingNewline = lines.length && lines[lines.length - 1] === '';
   if (hasTrailingNewline) {
     lines.pop();
   }
@@ -46,7 +46,7 @@ function CodeListing({ highlights }) {
       >
         <tbody>
           {lines.map((line, index) => {
-            const lineNumber = index + 1;
+            let lineNumber = index + 1;
 
             return (
               <tr key={index}>
@@ -120,71 +120,48 @@ function BinaryViewer() {
   );
 }
 
-export default function FileViewer({ path, details }) {
-  const { packageName, packageVersion } = usePackageInfo();
-  const { highlights, uri, language, size } = details;
-
-  const segments = path.split('/');
-  const filename = segments[segments.length - 1];
+export default function FileViewer({
+  packageName,
+  packageVersion,
+  path,
+  details
+}) {
+  let { highlights, uri, language, size } = details;
 
   return (
-    <div
-      css={{
-        border: '1px solid #dfe2e5',
-        borderRadius: 3,
-        '@media (max-width: 700px)': {
-          borderRightWidth: 0,
-          borderLeftWidth: 0
-        }
-      }}
-    >
-      <div
-        css={{
-          padding: 10,
-          background: '#f6f8fa',
-          color: '#424242',
-          border: '1px solid #d1d5da',
-          borderTopLeftRadius: 3,
-          borderTopRightRadius: 3,
-          margin: '-1px -1px 0',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          '@media (max-width: 700px)': {
-            paddingRight: 20,
-            paddingLeft: 20
-          }
-        }}
-      >
-        <span>{formatBytes(size)}</span> <span>{language}</span>{' '}
-        <a
-          title={filename}
-          href={`/${packageName}@${packageVersion}${path}`}
-          css={{
-            display: 'inline-block',
-            textDecoration: 'none',
-            padding: '2px 8px',
-            fontWeight: 600,
-            fontSize: '0.9rem',
-            color: '#24292e',
-            backgroundColor: '#eff3f6',
-            border: '1px solid rgba(27,31,35,.2)',
-            borderRadius: 3,
-            ':hover': {
-              backgroundColor: '#e6ebf1',
-              borderColor: 'rgba(27,31,35,.35)'
-            },
-            ':active': {
-              backgroundColor: '#e9ecef',
-              borderColor: 'rgba(27,31,35,.35)',
-              boxShadow: 'inset 0 0.15em 0.3em rgba(27,31,35,.15)'
-            }
-          }}
-        >
-          View Raw
-        </a>
-      </div>
+    <ContentArea>
+      <ContentAreaHeaderBar>
+        <span>{formatBytes(size)}</span>
+        <span>{language}</span>
+        <span>
+          <a
+            href={`/${packageName}@${packageVersion}${path}`}
+            css={{
+              display: 'inline-block',
+              marginLeft: 8,
+              padding: '2px 8px',
+              textDecoration: 'none',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              color: '#24292e',
+              backgroundColor: '#eff3f6',
+              border: '1px solid rgba(27,31,35,.2)',
+              borderRadius: 3,
+              ':hover': {
+                backgroundColor: '#e6ebf1',
+                borderColor: 'rgba(27,31,35,.35)'
+              },
+              ':active': {
+                backgroundColor: '#e9ecef',
+                borderColor: 'rgba(27,31,35,.35)',
+                boxShadow: 'inset 0 0.15em 0.3em rgba(27,31,35,.15)'
+              }
+            }}
+          >
+            View Raw
+          </a>
+        </span>
+      </ContentAreaHeaderBar>
 
       {highlights ? (
         <CodeListing highlights={highlights} />
@@ -193,7 +170,7 @@ export default function FileViewer({ path, details }) {
       ) : (
         <BinaryViewer />
       )}
-    </div>
+    </ContentArea>
   );
 }
 
