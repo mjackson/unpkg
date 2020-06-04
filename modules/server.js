@@ -1,3 +1,6 @@
+import { version } from '../package.json';
+
+console.log(`unpkg-server v${version}`);
 if (process.env.GAE_ENV === 'standard') {
   require('@google-cloud/trace-agent').start();
 }

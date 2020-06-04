@@ -1,7 +1,12 @@
 {
-  "name": "unpkg",
-  "private": true,
+  "name": "unpkg-server",
+  "version": "0.0.3",
+  "private": false,
   "description": "The CDN for everything on npm",
+  "main": "server.js",
+  "files": [
+    "server.js"
+  ],
   "scripts": {
     "build": "rollup -c",
     "clean": "git clean -e '!/.env' -fdX .",
@@ -31,6 +36,7 @@
     "jsesc": "^2.5.2",
     "lru-cache": "^5.1.1",
     "mime": "^2.4.0",
+    "minimist": "^1.2.0",
     "morgan": "^1.9.1",
     "ndjson": "^1.5.0",
     "pretty-bytes": "^5.1.0",

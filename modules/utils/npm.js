@@ -46,11 +46,12 @@ async function fetchPackageInfo(packageName, log) {
 
   log.debug('Fetching package info for %s from %s', packageName, infoURL);
 
-  const { hostname, pathname } = url.parse(infoURL);
+  const { hostname, pathname, port } = url.parse(infoURL);
   const options = {
     agent: agent,
     hostname: hostname,
     path: pathname,
+    port: port || 443,
     headers: {
       Accept: 'application/json'
     }
@@ -173,11 +174,12 @@ export async function getPackage(packageName, version, log) {
 
   log.debug('Fetching package for %s from %s', packageName, tarballURL);
 
-  const { hostname, pathname } = url.parse(tarballURL);
+  const { hostname, pathname, port } = url.parse(tarballURL);
   const options = {
     agent: agent,
     hostname: hostname,
-    path: pathname
+    path: pathname,
+    port: port || 443
   };
 
   const res = await get(options);
