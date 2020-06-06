@@ -5,15 +5,11 @@ import entryManifest from 'entry-manifest';
 import { createElement, createScript } from './markup.js';
 
 function getEntryPoint(name, format) {
-  let entryPoints;
-  entryManifest.forEach(manifest => {
-    if (name in manifest) {
-      entryPoints = manifest[name];
+  for (let manifest of entryManifest) {
+    let bundles = manifest[name];
+    if (bundles) {
+      return bundles.find(b => b.format === format);
     }
-  });
-
-  if (entryPoints) {
-    return entryPoints.find(e => e.format === format);
   }
 
   return null;
@@ -37,6 +33,8 @@ export default function getScripts(entryName, format, globalURLs) {
   if (!entryPoint) return [];
 
   return getGlobalScripts(entryPoint, globalURLs).concat(
+    // Inline the code for this entry point into the page
+    // itself instead of using another <script> tag
     createScript(entryPoint.code)
   );
 }

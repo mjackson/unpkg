@@ -12,8 +12,6 @@ const url = require('rollup-plugin-url');
 const entryManifest = require('./plugins/entryManifest');
 const pkg = require('./package.json');
 
-const env = process.env.BUILD_ENV || 'development';
-
 const manifest = entryManifest();
 
 const client = ['browse', 'main'].map(entryName => {
@@ -47,20 +45,20 @@ const client = ['browse', 'main'].map(entryName => {
         }
       }),
       replace({
-        'process.env.NODE_ENV': JSON.stringify(env)
+        'process.env.NODE_ENV': JSON.stringify(
+          process.env.NODE_ENV || 'development'
+        )
       }),
       url({
         limit: 5 * 1024,
         publicPath: '/_client/'
       }),
-      compiler(
-        env !== 'production' ? { formatting: 'PRETTY_PRINT' } : undefined
-      )
+      compiler()
     ]
   };
 });
 
-const dependencies = (env === 'development'
+const dependencies = (process.env.NODE_ENV === 'development'
   ? Object.keys(pkg.dependencies).concat(Object.keys(pkg.devDependencies || {}))
   : Object.keys(pkg.dependencies)
 ).concat('react-dom/server');
