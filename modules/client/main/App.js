@@ -130,7 +130,7 @@ export default function App() {
                 fontSize: '4.5em',
                 letterSpacing: '0.05em',
                 '@media (min-width: 700px)': {
-                  margin: '1.5em 0 1em'
+                  marginTop: '1.5em'
                 }
               }}
             >
