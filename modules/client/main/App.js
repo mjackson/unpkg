@@ -13,6 +13,8 @@ import { TwitterIcon, GitHubIcon } from './Icons.js';
 import CloudflareLogo from './images/CloudflareLogo.png';
 import GoogleCloudLogo from './images/GoogleCloudLogo.png';
 
+const buildId = process.env.BUILD_ID;
+
 const globalStyles = css`
   html {
     box-sizing: border-box;
@@ -77,9 +79,9 @@ function AboutLogoImage(props) {
 }
 
 function Stats({ data }) {
-  const totals = data.totals;
-  const since = parseDate(totals.since);
-  const until = parseDate(totals.until);
+  let totals = data.totals;
+  let since = parseDate(totals.since);
+  let until = parseDate(totals.until);
 
   return (
     <p>
@@ -97,15 +99,15 @@ function Stats({ data }) {
 }
 
 export default function App() {
-  const [stats, setStats] = useState(
+  let [stats, setStats] = useState(
     typeof window === 'object' &&
       window.localStorage &&
       window.localStorage.savedStats
       ? JSON.parse(window.localStorage.savedStats)
       : null
   );
-  const hasStats = !!(stats && !stats.error);
-  const stringStats = JSON.stringify(stats);
+  let hasStats = !!(stats && !stats.error);
+  let stringStats = JSON.stringify(stats);
 
   useEffect(() => {
     window.localStorage.savedStats = stringStats;
@@ -414,7 +416,12 @@ export default function App() {
             justifyContent: 'space-between'
           }}
         >
-          <p>&copy; {new Date().getFullYear()} UNPKG</p>
+          <p>
+            <span>Build: {buildId}</span>
+          </p>
+          <p>
+            <span>&copy; {new Date().getFullYear()} UNPKG</span>
+          </p>
           <p css={{ fontSize: '1.5rem' }}>
             <a
               href="https://twitter.com/unpkg"

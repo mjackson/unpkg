@@ -11,6 +11,8 @@ import { TwitterIcon, GitHubIcon } from './Icons.js';
 
 import SelectDownArrow from './images/SelectDownArrow.png';
 
+const buildId = process.env.BUILD_ID;
+
 const globalStyles = css`
   html {
     box-sizing: border-box;
@@ -382,7 +384,12 @@ export default function App({
             justifyContent: 'space-between'
           }}
         >
-          <p>&copy; {new Date().getFullYear()} UNPKG</p>
+          <p>
+            <span>Build: {buildId}</span>
+          </p>
+          <p>
+            <span>&copy; {new Date().getFullYear()} UNPKG</span>
+          </p>
           <p css={{ fontSize: '1.5rem' }}>
             <a
               href="https://twitter.com/unpkg"

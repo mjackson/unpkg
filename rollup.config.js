@@ -1,6 +1,8 @@
 require('dotenv').config();
 
 const builtinModules = require('module').builtinModules;
+const execSync = require('child_process').execSync;
+
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const compiler = require('@ampproject/rollup-plugin-closure-compiler');
@@ -11,6 +13,12 @@ const url = require('rollup-plugin-url');
 
 const entryManifest = require('./plugins/entryManifest');
 const pkg = require('./package.json');
+
+const buildId =
+  process.env.BUILD_ID ||
+  execSync('git rev-parse --short HEAD')
+    .toString()
+    .trim();
 
 const manifest = entryManifest();
 
@@ -48,6 +56,7 @@ const client = ['browse', 'main'].map(entryName => {
         }
       }),
       replace({
+        'process.env.BUILD_ID': JSON.stringify(buildId),
         'process.env.NODE_ENV': JSON.stringify(
           process.env.NODE_ENV || 'development'
         )
@@ -85,6 +94,7 @@ const server = {
       emitFiles: false
     }),
     replace({
+      'process.env.BUILD_ID': JSON.stringify(buildId),
       'process.env.CLOUDFLARE_EMAIL': JSON.stringify(
         process.env.CLOUDFLARE_EMAIL
       ),

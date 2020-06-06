@@ -7,8 +7,7 @@ before_install:
 script:
 - yarn lint
 - yarn test
-- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging")
-  yarn build
+- NODE_ENV=$([ "$TRAVIS_BRANCH" == "master" ] && echo "production" || echo "staging") BUILD_ID=${TRAVIS_COMMIT:0:8} yarn build
 deploy:
 - provider: gae
   skip_cleanup: true

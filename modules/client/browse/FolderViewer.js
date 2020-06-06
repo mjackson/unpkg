@@ -155,7 +155,7 @@ export default function FolderViewer({ path, details: entries }) {
               display: 'none'
             }
           },
-          '& tr:first-child td': {
+          '& tr:first-of-type td': {
             borderTop: 0
           }
         }}
