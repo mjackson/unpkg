@@ -28,6 +28,9 @@ const client = ['browse', 'main'].map(entryName => {
         '@emotion/core': 'emotionCore'
       }
     },
+    moduleContext: {
+      'node_modules/react-icons/lib/esm/iconBase.js': 'window'
+    },
     plugins: [
       manifest.record({ publicPath: '/_client/' }),
       babel({ exclude: /node_modules/ }),
@@ -67,6 +70,9 @@ const server = {
   external: builtinModules.concat(dependencies),
   input: 'modules/server.js',
   output: { file: 'server.js', format: 'cjs' },
+  moduleContext: {
+    'node_modules/react-icons/lib/esm/iconBase.js': 'global'
+  },
   plugins: [
     manifest.inject({ virtualId: 'entry-manifest' }),
     babel({ exclude: /node_modules/ }),
