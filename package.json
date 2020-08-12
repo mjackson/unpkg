@@ -77,6 +77,6 @@
     "supertest": "^3.0.0"
   },
   "engines": {
-    "node": "10.x.x"
+    "node": "12"
   }
 }

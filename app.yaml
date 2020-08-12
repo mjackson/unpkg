@@ -1,4 +1,4 @@
-runtime: nodejs10
+runtime: nodejs12
 env: standard
 instance_class: F4
 automatic_scaling:
