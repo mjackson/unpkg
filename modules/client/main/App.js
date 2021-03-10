@@ -11,7 +11,7 @@ import { fontSans, fontMono } from '../utils/style.js';
 
 import { TwitterIcon, GitHubIcon } from './Icons.js';
 import CloudflareLogo from './images/CloudflareLogo.png';
-import GoogleCloudLogo from './images/GoogleCloudLogo.png';
+import FlyLogo from './images/FlyLogo.png';
 
 const buildId = process.env.BUILD_ID;
 
@@ -371,11 +371,10 @@ export default function App() {
           </div>
 
           <p>
-            The origin servers run on world-class auto-scaling infrastructure
+            The Node appser runs on auto-scaling infrastructure
             provided by{' '}
-            <Link href="https://cloud.google.com/">Google Cloud</Link> which
-            dynamically adjusts the number of available servers to meet the
-            current demand for maximum efficiency and uptime.
+            <Link href="https://fly.io/">Fly.io</Link>. The app servers run in 17 {' '}
+            cities, and come and go based on active requests.
           </p>
 
           <div
@@ -386,10 +385,10 @@ export default function App() {
             }}
           >
             <AboutLogo>
-              <a href="https://cloud.google.com">
+              <a href="https://fly.io">
                 <AboutLogoImage
-                  alt="Google Cloud"
-                  src={GoogleCloudLogo}
+                  alt="Fly.io"
+                  src={FlyLogo}
                   width="320"
                 />
               </a>
