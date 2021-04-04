@@ -21,9 +21,9 @@ export default function rewriteBareModuleIdentifiers(code, packageConfig) {
     // .mjs stays minified; see #149
     retainLines: true,
     plugins: [
-      unpkgRewrite(origin, dependencies), 
-      "@babel/plugin-proposal-optional-chaining", 
-      "@babel/plugin-proposal-nullish-coalescing-operator"
+      unpkgRewrite(origin, dependencies),
+      '@babel/plugin-proposal-optional-chaining',
+      '@babel/plugin-proposal-nullish-coalescing-operator'
     ]
   };
 
