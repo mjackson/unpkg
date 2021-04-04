@@ -21,7 +21,6 @@
     "@babel/plugin-syntax-export-namespace-from": "^7.2.0",
     "@babel/plugin-syntax-import-meta": "^7.2.0",
     "@emotion/core": "^10.0.6",
-    "@google-cloud/trace-agent": "^4.1.0",
     "@reach/visually-hidden": "^0.1.4",
     "cheerio": "^1.0.0-rc.2",
     "cors": "^2.8.5",

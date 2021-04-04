@@ -40,12 +40,6 @@ export default function createServer() {
     app.use(cors());
     app.use(express.static('public', { maxAge: '1y' }));
 
-    // Special startup request from App Engine
-    // https://cloud.google.com/appengine/docs/standard/nodejs/how-instances-are-managed
-    app.get('/_ah/start', (req, res) => {
-      res.status(200).end();
-    });
-
     app.use(requestLog);
 
     app.get('/', serveMainPage);

@@ -1,7 +1,3 @@
-if (process.env.GAE_ENV === 'standard') {
-  require('@google-cloud/trace-agent').start();
-}
-
 import createServer from './createServer.js';
 
 const server = createServer();
