@@ -371,10 +371,10 @@ export default function App() {
           </div>
 
           <p>
-            The Node appser runs on auto-scaling infrastructure
-            provided by{' '}
-            <Link href="https://fly.io/">Fly.io</Link>. The app servers run in 17 {' '}
-            cities, and come and go based on active requests.
+            The origin server runs on auto-scaling infrastructure provided by{' '}
+            <Link href="https://fly.io/">Fly.io</Link>. The app servers run in
+            17 cities around the world, and come and go based on active
+            requests.
           </p>
 
           <div
@@ -386,11 +386,7 @@ export default function App() {
           >
             <AboutLogo>
               <a href="https://fly.io">
-                <AboutLogoImage
-                  alt="Fly.io"
-                  src={FlyLogo}
-                  width="320"
-                />
+                <AboutLogoImage alt="Fly.io" src={FlyLogo} width="320" />
               </a>
             </AboutLogo>
           </div>
