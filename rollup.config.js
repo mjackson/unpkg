@@ -16,9 +16,7 @@ const pkg = require('./package.json');
 
 const buildId =
   process.env.BUILD_ID ||
-  execSync('git rev-parse --short HEAD')
-    .toString()
-    .trim();
+  execSync('git rev-parse --short HEAD').toString().trim();
 
 const manifest = entryManifest();
 
@@ -94,15 +92,7 @@ const server = {
       emitFiles: false
     }),
     replace({
-      'process.env.BUILD_ID': JSON.stringify(buildId),
-      'process.env.CLOUDFLARE_EMAIL': JSON.stringify(
-        process.env.CLOUDFLARE_EMAIL
-      ),
-      'process.env.CLOUDFLARE_KEY': JSON.stringify(process.env.CLOUDFLARE_KEY),
-      'process.env.NPM_REGISTRY_URL': JSON.stringify(
-        process.env.NPM_REGISTRY_URL
-      ),
-      'process.env.ORIGIN': JSON.stringify(process.env.ORIGIN)
+      'process.env.BUILD_ID': JSON.stringify(buildId)
     })
   ]
 };
