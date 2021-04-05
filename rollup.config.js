@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const builtinModules = require('module').builtinModules;
 const execSync = require('child_process').execSync;
 
