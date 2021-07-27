@@ -48,3 +48,22 @@ describe('A request for a JavaScript file', () => {
     });
   });
 });
+
+describe('A request for a non-JavaScript file', () => {
+  let server;
+  beforeEach(() => {
+    server = createServer();
+  });
+
+  describe('finds typescript file in folder', () => {
+    it.skip('and redirects to it', done => {
+      request(server)
+        .get('/rxjs@7.2.0/dist/types/operators?extension=d.ts')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers.location).toBe('/rxjs@7.2.0/dist/types/operators/index.d.ts');
+          done();
+        });
+    });
+  });
+});

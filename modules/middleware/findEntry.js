@@ -51,10 +51,10 @@ function indexRedirect(req, res, entry) {
  * Follows node's resolution algorithm.
  * https://nodejs.org/api/modules.html#modules_all_together
  */
-function searchEntries(stream, filename) {
+function searchEntries(stream, filename, extensions) {
   // filename = /some/file/name.js or /some/dir/name
   return new Promise((accept, reject) => {
-    const jsEntryFilename = `${filename}.js`;
+    const fileNames = extensions.map(extension => `${filename}.${extension}`);
     const jsonEntryFilename = `${filename}.json`;
 
     const matchingEntries = {};
@@ -101,14 +101,14 @@ function searchEntries(stream, filename) {
           entry.path === filename ||
           // Allow accessing e.g. `/index.js` or `/index.json`
           // using `/index` for compatibility with npm
-          entry.path === jsEntryFilename ||
+          fileNames.some(fileName => entry.path === fileName) ||
           entry.path === jsonEntryFilename
         ) {
           if (foundEntry) {
             if (
               foundEntry.path !== filename &&
               (entry.path === filename ||
-                (entry.path === jsEntryFilename &&
+                (fileNames.some(fileName => entry.path === fileName) &&
                   foundEntry.path === jsonEntryFilename))
             ) {
               // This entry is higher priority than the one
@@ -157,9 +157,15 @@ function searchEntries(stream, filename) {
  */
 async function findEntry(req, res, next) {
   const stream = await getPackage(req.packageName, req.packageVersion, req.log);
+  let extensions = req.query.extension || ['js'];
+  if(!Array.isArray(extensions)) {
+    extensions = [extensions];
+  }
+
   const { foundEntry: entry, matchingEntries: entries } = await searchEntries(
     stream,
-    req.filename
+    req.filename,
+    extensions
   );
 
   if (!entry) {
@@ -181,9 +187,17 @@ async function findEntry(req, res, next) {
     // We need to redirect to some "index" file inside the directory so
     // our URLs work in a similar way to require("lib") in node where it
     // uses `lib/index.js` when `lib` is a directory.
-    const indexEntry =
-      entries[`${req.filename}/index.js`] ||
-      entries[`${req.filename}/index.json`];
+    let indexEntry;
+    for (const extension of extensions) {
+      const entry = entries[`${req.filename}/index.${extension}`];
+      if (entry) {
+        indexEntry = entry;
+        break;
+      }
+    }
+    if (!indexEntry) {
+      indexEntry = entries[`${req.filename}/index.json`];
+    }
 
     if (indexEntry && indexEntry.type === 'file') {
       return indexRedirect(req, res, indexEntry);

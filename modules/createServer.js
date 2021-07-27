@@ -113,7 +113,7 @@ export default function createServer() {
 
       app.get(
         '*',
-        allowQuery('module'),
+        allowQuery(['module', 'extension']),
         validatePackagePathname,
         validatePackageName,
         validatePackageVersion,
@@ -138,7 +138,7 @@ export default function createServer() {
 
     app.get(
       '*',
-      noQuery(),
+      allowQuery('extension'),
       validatePackagePathname,
       validatePackageName,
       validatePackageVersion,

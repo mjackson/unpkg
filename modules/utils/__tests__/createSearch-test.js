@@ -14,6 +14,10 @@ describe('createSearch', () => {
     expect(createSearch({ b: 'b', a: 'a', c: 'c' })).toEqual('?a=a&b=b&c=c');
   });
 
+  it('handles array query correctly', () => {
+    expect(createSearch({ ext: ['d.ts', 'ts'], a: 'a' })).toEqual('?a=a&ext=d.ts&ext=ts');
+  });
+
   it('returns an empty string when there are no params', () => {
     expect(createSearch({})).toEqual('');
   });
