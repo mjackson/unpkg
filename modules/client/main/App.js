@@ -180,7 +180,7 @@ export default function App() {
 
           <p>
             You may also use a{' '}
-            <Link href="https://docs.npmjs.com/misc/semver">semver range</Link>{' '}
+            <Link href="https://docs.npmjs.com/about-semantic-versioning">semver range</Link>{' '}
             or a <Link href="https://docs.npmjs.com/cli/dist-tag">tag</Link>{' '}
             instead of a fixed version number, or omit the version/tag entirely
             to use the <code>latest</code> tag.
