@@ -1,0 +1,1318 @@
+<?php 
+session_start();
+$_SESSION['name']="visitor";
+include 'config.php';
+
+//连接数据库
+$conn=new mysqli($mysql_server_name,$mysql_username,$mysql_password); 
+if($conn==false){echo "数据连接失败！";}
+$conn->query("set names ‘utf8‘");
+$conn -> select_db($mysql_database); 
+    
+$sql_one ="SELECT * FROM `ackjjl` ORDER BY `qishu` DESC LIMIT 1";
+
+$result_one = mysqli_fetch_row($conn->query($sql_one));
+
+//当前期数
+$new_qs=$result_one[1];
+
+//当期开奖号码
+$new_num=$result_one[3];
+
+//当期预设号码
+$yushe_num=explode(",",$result_one[4]);
+//下期期号
+$new_next=$result_one[5];
+//下期开奖日
+$nextdate=$result_one[6];
+//公开时间戳
+$gkTime=strtotime($nextdate)+43200;
+//下期预设号码
+$file = file_get_contents("./nextqi.json");
+$jsonf = json_decode($file,true);
+
+$ac_sql_one ="SELECT * FROM `ackjjl` ORDER BY `qishu` DESC LIMIT 1";  
+$ac_result_one = mysqli_fetch_row($conn->query($ac_sql_one));
+//AC当前期数
+//$ac_new_qs=$ac_result_one[1];
+$ac_new_qs = substr($ac_result_one[1],4);
+$ac_new = $ac_new_qs+1;
+//echo date('Y-m-d h:i:s', time());
+/*echo $nexdate;*/
+
+
+//$qis =  $ac_new_qs+1;
+//AC当期开奖号码
+$ac_new_num=$ac_result_one[3];
+
+//AC当期预设号码
+//$ac_yushe_num=explode(",",$ac_result_one[2]);
+$ac_yushe_num=explode(",",$ac_result_one[2]);
+$random_keys=array_rand($ac_yushe_num,3);
+
+$numran = $ac_yushe_num[$random_keys[0]].",".$ac_yushe_num[$random_keys[1]].",".$ac_yushe_num[$random_keys[2]];
+if( empty($ac_result_one[7])){
+	$sql = "UPDATE `ackjjl` SET `randnum`='".$numran."' WHERE id=".$ac_result_one[0];
+	$res = $conn->query($sql);
+	
+	$rendn[0] = $ac_yushe_num[$random_keys[0]];
+	$rendn[1] = $ac_yushe_num[$random_keys[1]];
+	$rendn[2] = $ac_yushe_num[$random_keys[2]];
+}else{
+	$rendn = explode(",",$ac_result_one[7]);
+}
+
+
+
+
+//AC下期期号
+$ac_new_next=$ac_result_one[5];
+//AC下期开奖日
+$ac_nextdates=$ac_result_one[6];
+$ac_nextdate =  date('Y-m-d',strtotime("$ac_nextdates +1 day"));
+$ys =  date('Y',strtotime($ac_nextdate));
+$ms =  date('m',strtotime($ac_nextdate));
+$ds =  date('d',strtotime($ac_nextdate));
+$weekarray=array("日","一","二","三","四","五","六");
+//echo "星期".$weekarray[date("w",strtotime("2011-11-11"))];
+
+
+$ws =  $weekarray[date("w",strtotime($ac_nextdate))];
+
+//公开时间戳
+$newdate=strtotime($ac_nextdate)+43200;
+//$newdate = date('Y-m-d',strtotime("-1 day",strtotime($ac_nextdate)));
+
+$yy =  date('Y',strtotime($newdate));
+$mm =  date('m',strtotime($newdate));
+$dd =  date('d',strtotime($newdate));
+$weekarray=array("日","一","二","三","四","五","六");
+
+
+$ww =  $weekarray[date("w",strtotime($newdate))];
+
+
+//AC下期预设号码
+$ac_file = file_get_contents("./acnextqi.json");
+$ac_jsonf = json_decode($ac_file,true);
+
+//访客此刻时间戳
+$nowtime=strtotime("now");
+function checkzu($parm){
+    //确立数组
+    $numx = array(
+        1=>array("11","14","41","44"),
+        2=>array("10","12","13","16","18","19","40","42","43","46","48","49"),
+        3=>array("15","17","45","47"),
+        4=>array("01","21","31","04","24","34"),
+        5=>array("02","03","06","08","09","20","22","23","26","28","29","30","32","33","33","36","38","39"),
+        6=>array("05","25","35","07","27","37")
+    );
+     //查询号码所在数组
+    foreach ($numx as $value) {
+     if(in_array($parm,$value)){
+         return $parm=array_search($value,$numx);
+     }
+    } 
+}
+$jj =  date('Y-m-d H:i:s', time());
+$gg = date('Y-m-d 21:30');
+
+?>
+<html lang="zh-CN"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
+    <title>
+    <?php echo $site_name; ?>    </title>
+    <link rel="icon" href="./favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    	<script src="./js/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+       /* body{-moz-user-select: none;-webkit-user-select: none;-ms-user-select: none;-khtml-user-select: none;user-select: none;}*/
+        body {
+          height: 100%;
+          background: url('images/bg.jpg') no-repeat fixed center top;
+          
+        }
+         a{text-decoration:none;}
+        @media (min-width: 1200px){
+            .container{max-width:1170px;padding-right:15px;padding-left:15px;}
+        }
+        body{-moz-user-select: none;-webkit-user-select: none;-ms-user-select: none;-khtml-user-select: none;user-select: none;}
+        #shipin{max-height:692px;}
+        #imss{
+        	width: 33%;
+        }
+        .pcd{
+        	display: none;
+        }
+        .show{
+        	display: block;
+        }
+    </style>
+    
+</head>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false" onbeforecopy="return false" oncopy="document.selection.empty()" onselect="document.selection.empty()">
+
+    <nav class="navbar fixed-top navbar-expand navbar-dark bg-dark " id="pc"> 
+        <div class="container ">
+            
+            <div class="d-flex">
+                <a href="./register"><button type="button" class="btn btn-outline-light me-2">注册</button></a>
+                <a href="./login"><button type="button" class="btn btn-light">登录</button></a>
+            </div>
+        </div>
+    </nav>
+    
+   <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="me-2 bi bi-bookmark-star-fill"></i>
+                <span class="fs-4 fw-bold">
+                    <?php echo $site_name; ?>
+                </span>
+            </a>
+        </div>
+    </nav>
+   
+    <!-- 头部 -->
+    <header class="fixed-bottom d-md-none" style="background-color:#feefd8;border-top:1px solid #d1c4b0;box-shadow: 0px -2px 4px rgba(100, 100, 100, 0.1);">
+        <div class="container">
+            <ul class="nav col-12 col-md-auto me-md-auto justify-content-center mb-md-0">
+                <li class="mx-auto">
+                   <a href="#" class="nav-link px-2 text-danger text-center py-0 shouye">
+                        <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" fill="white" fill-opacity="0.01"></rect><path d="M9 18V42H39V18L24 6L9 18Z" fill="none"></path><path d="M9 42V18L4 22L24 6L44 22L39 18V42H9Z" stroke="#8a1d17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 29V42H29V29H19Z" fill="none" stroke="#8a1d17" stroke-width="2" stroke-linejoin="round"></path><path d="M9 42H39" stroke="#8a1d17" stroke-width="2" stroke-linecap="round"></path></svg><br>首页
+                    </a>
+                </li>
+                <li class="mx-auto">
+                    <a href="#" class="nav-link px-2 text-dark text-center py-0 aaaa">
+                       <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" fill="white" fill-opacity="0.01"></rect><path d="M5.81824 6.72729V14H13.091" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M4 24C4 35.0457 12.9543 44 24 44V44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C16.598 4 10.1351 8.02111 6.67677 13.9981" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M24.005 12L24.0038 24.0088L32.4832 32.4882" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><br>记录
+                    </a>
+                </li>
+                <li class="mx-auto">
+                    <a href="#" class="nav-link px-2 text-dark text-center py-0 pinglun" pinglun>
+                        <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" fill="white" fill-opacity="0.01"></rect><rect width="48" height="48" fill="white" fill-opacity="0.01"></rect><path d="M44 6H4V36H13V41L23 36H44V6Z" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M14 19.5V22.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M24 19.5V22.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M34 19.5V22.5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><br>评论
+                    </a>
+                </li>
+                <li class="mx-auto">
+                    <a href="#" class="nav-link px-2 text-dark text-center py-0">
+                        <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" fill="white" fill-opacity="0.01"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M24 44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M24 23C26.7614 23 29 20.7614 29 18C29 15.2386 26.7614 13 24 13C21.2386 13 19 15.2386 19 18C19 20.7614 21.2386 23 24 23Z" fill="none" stroke="#333" stroke-width="2" stroke-linejoin="round"></path><path d="M10.022 38.332C10.3657 33.1206 14.7016 29 20 29H28C33.2914 29 37.6229 33.1097 37.9767 38.3113" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><br>我的
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+    
+    <section id="banner">
+                <img src="./images/toubu.jpg" class="img-fluid" alt="banner" style="border-bottom:1px solid #f4a86e;" width="100%">
+            </section>
+
+    <section class="py-3  shou" >
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-7 col-lg-6">
+                    <h1 class="display-6 text-center text-md-start fw-bolder">
+                        欢迎光临 <span class="text-primary"><?php echo $site_name; ?></span><br>
+                        <!--380072.com     -->               </h1>
+                    <p class="lead text-center text-md-start text-success mb-6 mb-lg-8 fw-bolder">
+                        澳门六合彩公司独家授权资料网站
+                    </p>
+                    <p class="lead text-center text-md-start mb-6 mb-lg-8 fw-bolder">
+                        热线电话：<?php echo $phone_number;?>                   </p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="row m-0">
+                        <div class="col-6">
+                            <img id="xx-left" data-original="./images/touxiang.jpg" class="img-fluid" src="./images/xiaoxiang.jpg" style="height: 262.467px;" width="100%">
+                        </div>
+                        <div class="col-6 text-center align-middle fs-5">
+                            <div id="xx-right" class="bg-success">
+                                <p class="m-0 text-white">杨家鳞</p>
+                                <p class="m-0 text-warning">深圳销售部总经理</p>
+                                <img data-original="./images/erweima/IMG_0324(20211127-123123).JPG" class="img-fluid" src="./images/erweima.jpg" style="" width="80%">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- / .row -->
+        </div> <!-- / .container -->
+    </section>
+    
+    
+    
+    <!-- 公开 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">每期公开验证</h1>
+            </div>
+        </div>
+        
+            <div class="card mb-4">
+                <div class="card-body bg-dark text-white p-3" style="text-indent:2em;">
+                <?php echo $site_name; ?>每期21:30公开验证，我们不同于其它假料网站，要么没有资料验证，要么打不开网站，或者开了奖才公布出来，那些是典型的骗子网站。请彩民注意：本站永远都可以打开进行验证！为了让大家清楚的看到博彩①肖①码的准确率，每期开奖日晚上21:30时公布完整资料给大家验证，看看是不是真的那么准确！<span class="text-warning"></span>
+                </div>
+            </div>
+          <?php
+          	if($jj < $gg ){ ?>
+          	
+          	
+          	
+            <div class="card mb-4">
+                
+                    <div class="ackj-jilu" style="background-image: url('images/num/acyz2.jpg');float: left">
+                        <div class="yz-title text-center">
+                            <div><?php echo $ys.'年第'.$ac_new_next;?>期绝密资料</div>
+                        </div>
+                        <div class="yz-main text-center">
+                        </div>
+                        <div class="yz-bottom text-center">
+                            <div class="number">
+                                <div class="number"><img data-original="./images/erweima.jpg" class="img-fluid" src="./images/erweima.jpg" style=""></div>
+                            </div>
+                        </div>
+                    	
+                	</div>
+             	</div>
+             	<h3 class="text-center fw-bolder m-1">公开验证倒计时</h3>
+                    <h4 class="text-center fw-bolder m-1"><span id="acshowtime">8小时24分20秒</span></h4>
+                    <a href="/acyanz"><button class="btn btn-success btn-lg d-block mx-auto">点击前往验证</button></a>
+                </div>
+            
+            
+            <h2 class="body-text">资料更新提醒</h2>
+            <h4 class="body-text"><a href="/login" class="text-primary">请登录领取<?php echo $ac_new_next;?>期资料<i class="bi bi-arrow-down-circle"></i></a></h4>
+                 
+            </div>  
+          	<?php	
+          	 }else{ 
+          		?>    
+                   
+        
+            <div class="card my-4">
+                <div class="card-body bg-snow p-3">
+                	<div class="ackj-jilu nn<?php echo $new_num; ?>" >
+                        	
+                            <div class="yz-title text-center">
+                                 <div><?php echo $ys.'年第'.$ac_new_qs; ?>期绝密资料</div>
+                            </div>
+                            <!--<div class="yz-bottom text-center">
+                                <div class="number nn<?php echo $acnumber; ?>" id="st"></div>
+                            </div>-->
+                            <div class="yz-main text-center">
+                                
+                                <div class="row teshu" style="border:0px solid #f00;text-align: center; display: block;">
+                                    
+                                </div>
+                            </div>
+                          
+                        </div>
+                   
+                </div>
+            </div>
+            <h3 class="text-center fw-bolder m-1">公开验证倒计时</h3>
+                    <h4 class="text-center fw-bolder m-1"><span id="acshowtime">00小时00分00秒</span></h4>
+                    <a href="/acyanz"><button class="btn btn-success btn-lg d-block mx-auto">点击前往验证</button></a>
+                </div>
+            
+            
+            <h2 class="body-text">资料更新提醒</h2>
+            <h4 class="body-text"><a href="/login" class="text-primary">请登录领取<?php echo $ac_new_next;?>期资料<i class="bi bi-arrow-down-circle"></i></a></h4>
+                
+            <?php } ?>
+                    
+                  
+            <div class="card">
+                <a href="/login"><img data-original="./images/hyq.jpg" class="card-img img-fluid" src="./images/hyq.jpg" style=""></a>
+                <img data-original="./images/ruhui.jpg" class="img-fluid" src="./images/ruhui.jpg" style="" width="100%">
+                <a href="/login"><img data-original="./images/hyq2.gif" class="card-img img-fluid" src="./images/hyq2.gif" style=""></a>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /公开 -->
+    
+    <!-- 入会 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">欢迎加入会员</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="text-center bg-light border border-success p-2">
+                        <h2 class="text-danger fw-bolder">入会请添加微信</h2>
+                        <img data-original="./images/erweima.jpg" class="img-fluid img-ma" src="./images/erweima.jpg" style="">
+                        
+                                                </h3><h2 class="text-success fw-bolder m-1">扫一扫二维码添加好友</h2>
+                                            </div>
+                </div>
+            </div>
+            <h2 class="body-text">欢迎来电咨询<br><span class="text-primary"><?php echo $phone_number;?></span></h2>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /入会 -->
+    
+    <!-- 最新消息 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">最新优惠消息</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <img data-original="./images/zxxx.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%"><img data-original="./images/zxxx1.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+            </div>
+          <!--  <h2 class="body-text">本站官方网址<br><span class="text-primary">www.380072.com</span></h2>-->
+        </div> <!-- / .container -->
+    </section>
+    <!-- /最新消息 -->
+    
+    <!-- 梦想 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">成就彩民梦想</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/mengx.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <h2 class="text-center"><span class="text-danger list-title">【博彩①肖①码】成就你的梦想</span></h2>
+                    <p class="card-text" style="text-indent:2em;">
+                        博彩①肖①码就是来给我们大陆彩民朋友送财，送希望的！要想从黑庄手中赢回自己输掉的钱，再赢到更多财富，要完成自己的人生梦想，就赶快加入会员，把握好机会，跟上我们这股
+                        博彩①肖①码的旋风，马上开始改变你的命运！
+                        博彩①肖①码启动至今有三年时间，已经有数万名会员在这里赚到了自己人生最大的一笔财富，帮助大家实现了各种梦想。各地会员遍布全国！我们主张低调的作风，要求会员们要保持平和的心态，正所谓小隐隐于野，大隐隐于市！他们中也许有很多人就低调的生活在你的附近。同一个城市、同一片天空、甚至同一条村子出来的，可能以前都一样穷，现在你们却差距甚大！与其感叹，不如立即加入会员吧，有钱了，你的梦想就接近了，你的梦想就容易实现了！你的梦想是什么呢？也许你见过有人玩六合彩玩到倾家荡产，也知道有人玩六合彩赢得身家千万，坐拥豪车洋楼！这是为什么呢？都是邻里之间吹牛而已吗？凡事不会空穴来风，我们的
+                        博彩①肖①码的会员们正时刻上演着这样的六合彩圆梦传奇！中国有句老话：人无横财不富，马无夜草不肥！成为千万富翁，实现属于自己的梦想是要靠善于发现机会，且勇于把握机会得来的！现在你已经发现了真正的
+                        博彩①肖①码资料，你还在等什么？我样家鳞相信，每一个人都有梦想！你的梦想是什么？你想实现梦想吗？你是那个幸运儿吗？让我们公司来帮助你吧！
+                    </p>
+                    <img data-original="./images/hwz.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /梦想 -->
+    
+    <!-- 分布图 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">会员遍布全国</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <marquee behavior="scroll" scrollamount="5" class="bg-light text-danger" style="margin-bottom:-0.5rem" width="100%">
+                        <span class="list-title">本资料由澳门六合彩公司独家特供，100%准确，包你期期中奖。如出错一期全额退款，分文不收！</span>
+                    </marquee>
+                    <img data-original="./images/fbt.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+<marquee direction="up" scrolldelay="90" scrollamount="3" class="text-center text-white" width="100%" height="400px">
+                    广东江门市容先生加入《博彩①肖①码》10期后回访此客户已因本资料赚336万元<br>
+                    广东罗定市霍先生加入《博彩①肖①码》10期后回访此客户已因本资料赚439万元<br>
+                    广东江门市潘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚323万元<br>
+                    深圳市宝安区冯生加入《博彩①肖①码》10期后回访此客户已因本资料赚546万元<br>
+                    湖北武汉市曾先生加入《博彩①肖①码》10期后后访此客户已因本资料赚229万元<br>
+                    湖南新化县杨先生加入《博彩①肖①码》10期后回访此客户已因本资料赚126万元<br>
+                    福建仙游县俞先生加入《博彩①肖①码》10期后回访此客户已因本资料赚122万元<br>
+                    广西崇左市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚722万元<br>
+                    东莞石揭镇陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚321万元<br>
+                    广西梧州市姚先生加入《博彩①肖①码》10期后回访此客户已因本资料赚344万元<br>
+                    广西北流市廖先生加入《博彩①肖①码》10期后回访此客户已因本资料赚325万元<br>
+                    广西灵山县钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚326万元<br>
+                    广西南宁市苏先生加入《博彩①肖①码》10期后回访此客户已因本资料赚343万元<br>
+                    广东省英德市林生加入《博彩①肖①码》10期后回访此客户已因本资料赚349万元<br>
+                    福建厦门市叶先生加入《博彩①肖①码》10期后回访此客户已因本资料赚109万元<br>
+                    东莞市黄江镇李生加入《博彩①肖①码》10期后回访此客户已因本资料赚125万元<br>
+                    浙江余姚市颜先生加入《博彩①肖①码》10期后回访此客户已因本资料赚165万元<br>
+                    广西省桂平市先生加入《博彩①肖①码》10期后回访此客户已因本资料赚195万元<br>
+                    广州增城市吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚143万元<br>
+                    广州仁和镇许先生加入《博彩①肖①码》10期后回访此客户已因本资料赚184万元<br>
+                    广州白云区刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚142万元<br>
+                    江西省赣州市李生加入《博彩①肖①码》10期后回访此客户已因本资料赚147万元<br>
+                    深圳市宝安区饶生加入《博彩①肖①码》10期后回访此客户已因本资料赚147万元<br>
+                    湖南安化县吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚246万元<br>
+                    广东梅州市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚141万元<br>
+                    广东英德市李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚147万元<br>
+                    广州市白云区林生加入《博彩①肖①码》10期后回访此客户已因本资料赚327万元<br>
+                    云南昭通市钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚178万元<br>
+                    湖南株洲市漆先生加入《博彩①肖①码》10期后回访此客户已因本资料赚128万元<br>
+                    南宁市宾阳县蓝生加入《博彩①肖①码》10期后回访此客户已因本资料赚526万元<br>
+                    福建长乐市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚108万元<br>
+                    江西九江市谭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚128万元<br>
+                    广东省英德市林生加入《博彩①肖①码》10期后回访此客户已因本资料赚349万元<br>
+                    福建厦门市叶先生加入《博彩①肖①码》10期后回访此客户已因本资料赚109万元<br>
+                    广东惠州市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚105万元<br>
+                    湖南长沙市谭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚423万元<br>
+                    四川省达县陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚208万元<br>
+                    广东珠海市沈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚114万元<br>
+                    广东东莞市李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚121万元<br>
+                    福建龙岩市周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚116万元<br>
+                    广州市花都区先生加入《博彩①肖①码》10期后回访此客户已因本资料赚242万元<br>
+                    浙江台州市曹先生加入《博彩①肖①码》10期后回访此客户已因本资料赚117万元<br>
+                    广西天等县李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚187万元<br>
+                    佛山南海区彭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚317万元<br>
+                    浙江省温州市李生加入《博彩①肖①码》10期后回访此客户已因本资料赚117万元<br>
+                    上海宝山区周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚177万元<br>
+                    广东省汕尾市王生加入《博彩①肖①码》10期后回访此客户已因本资料赚107万元<br>
+                    河北荆州市凡先生加入《博彩①肖①码》10期后回访此客户已因本资料赚108万元<br>
+                    广州珠海区郭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚338万元<br>
+                    广州番禺区颜先生加入《博彩①肖①码》10期后回访此客户已因本资料赚435万元<br>
+                    深圳平湖镇谢先生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    广东韶关市林先生加入《博彩①肖①码》10期后回访此客户已因本资料赚102万元<br>
+                    东莞厚街镇黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚333万元<br>
+                    东莞石揭镇陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚321万元<br>
+                    广西梧州市姚先生加入《博彩①肖①码》10期后回访此客户已因本资料赚344万元<br>
+                    广西北流市廖先生加入《博彩①肖①码》10期后回访此客户已因本资料赚325万元<br>
+                    广西灵山县钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚306万元<br>
+                    广西南宁市苏先生加入《博彩①肖①码》10期后回访此客户已因本资料赚334万元<br>
+                    福建省三明市先生加入《博彩①肖①码》10期后回访此客户已因本资料赚168万元<br>
+                    广东东莞市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚178万元<br>
+                    广东深圳市封斌生加入《博彩①肖①码》10期后回访此客户已因本资料赚204万元<br>
+                    广州番禺区游先生加入《博彩①肖①码》10期后回访此客户已因本资料赚102万元<br>
+                    深圳南山区陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚126万元<br>
+                    福建仙游县苏先生加入《博彩①肖①码》10期后回访此客户已因本资料赚293万元<br>
+                    福建厦门市周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚102万元<br>
+                    东莞厚街镇李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚522万元<br>
+                    东莞市黄江镇李生加入《博彩①肖①码》10期后回访此客户已因本资料赚121万元<br>
+                    浙江余姚市颜先生加入《博彩①肖①码》10期后回访此客户已因本资料赚116万元<br>
+                    广西省桂平市先生加入《博彩①肖①码》10期后回访此客户已因本资料赚192万元<br>
+                    广州增城市吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚101万元<br>
+                    广州仁和镇许先生加入《博彩①肖①码》10期后回访此客户已因本资料赚186万元<br>
+                    广州白云区刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚128万元<br>
+                    江西省赣州市李生加入《博彩①肖①码》10期后回访此客户已因本资料赚174万元<br>
+                    深圳市宝安区饶生加入《博彩①肖①码》10期后回访此客户已因本资料赚174万元<br>
+                    湖南安化县吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚526万元<br>
+                    湖北省沙市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚438万元<br>
+                    广东省阳江市黄生加入《博彩①肖①码》10期后回访此客户已因本资料赚104万元<br>
+                    深圳龙岗区郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚427万元<br>
+                    广西桂林市张先生加入《博彩①肖①码》10期后回访此客户已因本资料赚429万元<br>
+                    广东东莞市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚425万元<br>
+                    广东广州市吕先生加入《博彩①肖①码》10期后回访此客户已因本资料赚236万元<br>
+                    广东深圳市胡先生加入《博彩①肖①码》10期后回访此客户已因本资料赚234万元<br>
+                    广州珠海区李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚183万元<br>
+                    广东惠州市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    湖南长沙市谭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚330万元<br>
+                    广东省江门市陈生加入《博彩①肖①码》10期后回访此客户已因本资料赚242万元<br>
+                    福建省漳州市叶生加入《博彩①肖①码》10期后回访此客户已因本资料赚112万元<br>
+                    广东省汕头市乐生加入《博彩①肖①码》10期后回访此客户已因本资料赚102万元<br>
+                    福建莆田市颜先生加入《博彩①肖①码》10期后回访此客户已因本资料赚208万元<br>
+                    佛山南海区区永生加入《博彩①肖①码》10期后回访此客户已因本资料赚523万元<br>
+                    广东茂名市钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚108万元<br>
+                    中山南头镇黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚434万元<br>
+                    广州番禺区陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚331万元<br>
+                    北京朝阳区闵先生加入《博彩①肖①码》10期后回访此客户已因本资料赚325万元<br>
+                    广西灵山市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚126万元<br>
+                    广东汕头市郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚210万元<br>
+                    广东高州市马先生加入《博彩①肖①码》10期后回访此客户已因本资料赚126万元<br>
+                    广西百色市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚110万元<br>
+                    广州萝岗区陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚126万元<br>
+                    广西贺州市梁先生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    浙江宁海市秦先生加入《博彩①肖①码》10期后回访此客户已因本资料赚428万元<br>
+                    广西百色市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚123万元<br>
+                    广东汕头市郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚120万元<br>
+                    广东罗定市容先生加入《博彩①肖①码》10期后回访此客户已因本资料赚328万元<br>
+                    广东江门市吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚106万元<br>
+                    深圳宝安区刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚101万元<br>
+                    湖南娄底市李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚107万元<br>
+                    广西桂平市朱先生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    福建漳浦县陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚421万元<br>
+                    湖北大冶市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚123万元<br>
+                    广东梅州市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚112万元<br>
+                    广东英德市李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚172万元<br>
+                    广东汕头市郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚192万元<br>
+                    广西省巴马县黄生加入《博彩①肖①码》10期后回访此客户已因本资料赚310万元<br>
+                    湖南宁远县李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚326万元<br>
+                    河北唐山市谈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚347万元<br>
+                    广州珠海区刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚345万元<br>
+                    福建莆田市阮先生加入《博彩①肖①码》10期后回访此客户已因本资料赚421万元<br>
+                    四川省叙永县陈生加入《博彩①肖①码》10期后回访此客户已因本资料赚323万元<br>
+                    广西河池市韦先生加入《博彩①肖①码》10期后回访此客户已因本资料赚343万元<br>
+                    佛山南海区谭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚320万元<br>
+                    广东云浮市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚327万元<br>
+                    湖北省沙市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚383万元<br>
+                    广东省阳江市黄生加入《博彩①肖①码》10期后回访此客户已因本资料赚101万元<br>
+                    深圳龙岗区郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚271万元<br>
+                    广西桂林市张先生加入《博彩①肖①码》10期后回访此客户已因本资料赚329万元<br>
+                    广东东莞市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚325万元<br>
+                    广东广州市吕先生加入《博彩①肖①码》10期后回访此客户已因本资料赚111万元<br>
+                    广东深圳市胡先生加入《博彩①肖①码》10期后回访此客户已因本资料赚223万元<br>
+                    湖北武汉市曾先生加入《博彩①肖①码》10期后回访此客户已因本资料赚229万元<br>
+                    福建省晋江市陈生加入《博彩①肖①码》10期后回访此客户已因本资料赚121万元<br>
+                    广东顺德市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚116万元<br>
+                    广东中通县吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚252万元<br>
+                    广东南海市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚105万元<br>
+                    湖南省益阳市周生加入《博彩①肖①码》10期后回访此客户已因本资料赚173万元<br>
+                    广东省东莞市罗生加入《博彩①肖①码》10期后回访此客户已因本资料赚105万元<br>
+                    广东清远市梁先生加入《博彩①肖①码》10期后回访此客户已因本资料赚282万元<br>
+                    福建武平县赖先生加入《博彩①肖①码》10期后回访此客户已因本资料赚101万元<br>
+                    深圳市福田区周生加入《博彩①肖①码》10期后回访此客户已因本资料赚162万元<br>
+                    广东省江门市陈生加入《博彩①肖①码》10期后回访此客户已因本资料赚424万元<br>
+                    福建省漳州市叶生加入《博彩①肖①码》10期后回访此客户已因本资料赚110万元<br>
+                    广东省汕头市乐生加入《博彩①肖①码》10期后回访此客户已因本资料赚100万元<br>
+                    福建莆田市颜先生加入《博彩①肖①码》10期后回访此客户已因本资料赚308万元<br>
+                    广东汕头市郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚194万元<br>
+                    广西省巴马县黄生加入《博彩①肖①码》10期后回访此客户已因本资料赚420万元<br>
+                    湖南宁远县李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚426万元<br>
+                    河北唐山市谈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚437万元<br>
+                    广州珠海区刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚105万元<br>
+                    福建莆田市阮先生加入《博彩①肖①码》10期后回访此客户已因本资料赚421万元<br>
+                    四川省叙永县陈生加入《博彩①肖①码》10期后回访此客户已因本资料赚423万元<br>
+                    广西河池市韦先生加入《博彩①肖①码》10期后回访此客户已因本资料赚424万元<br>
+                    佛山南海区谭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚420万元<br>
+                    湖南娄底市李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚170万元<br>
+                    广西桂平市朱先生加入《博彩①肖①码》10期后回访此客户已因本资料赚100万元<br>
+                    福建漳浦县陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚421万元<br>
+                    广东珠海市沈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚140万元<br>
+                    广东东莞市李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚120万元<br>
+                    福建龙岩市周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚160万元<br>
+                    广州市花都区先生加入《博彩①肖①码》10期后回访此客户已因本资料赚624万元<br>
+                    浙江台州市曹先生加入《博彩①肖①码》10期后回访此客户已因本资料赚110万元<br>
+                    广西天等县李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚183万元<br>
+                    佛山南海区彭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚310万元<br>
+                    浙江省温州市李生加入《博彩①肖①码》10期后回访此客户已因本资料赚110万元<br>
+                    上海宝山区周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚173万元<br>
+                    广东省汕尾市王生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    广州市白云区林生加入《博彩①肖①码》10期后回访此客户已因本资料赚327万元<br>
+                    云南昭通市钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚171万元<br>
+                    湖南株洲市漆先生加入《博彩①肖①码》10期后回访此客户已因本资料赚122万元<br>
+                    南宁市宾阳县蓝生加入《博彩①肖①码》10期后回访此客户已因本资料赚226万元<br>
+                    福建长乐市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    浙江台州市曹先生加入《博彩①肖①码》10期后回访此客户已因本资料赚117万元<br>
+                    广西天等县李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚187万元<br>
+                    佛山南海区彭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚317万元<br>
+                    浙江省温州市李生加入《博彩①肖①码》10期后回访此客户已因本资料赚117万元<br>
+                    上海宝山区周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚177万元<br>
+                    广东省汕尾市王生加入《博彩①肖①码》10期后回访此客户已因本资料赚107万元<br>
+                    广州市白云区林生加入《博彩①肖①码》10期后回访此客户已因本资料赚327万元<br>
+                    云南昭通市钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚178万元<br>
+                    湖南株洲市漆先生加入《博彩①肖①码》10期后回访此客户已因本资料赚128万元<br>
+                    河北荆州市凡先生加入《博彩①肖①码》10期后回访此客户已因本资料赚103万元<br>
+                    广州珠海区郭先生加入《博彩①肖①码》10期后回访此客户已因本资料赚331万元<br>
+                    福建省三明市先生加入《博彩①肖①码》10期后回访此客户已因本资料赚162万元<br>
+                    广东东莞市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚207万元<br>
+                    广东云浮市严先生加入《博彩①肖①码》10期后回访此客户已因本资料赚208万元<br>
+                    广东深圳市封斌生加入《博彩①肖①码》10期后回访此客户已因本资料赚408万元<br>
+                    广州番禺区游先生加入《博彩①肖①码》10期后回访此客户已因本资料赚108万元<br>
+                    广东河源市关先生加入《博彩①肖①码》10期后回访此客户已因本资料赚107万元<br>
+                    佛山顺德区潘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚109万元<br>
+                    广西梧州市周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚108万元<br>
+                    广东东莞市胡先生加入《博彩①肖①码》10期后回访此客户已因本资料赚460万元<br>
+                    珠海香洲区李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚390万元<br>
+                    广东江门市容先生加入《博彩①肖①码》10期后回访此客户已因本资料赚366万元<br>
+                    广东罗定市霍先生加入《博彩①肖①码》10期后回访此客户已因本资料赚490万元<br>
+                    广东江门市潘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚423万元<br>
+                    深圳市宝安区冯生加入《博彩①肖①码》10期后回访此客户已因本资料赚460万元<br>
+                    广东汕头市郑先生加入《博彩①肖①码》10期后回访此客户已因本资料赚100万元<br>
+                    广东高州市马先生加入《博彩①肖①码》10期后回访此客户已因本资料赚160万元<br>
+                    湖南新化县杨先生加入《博彩①肖①码》10期后回访此客户已因本资料赚160万元<br>
+                    福建仙游县俞先生加入《博彩①肖①码》10期后回访此客户已因本资料赚120万元<br>
+                    佛山南海区区永生加入《博彩①肖①码》10期后回访此客户已因本资料赚253万元<br>
+                    广东茂名市钟先生加入《博彩①肖①码》10期后回访此客户已因本资料赚158万元<br>
+                    广东阳江市熬先生加入《博彩①肖①码》10期后回访此客户已因本资料赚356万元<br>
+                    广西南宁市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚521万元<br>
+                    深圳福永镇李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚528万元<br>
+                    广东中山是林先生加入《博彩①肖①码》10期后回访此客户已因本资料赚532万元<br>
+                    中山南头镇黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚544万元<br>
+                    广州番禺区陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚531万元<br>
+                    北京朝阳区闵先生加入《博彩①肖①码》10期后回访此客户已因本资料赚525万元<br>
+                    广西灵山市刘先生加入《博彩①肖①码》10期后回访此客户已因本资料赚161万元<br>
+                    湖北大冶市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚223万元<br>
+                    湖南省桂阳县先生加入《博彩①肖①码》10期后回访此客户已因本资料赚128万元<br>
+                    广州市番禺区吴生加入《博彩①肖①码》10期后回访此客户已因本资料赚118万元<br>
+                    广东深圳市罗先生加入《博彩①肖①码》10期后回访此客户已因本资料赚206万元<br>
+                    广东汕头市吴先生加入《博彩①肖①码》10期后回访此客户已因本资料赚124万元<br>
+                    广西崇左市陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚512万元<br>
+                    广州番禺区颜先生加入《博彩①肖①码》10期后回访此客户已因本资料赚315万元<br>
+                    深圳南山区陈先生加入《博彩①肖①码》10期后回访此客户已因本资料赚164万元<br>
+                    福建仙游县苏先生加入《博彩①肖①码》10期后回访此客户已因本资料赚529万元<br>
+                    福建厦门市周先生加入《博彩①肖①码》10期后回访此客户已因本资料赚150万元<br>
+                    东莞厚街镇李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚522万元<br>
+                    福建厦门市叶先生加入《博彩①肖①码》10期后回访此客户已因本资料赚109万元<br>
+                    广州珠海区李先生加入《博彩①肖①码》10期后回访此客户已因本资料赚158万元<br>
+                    广东惠州市黄先生加入《博彩①肖①码》10期后回访此客户已因本资料赚105万元
+                </marquee>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /分布图 -->
+    
+    <!-- 打击假料 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">坚决打击假料</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/ttt.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text">
+                        ①：博彩①肖①码的资料，胜过一切所谓的预测分析的资料，真正保证让彩民赚钱。
+                        <br>②：博彩①肖①码唯一官方网站：380072.com，此外市面上五花八门书籍、U盘、光盘、大师料、资料均为假冒，请广大彩民认清楚，以免上当受骗。
+                        <br>③：加入博彩①肖①码的会员，我们将热忱的为每一位会员服务，全天24小时开通咨询热线，帮助每一位会员发家致富、狂赚百万！
+                        <br>④：加入博彩①肖①码的会员，以高级法律的形式，明确合作双方的权利义务，保障会员每期都及时拿到准确的特供资料，中奖更轻松。
+                        <br>⑤：为了打击外围黑庄、打击假料诈骗，为和谐社会贡献一份力量；我们收费透明化、流程公开化，绝无任何中途收费，真正做到公开公正公平，欢迎广大彩民监督！
+                        <br>⑥：期期中奖率可达100%，如意外造成错误，由澳门六合彩公司直接赔付会员的损失，最高赔偿可达20万元人民币，请广大彩民放心入会。
+                    </p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /打击假料 -->
+    
+    <!-- 入会细则 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">入会立即取料</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text">30期资料仅600元</h2>
+            <div class="card">
+                <div class="card-body">
+                    <img data-original="./images/cfzl.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="text-center p-0"><span class="text-warning list-title">为什么要收600元？</span></p>
+                    <p class="card-text text-white" style="text-indent:2em;"> 本公司成立之初，加入会员是免费的，目的很明确：就是要狠狠打击大陆私彩黑庄，让彩民们赢回输掉的钱。自从2019年公司成立至今，由于是内部提供的资料极为精准，帮助了无数彩民翻身致富，打击了无数的黑庄，致使大陆的庄家们对我是恨之入骨，打恐吓电话的，发威胁短信的，放狠话的，请黑社会的，用尽手段，恨不得杀了我，迫不得已我出门都要带保镖。加上由于公司发展，越来越多彩民对我的信任，工作量越来越大，我们不得不租办公室，招客服，请保安，还有维护网站、电话等庞大的费用，因此万般无奈的我只能向大家收取一点点成本，目的不是赚大家的钱，你们都那么困难了，我又怎么能赚你们的钱呢？希望大家能够理解我的苦衷，我诚心诚意帮助你们，不是赚你的钱，只是收回一点点维护网站的成本。你连区区几百都要和我讨价还价的话会令我伤心，更有些朋友来电想要免费提供资料的，我真的不想和你说话，请你将心比心，不要再为难我好吗？区区600元就可以让你翻身致富，你还在犹豫什么呢？请记住，我们的目标是一致的：合作共赢，打击黑庄赢回输了的钱，一起走向幸福的人生。</p>
+                </div>
+                <div class="card-body bg-snow">
+                    <p class="card-text" style="text-indent:2em;"> 现在您只要投资小小的600元，就可以帮您摆脱困境，改变您的生活。请问你们曾经是不是因赌地下六合彩输的一无所有，负债累累，倾家荡产？严重的更有甚者连生存下去的勇气都没有了。我样家鳞在这里和你们说，如果你手上没有一份准确的资料在手盲目乱下注的话，即使我先给你100万，1000万，不用多久你也能把他输得一干二净！不信者尽可一试！结局相信很多彩民都是输，不用我说。于是你们就开始在网上开始找各种资料，什么U盘啊，视频，书籍，刮刮卡，软件高手料，中后付款的。结果到头来准确的资料没有找到，还被骗得一塌糊涂，经济上更雪上加霜。这些相信很多彩民都深有体会啊！这时的你们几乎绝望了，不敢再相信什么资料了。当你们浏览到本网站，看到我们博彩①肖①码资料时，对我们一码资料持半信半疑的态度，分不清真假。朋友们，网上的资料有假的肯定也有真的，最可悲的是如果你在一份真真实实的资料面前说是假的，假的资料认为是真的，那么就算是神仙也打救不了你们！不管你们之前被骗了十次，二十次也好，不要轻易放弃。六合彩赔率这么高，只要碰到一次真的就足以翻身发财！而本资料就绝对是正版内部资料，我绝对是你这一辈子当中的贵人。本资料曾经帮助过多少沉沦于六合苦海的彩民翻身致富，摆脱困境，重见光明。如果本资料都不能够帮助到你们翻身致富的，那么我劝你们不要再玩六合彩了，永远戒赌!</p>
+                    <img data-original="./images/zhijietg.gif" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/jj.png" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/banli.png" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/liuc.png" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/rh.png" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                </div>
+            </div>
+            <hr>
+            <h3 class="body-text mt-3">
+            <p class="text-primary text-center">【博彩①肖①码】入会细则
+            </p>
+            <p class="text-dark text-start" style="text-indent:2em;">
+                一：来电报名，本站提供财务部门的银行账户，支持各渠道转卡，谨防假冒！
+            </p>
+            <p class="text-dark text-start" style="text-indent:2em;">
+                二：选择您方便的转账渠道，办理相关的会员费用。
+            </p>
+            <p class="text-dark text-start" style="text-indent:2em;">
+                三：办理好费用请联系本站即可取料！祝贺您成为我们尊贵的会员！
+            </p>
+            <p class="text-dark">30期仅需600元，每期仅限50人！</p>
+            </h3>
+            <h2 class="body-text">欢迎来电咨询<br><span class="text-primary"><?php echo $phone_number;?></span></h2>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /入会细则 -->
+    
+    <!-- 现实 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">本人隐私信息</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text">本人的工作证、身份证</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img data-original="./images/gzz.jpg" class="img-thumbnail img-fluid mx-auto d-block" alt="工作证" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC">
+                        </div>
+                        <div class="col-md-6">
+                                <img data-original="./images/sfz.jpg" class="img-thumbnail img-fluid mx-auto d-block" alt="身份证" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC">
+                                <img data-original="./images/sfzfm.jpg" class="img-thumbnail img-fluid mx-auto d-block" alt="身份证反面" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2 class="body-text">现实生活中的我</h2>
+            <div class="card">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/xianshi.jpg" class="img-fluid" alt="现实的我" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">虽然我是博彩①肖①码的总经理，似乎职位高高在上，但我也是上有老下有小，也有兄弟姐妹亲人便宜，也和你们一样是有血有肉的普通人。请把我当作你的姐妹朋友，我愿和每一位会员成为知心朋友，助你翻身致富！
+                            <br>　　我样家鳞在此惶恐不敬的以自己和亲人的名义，以全家老少的身心健康和终生幸福对彩民起誓担保：请放心入会合作，合作中途绝无其它任何收费，保证资料每期百分百中奖！
+                            <br>　　如果本站有任何一丝欺骗彩民或入会后资料没帮你中奖发财，我样家鳞和家人就出门被大货车撞碾成肉泥！
+                            <br>　　坑害彩民就等于落井下石，丧尽天良的骗子必遭天谴会终遭报应的，身患百癌！遍体肿囊！全身脓疱，体无完肤！不得好死！而且下辈子绝户，全家得艾滋，死后葬身乱坟岗。男的代代为奴，女的世世为娼！！
+                            <br>　　请大家将心比心的想想，若不是真的有绝对可靠的实力和绝对保证中奖的把握，谁敢拿全家老小的性命咒自己这么毒的誓呢？只要有一点点良心的人都不可能这样做！更何况我等柔弱女子！我样家鳞光明磊落，一诺千金，掷地有声！我知道说了这些话就会有冥冥中有天看着，决不会为了坑骗彩民几百块钱而做出此等灭绝人性的事，人恶有天收，善恶终有报啊！广东人俗话说：“做人讲口齿，牙齿当金使！”，我带全家老小就算赌上性命也保证说到做到！你现在就加入会员，不过小小一千几百元，绝对值得让你亲自见证这份资料的实力！博彩①肖①码必将为你迎来六合致富之路的胜利曙光。</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /现实 -->
+    
+    <!-- 证书 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">官方授权证书</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text">代理证书、站点证书</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <img data-original="./images/zhengshu1.jpg" class="img-fluid" alt="证书" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <img data-original="./images/zhengshu2.jpg" class="img-fluid" alt="证书" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        </div>
+                    </div>
+                    <p class="card-text text-white" style="text-indent: 2em">证书说明：因为【博彩①肖①码】不是样家鳞个人的财产，不是某一个人的产业，它的股权归属于澳门六合彩公司销售中心以及相关的大陆政府监管部门，两份证书一份是【博彩①肖①码】为澳门六合彩公司指定官方网站的授权证书，一份是证明我样家鳞为【博彩①肖①码 】网站的唯一合法代表的任命证书。这才真正是澳门六合彩公司颁发的授权证书，请广大彩民擦亮双眼仔细识别，放心跟着我样家鳞翻身致富！</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /证书 -->
+    
+    <!-- 签约发布 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">开展铲庄福利</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text">时代契机</h2>
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/qy1.jpg" class="img-fluid" alt="签约仪式" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">澳门赛马会正逢30周年纪念之际，为了帮助大陆彩民，救助彩民，了解彩民的难处，知道大陆彩民非常需要一份稳定准确的一码资料，应大陆彩民的要求，决定开展【博彩①肖①码】铲庄福利帮助彩民，让所有的彩民早日翻身致富，狂挣千万财富。<mark>（上图正是我样家鳞本人，在【博彩①肖①码】纪念仪式上的合照）</mark></p>
+                </div>
+            </div>
+            <h2 class="body-text">协商签约</h2>
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/qy2.jpg" class="img-fluid" alt="签约仪式" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">在大陆政策的支持下，澳门赛马会六合彩公司正式签约博彩①肖①码，雷霆出击打击大陆外围黑庄，让所有的彩民早日得福利，铲庄翻身致富。<mark>（上图正是我样家鳞本人，在【博彩①肖①码】签约仪式上的合照）</mark></p>
+                </div>
+            </div>
+            <h2 class="body-text">正式发布</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <img data-original="./images/fbh.jpg" class="img-fluid mb-3" alt="发布会" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-warning" style="text-indent: 2em">上图正是我样家鳞得到澳门六合彩公司授权博彩①肖①码成为负责人！我秉持铲庄救民的公义，坚持初心，不忘根本，为大陆彩民提供最官方、最权威、最精准的资料。博彩①肖①码的诞生，有如雷霆突现，从此让大陆黑庄和卖资料的不法分子震耳欲溃！</p>
+                </div>
+            </div>
+            <h2 class="body-text">启动仪式</h2>
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/qidong1.jpg" class="img-fluid mb-3" alt="启动仪式" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/qidong2.jpg" class="img-fluid" alt="启动仪式" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">我样家鳞本人作为澳门六合彩公司委任的博彩①肖①码大陆负责人，与各位高层领导出席了启动仪式。【博彩①肖①码】是澳门六合彩公司和大陆政府合作的最成功典范，是澳门六合彩公司面向大陆推出的救民扶贫大活动。这是力挽狂澜的一次颠峰之作，必将掀起一轮又一轮的中奖高潮。这就是悬在所有黑庄头上的一颗原子弹，不管他们有多大能耐，哪怕上亿的身家，都顶不住彩民的狂轰滥炸。</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /签约发布 -->
+    
+    <!-- 深圳公司 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">深圳销售中心</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text">福利正式启动</h2>
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/sz1.jpg" class="img-fluid mb-3" alt="深圳1" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/sz2.jpg" class="img-fluid" alt="深圳2" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">澳门六合彩公司斥资在内地深圳开设了六合彩销售中心【博彩①肖①码】，负责中国整个大陆区域的六合彩救民行动，只有我们是真真实实的存在的，是实实在在可以帮到广大彩民朋友的六合彩官方机构！我们将以专业的服务、官方的技术、绝对的诚信！保证每一位加入我们会员的彩民期期中奖赢钱！</p>
+                </div>
+            </div>
+            <h2 class="body-text">团队周年庆典</h2>
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                <img data-original="./images/qingdian1.jpg" class="img-fluid mb-3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                <img data-original="./images/qingdian2.jpg" class="img-fluid mb-3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                <img data-original="./images/qingdian3.jpg" class="img-fluid mb-3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                <img data-original="./images/qingdian4.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">上图是博彩①肖①码全体人员的周年庆典活动。【博彩①肖①码】是六合彩至今为止最精准的一份资料，黑庄头上的一颗定时炸弹，不管大陆黑庄有多大的能耐，黑庄身家有多少千万，哪怕上个亿的身家，都顶不住彩民的期期大中，期期杀庄。（上图3正是我样家鳞本人）</p>
+                </div>
+            </div>
+            <h2 class="body-text">优秀会员活动</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                <img data-original="./images/yxhy1.jpg" class="img-fluid mb-3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                <img data-original="./images/yxhy2.jpg" class="img-fluid mb-3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                <img data-original="./images/yxhy3.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-warning" style="text-indent: 2em">邀请我们的优秀会员到香港参加文化活动，体验非物质文化遗产，【博彩①肖①码】让每位会员朋友狂赚百万千万财富！</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /深圳公司 -->
+    
+    <!-- 慈善事业 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">推动慈善事业</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                    <img data-original="./images/cs1.jpg" class="img-fluid" alt="慈善1" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/cs2.jpg" class="img-fluid" alt="慈善2" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/cs3.jpg" class="img-fluid" alt="慈善3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">慈善事业是一种有益于社会与人群的社会公益事业，是政府主导下的社会保障体系的一种必要的补充。是在政府的倡导或帮助、扶持下，由民间的团体和个人自愿组织与开展活动的、对社会中遇到灾难或不幸的人，不求回报地实施救助的一种无私的支持与奉献的事业。慈善事业实质上也是一种社会再分配的实现形式。中国是世界上最早倡行与发展慈善事业的国家。与之相应的是，其慈善思想也源远流长。先秦诸子百家与随后的佛家、道家都对慈善有过精辟的阐述。都蕴含着救人济世、福利为民以及人类共通的人道理念和道德准则。</p>
+                    <img data-original="./images/cs4.jpg" class="img-fluid mb-3" alt="慈善4" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/cs5.jpg" class="img-fluid" alt="慈善5" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-dark" style="text-indent: 2em">博彩①肖①码除持续捐助各类型慈善项目外，样家鳞总经理将与六合彩慈善信托基金深度合作各类慈善活动，以促进社会长远持续的发展。</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /慈善事业 -->
+    
+    <!-- 会员风采 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">真实会员心声</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text">各地会员感谢锦旗</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <img data-original="./images/锦旗1.jpg" class="img-fluid mb-3" alt="锦旗" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/锦旗2.jpg" class="img-fluid mb-3" alt="锦旗" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <img data-original="./images/锦旗3.jpg" class="img-fluid" alt="锦旗" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    <p class="card-text text-warning" style="text-indent: 2em">收获各地彩民会员赠送的锦旗牌匾无数，这些不光是我样家鳞的荣誉，更是博彩①肖①码全体工作人员的荣誉！为了保护会员的个人隐私，经过征求会员同意后，此处仅展示其中部分会员赠送锦旗的留念照片。</p>
+                </div>
+            </div>
+            <h2 class="body-text">往届会员真实经历</h2>
+            <div class="card mb-4">
+                <div class="card-body bg-snow">
+                    <marquee behavior="alternate" scrollamount="6" class="bg-light" width="100%"><span class="text-success list-title">本站会员的真实案例，这样的事情就在我们身边！</span></marquee>
+                    <img data-original="./images/h1.jpg" class="img-thumbnail" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        <p class="card-text text-dark" style="text-indent: 2em">上图为广东省佛山市刘焕鑫：我叫刘焕鑫，来自河北，2015年到广东做生意，2016年接触到六合彩，短短三年我把辛苦攒下的一百多万元全输光了，加上抵押房子的钱将近三百万，那时候的我已经是妻离子散没有活下去的勇气了，直到2019年我遇到了何姐我的救命恩人，万念俱灰的我加入了何姐的会员，从开始合作的第一期我小心翼翼的下100元到连着中奖第五期我已经赢回五十万元，合作到第十期我就已经赚到了七位数的大钱。并在合作后第二个月我成功提了我人生的第一辆豪车，我能有现在的生活都是何姐给我的，他赋予了我新的生命，所以我本人愿意出镜为何姐向大家做一个见证，如果你现在的情况如我几年前的一样那我真心希望你能加入博彩①肖①码，你的困境你的难题会迎刃而解。</p>
+                    <img data-original="./images/h2.jpg" class="img-thumbnail" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        <p class="card-text text-dark" style="text-indent: 2em">上图为山东省济宁韦利兵：我是一名金融白领，之前股市大跌我输了很多钱，在家没事玩起了六合彩，没有想到更惨输得一塌糊涂，还欠了好几万的债，后来我无意在网上看到何姐的【博彩①肖①码】官网，和看了你们的视频，说句心里话吧，刚开始我不怎么相信你们真有那么神的，然后我就悄悄地跟踪了半个多月，不象其它假冒网站，开奖过后又改正回来，所以我对你们的感觉就是：“值得信赖”四个字！于是就选择跟你们合作了。几期下来我不但把自己输的钱赢回来还赢多几十万。现在我很感慨的对大家说六合彩看起来简单，玩起来真是能害死人，如果没有何姐的帮助，现在不知道怎么办好了，我永远都会支持您，是您帮助我翻身做人感谢何姐的大恩大德，本人愿为何姐做个见证！上图是我加入何姐合作之后所赚到的钱。</p>
+                    <img data-original="./images/h3.jpg" class="img-thumbnail" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        <p class="card-text text-dark" style="text-indent: 2em">上图为广东省汕头市李瑞馨：我是广东汕头的服装店店老板，由于生意不好我便想在买码找些收入，没想到一直输多赢少所有的存款50万之多都输了，那可是我们家一生积累的，我老公还说要和我离婚，我绝望了。我很后悔！在我最心灰意冷的时候，我无意中在网上看到何姐的资料，那么多钱都输了，于是我抱着试试看的心态加入了【博彩①肖①码】的会员，没有想到第一期居然就中了，我连跟连中，于是我疯狂押大注把自己输掉的全部赢了回来！这一天终于等到了!合作五期下来，我都赢回之前输了的钱，而且还赢回来了很多现金！现在啊，那些疏远了的亲朋好友又都常常有联系了。老公孩子也同意回来。还有很多期才到30期，我现在一定把握机会多赚庄家的钱，赢多点钱买好房子给儿子！我也明白一个道理，人间冷暖，全靠自己啊！是何姐您给我这一次翻身的机会，简直是再造之恩！我以后要好经营公司！</p>
+                    <marquee behavior="alternate" scrollamount="6" class="bg-light" width="100%"><span class="text-danger list-title">还有很多很多的成功事例我们无法一一列举出来</span></marquee>
+                    <div class="row">
+                        <div class="col-md-6" style="padding:5px">
+                            <img data-original="./images/huiyuan1.jpg" class="img-fluid" alt="会员1" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        </div>
+                        <div class="col-md-6" style="padding:5px">
+                            <img data-original="./images/huiyuan2.jpg" class="img-fluid" alt="会员2" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        </div>
+                        <div class="col-md-6" style="padding:5px">
+                            <img data-original="./images/huiyuan3.jpg" class="img-fluid" alt="会员3" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        </div>
+                        <div class="col-md-6" style="padding:5px">
+                            <img data-original="./images/huiyuan4.jpg" class="img-fluid" alt="会员4" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                        </div>
+                        <img data-original="./images/c33.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                    </div>
+                </div>
+            </div>
+            <h2 class="body-text text-primary">感谢各位会员的亲身作证，请广大彩民放心加入会员！</h2>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /会员风采 -->
+    
+    <!-- 入会2 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">邀请你的加入</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="text-center bg-light border border-success p-2">
+                        <h2 class="text-danger fw-bolder">入会请添加微信</h2>
+                        <img data-original="./images/erweima/IMG_0324(20211127-123123).JPG" class="img-fluid img-ma" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC">
+                      
+                                                </h3><h2 class="text-success fw-bolder m-1">扫一扫二维码添加好友</h2>
+                                            </div>
+                </div>
+            </div>
+           <h2 class="body-text">欢迎来电咨询<br><span class="text-primary"><?php echo $phone_number;?></span></h2>
+            <div class="card">
+                <a href="/login"><img data-original="./images/hyq.jpg" class="card-img img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"></a>
+                <img data-original="./images/ruhui.jpg" class="img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" width="100%">
+                <a href="/login"><img data-original="./images/hyq2.gif" class="card-img img-fluid" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"></a>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /入会2 -->
+    
+    <!-- 服务承诺 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">郑重服务承诺</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text"> <p class="text-start" style="text-indent: 2em">敢于挑战一切卖假资料，假会员料，假书籍的不法分子，本人样家鳞本着先做人；后做事的原则；认真服务好大陆每一位彩民朋友；帮助他们早日打倒黑庄；从新翻身做人。并严格要求自己；接受彩民和港澳六合彩公司监督，遵守以下承诺：</p></h2>
+            <div class="card">
+                <div class="card-body bg-snow p-3">
+                    <p class="card-text text-dark" style="text-indent: 2em">一、【博彩①肖①码】为百分百港澳六合彩公司内幕资料；资料真实可靠；保证期期中奖，【博彩①肖①码】杀庄。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">二、港澳六合彩公司唯一发行内幕资料为【博彩①肖①码】，除此之外，市面上五花八门书籍，U盘；光盘；大师料；书籍资料；均为假冒，请广大彩民认清楚，以免上当受骗。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">三、成为【博彩①肖①码】的客户，港澳六合彩公司有义务做好每一位客户的售后服务，提供全天24小时热线咨询服务，直到帮助客户成为百万富翁，千万富翁为止。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">四、每一个和我们合作的【博彩①肖①码】的客户，我们给到的是签定合同的保障，以法律合同的形式，明确合作双方的权利义务，使我们的客户拿到的是第一手的准确的内幕资料。确保期期中奖，期期赢钱。购买有保障，中奖更轻松。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">五、打击一切卖假资料；假料；假U盘；假书的不法行为；帮助每一位真正有需要的彩民实现脱贫致富，博彩①肖①码资料，港澳六合彩公司指定销售价钱多少，就是多少，销售部门不能以任何理由，中途多收客户一分钱，并开通香港总部24小时投诉电话，如发现以任何理由收取费用的，一将查实将以十倍赔偿给客户。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">六、香港六合彩【博彩①肖①码】，铁的承诺，资料①码中特，准确率能达到百分百，如果购买我们资料的客户，发现有任何一期错误，港澳六合彩公司将赔偿我们的客户10万人民币，请广大彩民放心购买。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">七、为了从根本上消灭大陆黑庄；更好帮助彩民朋友，香港六合彩【博彩①肖①码】每期只招收50名客户；每人只能合作一次；希望；我们广大彩民；在30期内把输的钱赢回以后不要好了伤疤；忘了疼。从新做人远离赌博，赚到钱做实业。</p>
+                    <p class="card-text text-dark" style="text-indent: 2em">对于以上的七款承诺，如果没有100%兑现，要是没有说到做到。本人样家鳞绝子绝孙，出门被车撞死，世世代代为奴。举头有神灵、人在做，天在看。</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /服务承诺 -->
+    
+    <!-- 彩民答疑 -->
+    <section class="py-3">
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0">解答彩民疑问</h1>
+            </div>
+        </div>
+        <div class="container">
+            <h2 class="body-text"> <p class="text-start" style="text-indent: 2em">非常感谢您的耐心浏览，您的决定将影响您一生！如果还有疑问，请参详彩民答疑。</p></h2>
+            <div class="card">
+                <div class="card-body p-3">
+                    <p class="card-text text-light"> <span class="text-warning">彩民疑问1：资料真的有那么准吗？</span>
+                        <br>　　本站从2017年试业开始到至今，四年时间的经营了，谁说说，不准的话能开这么久吗？看哪些假网站三天两头关李就知道为啥了！如今国家出台新的网络监管非常严格，弄虚作假是逃脱不来法律的制裁的！【博彩①肖①码】作为顶尖资料站，已经确实颇有名气，就算不认识但听说过“博彩①肖①码”的朋友亦不在少数。我们不但没有弄虚作假，而且四年来每期都提前三五分钟公布号码，让千万彩民一起亲身见证我们的实力！我们的会员遍布全国及帮助众多彩民快速致富，堪称一个[百万富翁制造工厂]！请您放心入会，大胆合作！现在立即加入会员，马上领取资料！</p>
+                    <p class="card-text text-light"> <span class="text-warning">彩民疑问2：入会后有无中途收费？</span>
+                        <br>　　请各位彩民朋友放心！【博彩①肖①码】30期一码中特资料只需600元。这个定价是公开透明的，而且受到港澳六合彩公司全程监管！是没有任何中途收费的！如有违规，中途收取其他收费则等同诈骗！我样家鳞以总经理的身份向彩民朋友保证。中途绝无任何费用，您办理了600元即可取得资料！如有虚言，本人样家鳞愿承担所有法律责任！而且本站公布有我的个人信息，在深圳要找到我很容易，如果本人所言有一丝丝的欺骗！请按照身份证地址来砍杀我！让我出门就被暴徒乱刀砍死在街头！谁敢说这些话！我就敢！</p>
+                    <p class="card-text text-light"> <span class="text-warning">彩民疑问3：能否试料或中后付款？</span>
+                        <br>　　对不起，请您理解我们公司既然提供给您优质的服务，就需要严格的规章制度和办公流程才能有条不紊的经营。大陆彩民千千万，如果每人都来试料或中后付款，我们有限的人力将无从应付，而且无法保障对老会员的服务质量！我们曾尝试过提供试料，但结果令人大失所望！因为不设门槛就等于给了那些假料网站、幕后黑庄一个取料渠道，害得广大彩民反遭蒙骗和伤害！彩民朋友们，希望你们谅解！毕竟付出才有回报！博彩①肖①码是公正公开透明的，只要你付出这600元，那么您得到的回报将是千百倍的财富！</p>
+                    <p class="card-text text-light"> <span class="text-warning">彩民疑问4：为什么经常验证不到？</span>
+                        <br>　　【博彩①肖①码】每期都在开奖前提前三分钟公开验证！这是万人见证的事实！为什么我们要在在开奖前三分钟才公开？是为避免过早公开时，假料网站取得资料后又去欺骗其他彩民。正是因为我们规定了公开验证的时间，大量彩民和偷料者都在这个时段涌入，造成了网络拥堵！据统计在开奖前最高峰值达数万人在同时刷新，正因为不只您一个人在验证，所以可能会不能及时看到验证资料！这正如一条双车道公路几分钟内同时涌入数百台车，拥堵就是必然的了！但请您放心！只要您多刷新几次多验证几期，是绝对可以验证到的！！</p>
+                    <p class="card-text text-light"> <span class="text-warning">彩民疑问5：同城可以当面交易吗？</span>
+                        <br>　　假资料网站都不敢当面交易，他们怕被彩民活活打死！我样家鳞行的正坐得直，为彩民造福功德无量，当然可以当面交易！但博彩①肖①码确实伤害了太多不法分子的利益,为了确保人身安全，只能够先验证身份证等相关证件，证实是普通彩民才可预约当面交易。无预约直接上门的，一概不接见！我敢公布个人身份地址并每期在网站公开验证,就证明我们是真实的资料，是诚心诚意和彩民合作！区区一千几百块在这个社会算什么呢？如果你不相信我们的资料那么你可以不购买！买卖是公平公正的！打击一切假资料、打倒黑庄是我们的宗旨！</p>
+                    <p class="card-text text-light"> <span class="text-warning">彩民疑问6：为何我们不自己下注？</span>
+                        <br>　　首先我们不是一个纯粹为了营利性的组织。我们公司的组织性质是慈善投资公司，受管于港澳六合彩公司，是配合大陆政府打击六合彩黑庄打击地下赌博的利器！当然，我们也不会嫌钱多！我们自己下注不如集合会员伙伴们的力量为我们所用！从合作成功的会员中挑选需要长期合作的对象，请会员代为下注，看个人能力一至六百不等。输赢由我们负责的，两期一结，会员无需承担风险。以自愿为原则，绝不勉强参与！不过目前为止，大部分彩民还是非常愿意帮忙的，有特殊原因不能帮忙的会员，我们也会表示谅解，请大家放心。</p>
+                </div>
+            </div>
+        </div> <!-- / .container -->
+    </section>
+    <!-- /彩民答疑 -->
+
+    <section class="py-3 aaaaa">
+ <?php 
+/*$acsql ="SELECT * FROM `ackjjl` order by `qishu` desc limit $qslimit";*/
+$acsql ="SELECT * FROM `ackjjl` ORDER BY `qishu` DESC LIMIT 20";  
+$acresult = $conn->query($acsql);
+if($acresult==false){echo '获取数据失败';}
+foreach($acresult as $accol) {
+    //$acqishu=$accol['qishu'];
+    $acqishu= substr($accol['qishu'],4);
+    $acnumber=$accol['number'];
+    $acgknum=explode(",",$accol['gknum']);
+	$tacc = $accol['nextdate'];
+	$y =  date('Y',strtotime($tacc));
+	$m =  date('m',strtotime($tacc));
+	$d =  date('d',strtotime($tacc));
+	$weekarray=array("日","一","二","三","四","五","六");
+	$w =  $weekarray[date("w",strtotime($tacc))];
+	 $a=rand(0,5);
+ 	$b=rand(0,5);
+	$c=rand(0,5);
+	if( empty($accol['randnum'])){
+		if($a != $b && $a != $c && $b!=$c){
+			$numr = $acgknum[$a].",".$acgknum[$b].",".$acgknum[$c];
+			
+			$acc=explode(",",$numr);
+			foreach($acc as $k=>$v){
+				
+				$acc[$k] = $v;
+			}
+			shuffle($acc);
+			
+			$numrans = implode(",",$acc);
+			
+			$sql = "UPDATE `ackjjl` SET `randnum`='".$numrans."' WHERE id=".$accol['id'];
+			$res = $conn->query($sql);
+			
+			$rendns[0] = $acc[0];
+			$rendns[1] = $acc[1];
+			$rendns[2] = $acc[2];
+			
+		}
+	}else{
+		$rendns = explode(",",$accol['randnum']);
+	}
+?>       
+        <div class="bt-out mb-4">
+            <div class="bt-in py-3">
+                <h1 class="fw-bold m-0"><?php echo $y.$acqishu; ?>期资料记录<i class="bi bi-caret-down"></i></h1>
+            </div>
+        </div>
+        
+            <div class="card my-4">
+                <div class="card-body bg-snow p-3">
+                	<div class="ackj-jilu nn<?php echo $acnumber; ?>" >
+                        	
+                            <div class="yz-title text-center">
+                                 <div><?php echo $ys.'年第'.$acqishu; ?>期绝密资料</div>
+                            </div>
+                            <!--<div class="yz-bottom text-center">
+                                <div class="number nn<?php echo $acnumber; ?>" id="st"></div>
+                            </div>-->
+                            <div class="yz-main text-center">
+                                
+                                <div class="row teshu" style="border:0px solid #f00;text-align: center; display: block;">
+                                    
+                                </div>
+                            </div>
+                          
+                        </div>
+                   <!-- <div id="acyz1">
+                        <div class="yz-title text-center">
+                            <div><?php echo $y.'年第'.$acqishu; ?>期绝密资料</div>
+                        </div>
+                        <div class="yz-main text-center">
+                            <div class="number n<?php echo $rendns[0]; ?>"></div>
+                            <div class="number n<?php echo $rendns[1]; ?>"></div>
+                            <div class="number n<?php echo $rendns[2]; ?>"></div>
+                        </div>
+                        <div class="yz-bottom text-center">
+                            <div class="number">
+                                <div class="number n<?php echo $acnumber; ?>"></div>
+                            </div>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+        
+<?php } ?>        
+        
+    </section>
+    
+    <!-- 抵制试料 -->
+     <div class="card">
+            <div class="card-body">
+                <img data-original="./images/shil.jpg" class="img-fluid" width="100%">
+                <p class="text-center bg-warning" style="margin-bottom:0"><span class="text-danger list-title">再给你自己一次机会</span></p>
+                <p class="card-text bg-info" style="text-indent:2em;padding:0.5em;">输穷输怕的彩民，在你们对网上所有的资料都失望透顶的时候，有缘看到本站请给我一个机会，也等于再给你自己一次机会。还有<?php echo $site_name; ?>岂立至今为的是什么？就是因为<?php echo $site_name; ?>的实力准确性得到了广大彩民的认可，才能坚持到今天。无论你之前输了多少，对我们来说都不是问题，只要鼓起你的勇气加入<?php echo $site_name; ?>的会员，保证你期期赚大钱，3到5期回本！绝对不是问题！如果你对未来的路感到迷茫，对是否继续购买六合彩感到不确定，那可以告诉你，加入我的会员之后，这些都不再是你要关心的问题，你只要每天开奖做你该做的事，接受香港工作人员通知的资料，再到黑庄这边下注，接着就是等到21:30分之后去领取属于你赢来的钱，就是这么简单！你中不中奖不是由天来决定，而是由你自己来决定的！</p>
+                <img data-original="./images/jiaru.jpg" class="img-fluid" width="100%">
+                <img data-original="./images/e000.jpg" class="img-fluid" width="100%">
+                                                <div class="text-center bg-light border border-success p-2">
+                   
+                    <img data-original="./images/erweima.jpg" class="img-fluid img-ma">
+                    <h2 class="text-success fw-bolder">扫一扫二维码添加好友</h2>
+              
+                </div>
+                 <a href="./login">
+                    <img data-original="./images/vip.gif" class="img-fluid" width="100%"></a>
+            </div>
+           
+        </div>
+     <div id="hf" class="card ping">
+            <div class="card-header">快捷回复</div>
+            <div class="card-body">
+                <textarea class="form-control" rows="3" placeholder="请输入内容&hellip;"></textarea>
+                <div class="file-input">
+                    <p class="input-container">上传图片
+                        <input type="file" id="upload" accept="image/*" multiple>
+                    </p> <span id="name"></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1"><i class="bi bi-person-fill"></i></span>
+                            <input type="text" class="form-control" placeholder="请输入用户名" aria-label="用户名">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text" id="basic-addon1"><i class="bi bi-key-fill"></i></span>
+                            <input type="text" class="form-control" placeholder="请输密码" aria-label="密码">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <a class="py-1" href="./register">还不是会员？</a>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <button id="fabiao" type="button" class="btn btn-success w-50">发表</button>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="text-muted py-1">已有会员留言 <span id="sum" class="text-danger">0</span> 条</h5>
+            </div>
+        </div>
+        <!-- /快捷回复 -->
+        
+    <!-- 会员评论 -->
+<?php
+$sql1 ="SELECT * FROM `post` order by `time` desc";
+$result1 = $conn->query($sql1);
+if($result1==false){echo '获取数据失败';}
+$conn->close();
+foreach($result1 as $col) {
+    $id=$col['id'];
+    $name=$col['name'];
+    $tx=$col['tx'];
+    $level=$col['level'];
+    $time=date('Y-m-d H:i', $col['time']);
+    $content=$col['content'];
+    $img=$col['img'];
+    $video=$col['video'];
+    $adtime=date('Y-m-d H:i', $col['adtime']);
+    $adcontent=$col['adcontent'];
+?>
+        <div class="card bbs" style="font-size:14px;">
+            <div class="card-body bbs-box">
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            <td class="bg-secondary tdl text-center">
+                                <span class="text-light"><b><?php echo $name; ?></b></span>
+                                <hr class="bbs-hr">
+                                <img data-original="<?php echo $tx; ?>" alt="头像" class="img-thumbnail bbs-tx rounded-circle">
+                                <br> <span class="text-warning" style="font-size:12px;"><?php echo $level; ?></span>
+                            </td>
+                            <td width="83.3%">
+                                <span class="text-muted">&nbsp;发表于<?php echo $time; ?></span>
+                                <hr class="bbs-hr"> <span><?php echo $content; ?></span>
+                                <br>
+                                <img data-original="<?php echo $img; ?>" class="img-fluid" alt="附图" onerror="this.style.display='none'">
+<?php if(!empty($video)){ ?>
+                                <br>
+                                <span class="text-primary">
+                                    <a href="<?php echo $video; ?>" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;……>点击查看视频附件<…… </a>
+                                </span>
+<?php }
+    if(!empty($adcontent)){ ?>
+                                <div class="card adminrp mx-auto">
+                                    <div class="card-header">
+                                        <b>管理员</b>&nbsp;<span class="text-muted" style="font-size:12px;">回复于<?php echo $adtime; ?></span>
+                                    </div>
+                                    <div class="card-body">
+                                        <?php echo $adcontent; ?>
+                                    </div>
+                                </div>
+<?php } ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php } ?>
+    <!-- /会员评论 -->
+    </div>
+    
+    <?php if(is_mobile()){?>
+   
+    <?php }?>
+    
+    <div id="scroll_to_top" class="d-fixed" style="position: fixed; bottom: 80px; right: 10px; width: 70px; height: 70px;">
+    	<a href="javascript:void(0);" class="text-black-50" style="width: 70px; height: 70px; display: inline-block;font-size:70px;line-height:70px;" title="返回顶部"><i class="bi bi-arrow-up-circle"></i></a>
+    </div>
+    
+    
+    
+    <script src="./js/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
+    <script>
+    	
+    	$(".aaaa").click(function () {
+		    $('html,body').animate({
+		        scrollTop:$(".aaaaa").offset().top},{duration:500,easing:'swing'});
+		    return false;
+		})
+		$(".shouye").click(function () {
+		    $('html,body').animate({
+		        scrollTop:$(".shou").offset().top},{duration:500,easing:'swing'});
+		    return false;
+		})
+		$(".pinglun").click(function () {
+		    $('html,body').animate({
+		        scrollTop:$(".ping").offset().top},{duration:500,easing:'swing'});
+		    return false;
+		})
+    $(document).ready(function() {
+        //倒数计时
+        var showtime = function () {
+            var nowtime = new Date(),  //获取当前时间
+                endtime = new Date("<?php echo $nextdate; ?> 21:32");  //定义结束时间
+                endtime = endtime.getTime();
+                nowtime = nowtime.getTime();
+            if(endtime<nowtime){endtime=endtime+(1000*60*60*24)}
+            var lefttime = endtime - nowtime,  //距离结束时间的毫秒数
+                leftd = Math.floor(lefttime/(1000*60*60*24)),  //计算天数
+                lefth = Math.floor(lefttime/(1000*60*60)%24),  //计算小时数
+                leftm = Math.floor(lefttime/(1000*60)%60),  //计算分钟数
+                lefts = Math.floor(lefttime/1000%60);  //计算秒数
+            return leftd + "天" + lefth + "小时" + leftm + "分" + lefts + "秒";  //返回倒计时的字符串
+        }
+       /* var sts = document.getElementById("showtime");
+        setInterval (function () {
+            sts.innerHTML = showtime();
+        }, 1000);  //反复执行函数本身*/
+        
+        var acshowtime = function () {
+            var nowtime = new Date(),  //获取当前时间
+                endtime = new Date("<?php echo date('Y/m/d'); ?> 21:30");  //定义结束时间
+                endtime = endtime.getTime();
+                nowtime = nowtime.getTime();
+            if(endtime<nowtime){endtime=endtime+(1000*60*60*24)}
+            var lefttime = endtime - nowtime,  //距离结束时间的毫秒数
+                lefth = Math.floor(lefttime/(1000*60*60)%24),  //计算小时数
+                leftm = Math.floor(lefttime/(1000*60)%60),  //计算分钟数
+                lefts = Math.floor(lefttime/1000%60);  //计算秒数
+            return lefth + "小时" + leftm + "分" + lefts + "秒";  //返回倒计时的字符串
+        }
+        var acst = document.getElementById("acshowtime");
+        setInterval (function () {
+            acst.innerHTML = acshowtime();
+        }, 1000);  //反复执行函数本身
+    });
+    </script>
+    <section style="height:40px;border-bottom-left-radius:50%;border-bottom-right-radius:50%;">
+    </section> 
+    <footer class="bg-white pt-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10">
+                    <h3><span class="badge bg-warning">免责提示</span></h3>
+                    <p class="text-secondary">未满十八岁人士、无民事行为能力人，请勿浏览本站内容，本站拒绝提供任何服务。</p>
+                    <p class="text-secondary">请勿沉迷赌博，如需寻求真实资料，可致电热线：<?php echo $phone_number;?> 。</p>
+                </div>
+                <div class="col-md-2 d-none d-md-block">
+                    <img id="jiezhi" src="./images/jiezhi.gif" alt="有节制博彩">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8">
+                    <p class="text-primary">
+                    澳门六合彩公司: 本站资料来自于澳门彩票中心特供资料，真实、快速、准确率高达100%以上!
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <p>版权所有 不得转载 © 博彩①肖①码</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+</body></html>
