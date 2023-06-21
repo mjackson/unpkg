@@ -8,6 +8,18 @@ describe('A request to browse a file', () => {
     server = createServer();
   });
 
+  describe('when the URL does not contains filename', () => {
+    it('redirects to browseDirectory', done => {
+      request(server)
+        .get('/browse/react@16.8.0')
+        .end((err, res) => {
+          expect(res.statusCode).toBe(302);
+          expect(res.headers['location']).toBe('/browse/react@16.8.0/');
+          done();
+        });
+    });
+  });
+
   describe('when the file exists', () => {
     it('returns an HTML page', done => {
       request(server)
