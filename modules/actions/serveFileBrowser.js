@@ -54,6 +54,11 @@ async function findEntry(stream, filename) {
 
 async function serveFileBrowser(req, res) {
   const stream = await getPackage(req.packageName, req.packageVersion, req.log);
+
+  if (!req.filename) {
+    return res.redirect(req.originalUrl + '/')
+  }
+
   const entry = await findEntry(stream, req.filename);
 
   if (!entry) {
